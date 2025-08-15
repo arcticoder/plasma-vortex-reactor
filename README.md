@@ -22,4 +22,17 @@ Open the multi-repo workspace: plasma-vortex-reactor.code-workspace
   ```
 - UQ results can be produced via `reactor.uq.run_uq_sampling` and saved to `uq_results.json`.
 
+- Param sweep CSV:
+  ```
+  python scripts/param_sweep_confinement.py --out confinement_sweep.csv
+  ```
+- Metrics gate check against metrics.json:
+  ```
+  python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
+  ```
+- UQ demo:
+  ```
+  python scripts/uq_demo.py --samples 20 --seed 123
+  ```
+
 See `docs/ARTIFACT_SCHEMA.md` for artifact structures.

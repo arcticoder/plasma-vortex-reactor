@@ -3,6 +3,10 @@ from __future__ import annotations
 import argparse
 import csv
 from reactor.metrics import confinement_efficiency_estimator
+try:
+    from reactor.plotting import quick_scatter  # type: ignore
+except Exception:
+    quick_scatter = None  # type: ignore
 
 
 def main():
@@ -14,6 +18,7 @@ def main():
     ap.add_argument("--ripple-max", type=float, default=0.02)
     ap.add_argument("--ripple-steps", type=int, default=10)
     ap.add_argument("--out", default="confinement_sweep.csv")
+    ap.add_argument("--plot", default=None, help="Optional PNG output; requires matplotlib")
     args = ap.parse_args()
 
     xi_vals = [args.xi_min + i*(args.xi_max-args.xi_min)/max(args.xi_steps-1,1) for i in range(args.xi_steps)]
@@ -26,6 +31,19 @@ def main():
             for rp in ripple_vals:
                 eff = confinement_efficiency_estimator(xi, rp)
                 w.writerow([xi, rp, eff])
+    if args.plot and quick_scatter is not None:
+        # flatten to a simple scatter over xi dimension by averaging over ripple
+        import numpy as np
+        rows = []
+        for xi in xi_vals:
+            effs = [confinement_efficiency_estimator(xi, rp) for rp in ripple_vals]
+            rows.append((xi, float(np.mean(effs))))
+        xs = [r[0] for r in rows]
+        ys = [r[1] for r in rows]
+        try:
+            quick_scatter(xs, ys, args.plot, xlabel="xi", ylabel="mean efficiency", title="Mean efficiency vs xi")
+        except Exception as e:  # pragma: no cover
+            print(f"Plot failed: {e}")
 
 
 if __name__ == "__main__":

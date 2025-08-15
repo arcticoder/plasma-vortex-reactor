@@ -5,6 +5,11 @@ from .config import load_json
 from .core import Reactor
 from .metrics import save_feasibility_gates_report, confinement_efficiency_estimator
 from .analysis import b_field_rms_fluctuation, estimate_density_from_em, stability_variance
+from .logging_utils import append_event
+try:
+    from . import plotting as plotting_helpers  # type: ignore
+except Exception:  # pragma: no cover
+    plotting_helpers = None  # type: ignore
 
 
 def cmd_demo(args: argparse.Namespace) -> None:
@@ -15,9 +20,12 @@ def cmd_demo(args: argparse.Namespace) -> None:
     grid = tuple(cfg.get("grid", [32, 32]))
     nu = float(cfg.get("nu", 1e-3))
     R = Reactor(grid=grid, nu=nu, timeline_log_path=timeline_path, xi=xi, b_field_ripple_pct=br)
+    # log run seed for reproducibility, if timeline is enabled
+    if timeline_path:
+        append_event(timeline_path, event="run_started", status="ok", details={"seed": int(args.seed)})
     for _ in range(int(args.steps)):
         R.step(dt=float(args.dt))
-    print(json.dumps({"done": True, "timeline": timeline_path or None}))
+    print(json.dumps({"done": True, "timeline": timeline_path or None, "seed": int(args.seed)}))
 
 
 def cmd_param_sweep(args: argparse.Namespace) -> None:
@@ -28,6 +36,24 @@ def cmd_param_sweep(args: argparse.Namespace) -> None:
         for rp in ripple_vals:
             eff = confinement_efficiency_estimator(xi, rp)
             rows.append({"xi": xi, "b_field_ripple_pct": rp, "efficiency": eff})
+    # Save CSV if requested
+    if args.out:
+        import csv
+        with open(args.out, "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=["xi", "b_field_ripple_pct", "efficiency"])
+            w.writeheader()
+            for r in rows:
+                w.writerow(r)
+    # Optional quick plot
+    if args.plot and plotting_helpers is not None:
+        try:
+            xs = [r["xi"] for r in rows]
+            ys = [r["efficiency"] for r in rows]
+            plotting_helpers.quick_scatter(xs, ys, args.plot, xlabel="xi", ylabel="efficiency", title="Confinement efficiency sweep")
+        except Exception as e:
+            # keep CLI robust if plotting unavailable
+            print(json.dumps({"warning": f"plotting failed: {e}"}))
+    # Always print JSON summary for programmatic consumption
     print(json.dumps({"rows": rows}))
 
 
@@ -35,6 +61,7 @@ def cmd_feasibility(args: argparse.Namespace) -> None:
     # Thin wrapper around generate_feasibility_report behavior: expect precomputed arrays via JSON strings
     import numpy as np
     from .thresholds import Thresholds
+    import sys
     thr = Thresholds()
     def _load_series(s):
         return np.array(json.loads(s), dtype=float) if s else None
@@ -81,6 +108,8 @@ def cmd_feasibility(args: argparse.Namespace) -> None:
         "density_stats": dens_stats,
     }
     print(json.dumps(payload))
+    if args.fail_on_gate and not payload.get("stable", False):
+        sys.exit(2)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -92,6 +121,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_demo.add_argument("--timeline-log", default=None)
     p_demo.add_argument("--steps", type=int, default=10)
     p_demo.add_argument("--dt", type=float, default=1e-3)
+    p_demo.add_argument("--seed", type=int, default=123)
     p_demo.set_defaults(func=cmd_demo)
     # param sweep
     p_sweep = sp.add_parser("param-sweep")
@@ -101,6 +131,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_sweep.add_argument("--ripple-min", type=float, default=0.0)
     p_sweep.add_argument("--ripple-max", type=float, default=0.02)
     p_sweep.add_argument("--ripple-steps", type=int, default=10)
+    p_sweep.add_argument("--out", default=None, help="Optional CSV output path")
+    p_sweep.add_argument("--plot", default=None, help="Optional PNG path; requires matplotlib")
     p_sweep.set_defaults(func=cmd_param_sweep)
     # feasibility
     p_feas = sp.add_parser("feasibility")
@@ -112,6 +144,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_feas.add_argument("--gamma-duration", type=float, default=0.01)
     p_feas.add_argument("--density-threshold", type=float, default=1e20)
     p_feas.add_argument("--b-ripple-max", type=float, default=0.01)
+    p_feas.add_argument("--fail-on-gate", action="store_true", help="Exit non-zero if any feasibility gate fails")
     p_feas.set_defaults(func=cmd_feasibility)
     return ap
 

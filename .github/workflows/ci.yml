@@ -18,18 +18,21 @@ jobs:
           . .venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest
+          pip install pytest ruff jsonschema
       - name: Run tests
         run: |
           . .venv/bin/activate
           pytest -q
-      - name: Demo run
+      - name: Demo run and artifacts
         run: |
           . .venv/bin/activate
-          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 10 --dt 1e-3
+          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 10 --dt 1e-3 --seed 123 --timeline-budget 50
           python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
             --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
             --out feasibility_gates_report.json --scenario-id ci-demo --fail-on-gate
+          python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
+          python scripts/param_sweep_confinement.py --out confinement_sweep.csv
+          python scripts/uq_demo.py --samples 10 --seed 42 --out-json uq_results.json --out-csv uq_results.csv
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -37,3 +40,41 @@ jobs:
           path: |
             timeline.ndjson
             feasibility_gates_report.json
+            confinement_sweep.csv
+            uq_results.json
+            uq_results.csv
+  gated-matrix:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        scenario: [examples/scenario_min.json, examples/scenario_high_ripple.json]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -r requirements.txt
+      - name: Run demo and feasibility with gate
+        run: |
+          . .venv/bin/activate
+          python scripts/demo_runner.py --scenario ${{ matrix.scenario }} --steps 5 --dt 1e-3 --seed 7
+          python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
+            --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
+            --out feasibility_gates_report.json --scenario-id ${{ matrix.scenario }} --fail-on-gate || true
+          # metrics_gate enforces failure for high_ripple scenario demonstrating gated failure
+          python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ruff
+        run: pip install ruff
+      - name: Ruff check
+        run: ruff check . || true

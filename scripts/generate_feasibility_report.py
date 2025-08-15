@@ -23,6 +23,8 @@ def main():
     ap.add_argument("--b-ripple-max", type=float, default=Thresholds.b_ripple_max_pct)
     ap.add_argument("--scenario-id", default=None, help="Identifier for the scenario/config used")
     ap.add_argument("--fail-on-gate", action="store_true", help="Exit non-zero if any feasibility gate fails")
+    ap.add_argument("--dry-run", action="store_true", help="Do not write file; just print summary")
+    ap.add_argument("--validate", action="store_true", help="Validate JSON with jsonschema if available")
     args = ap.parse_args()
 
     thr = Thresholds()
@@ -79,7 +81,25 @@ def main():
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "scenario_id": args.scenario_id,
     }
-    save_feasibility_gates_report(args.out, payload)
+    # Optional schema validation
+    if args.validate:
+        try:
+            import jsonschema  # type: ignore
+            schema = {
+                "type": "object",
+                "properties": {
+                    "stable": {"type": "boolean"},
+                    "gamma_ok": {"type": "boolean"},
+                    "b_ok": {"type": "boolean"},
+                    "dens_ok": {"type": "boolean"}
+                },
+                "required": ["stable", "gamma_ok", "b_ok", "dens_ok"]
+            }
+            jsonschema.validate(instance=payload, schema=schema)
+        except Exception as e:
+            print(json.dumps({"warning": f"validation failed or jsonschema missing: {e}"}))
+    if not args.dry_run:
+        save_feasibility_gates_report(args.out, payload)
     print(json.dumps(payload, indent=2))
     if args.fail_on_gate and not payload["stable"]:
         sys.exit(2)

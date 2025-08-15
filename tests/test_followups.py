@@ -5,7 +5,7 @@ from reactor.energy import EnergyLedger, energy_interval, merge_ledgers
 from reactor.analysis import simulate_b_field_ripple, b_field_rms_fluctuation, stability_variance
 from reactor.core import Reactor
 from reactor.analysis import estimate_density_from_em
-from reactor.thresholds import Thresholds
+from reactor.thresholds import Thresholds, thresholds_from_json
 
 
 def test_yield_proxy_reaches_phase1_threshold_note():
@@ -73,3 +73,16 @@ def test_density_attainment_and_artifact(tmp_path):
     art = tmp_path / "density_profile.txt"
     art.write_text("\n".join(str(float(v)) for v in ne))
     assert art.exists() and art.stat().st_size > 0
+
+
+def test_windowed_gamma_and_thresholds_from_json(tmp_path):
+    import json as _json
+    from reactor.analysis import windowed_gamma
+    series = np.array([100, 150, 160, 130, 200], dtype=float)
+    stats = windowed_gamma(series, window_size=3)
+    assert stats["min"].shape[0] == 3 and stats["max"].shape[0] == 3 and stats["mean"].shape[0] == 3
+    # thresholds_from_json
+    m = tmp_path / "metrics.json"
+    _json.dump({"gamma_min": 150.0, "b_field_min_T": 4.5}, open(m, "w"))
+    thr = thresholds_from_json(str(m))
+    assert thr.gamma_min == 150.0 and thr.b_field_min_T == 4.5

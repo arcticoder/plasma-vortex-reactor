@@ -33,14 +33,20 @@ def main():
     t0 = time.perf_counter()
     # naive budget enforcement: just stop logging after N events by nulling the path
     events_logged = 0
-    for _ in range(int(args.steps)):
+    for i in range(int(args.steps)):
+        st = time.perf_counter()
         R.step(dt=float(args.dt))
+        et = time.perf_counter()
+        # include timing in timeline events by emitting a generic step event
+        if timeline_path and events_logged < args.timeline_budget:
+            from reactor.logging_utils import append_event
+            append_event(str(timeline_path), event="step", status="ok", details={"i": i, "dt": float(args.dt), "elapsed_s": et - st, "seed": int(args.seed)})
         if timeline_path and events_logged >= args.timeline_budget:
             R.timeline_log_path = None
         else:
             events_logged += 1
     t1 = time.perf_counter()
-    print(json.dumps({"done": True, "timeline": timeline_path or None, "elapsed_s": t1 - t0}))
+    print(json.dumps({"done": True, "timeline": timeline_path or None, "elapsed_s": t1 - t0, "seed": int(args.seed)}))
 
 
 if __name__ == "__main__":

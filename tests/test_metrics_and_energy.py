@@ -44,6 +44,11 @@ def test_energy_ledger_and_fom(tmp_path):
     assert 0 < epa < 1000.0
     f = fom(0.5, 100.0, 1000.0)
     assert np.isclose(f, 0.05)
+    # channels
+    el.add_channel_energy("coils", power_w=200.0, dt_s=2.0)
+    el.add_channel_energy("heaters", power_w=100.0, dt_s=1.0)
+    ch = el.channels()
+    assert ch.get("coils", 0) > ch.get("heaters", 0)
 
 
 def test_plasma_debye_length():
