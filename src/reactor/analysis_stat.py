@@ -21,3 +21,18 @@ def windowed_gamma(series: Iterable[float], window_size: int) -> Dict[str, np.nd
     mins = np.array([np.min(arr[i:i+w]) for i in range(arr.size - w + 1)], dtype=float)
     maxs = np.array([np.max(arr[i:i+w]) for i in range(arr.size - w + 1)], dtype=float)
     return {"min": mins, "max": maxs, "mean": means}
+
+
+def ema(series: Iterable[float], alpha: float) -> np.ndarray:
+    """Exponential moving average with smoothing factor alpha in (0,1]."""
+    arr = np.asarray(list(series), dtype=float)
+    if arr.size == 0:
+        return arr
+    a = float(alpha)
+    if not (0 < a <= 1):
+        raise ValueError("alpha must be in (0,1]")
+    out = np.empty_like(arr)
+    out[0] = arr[0]
+    for i in range(1, arr.size):
+        out[i] = a*arr[i] + (1-a)*out[i-1]
+    return out

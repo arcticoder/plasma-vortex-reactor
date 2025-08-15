@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Metrics Thresholds",
+  "type": "object",
+  "properties": {
+    "gamma_min": {"type": "number"},
+    "gamma_duration_s": {"type": "number"},
+    "density_min_cm3": {"type": "number"},
+    "confinement_min": {"type": "number"},
+    "b_field_min_T": {"type": "number"},
+    "b_ripple_max_pct": {"type": "number"},
+    "energy_per_pbar_max_J": {"type": "number"},
+    "total_energy_reduction_min": {"type": "number"},
+    "fom_min": {"type": "number"}
+  },
+  "additionalProperties": false
+}

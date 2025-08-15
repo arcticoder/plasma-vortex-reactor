@@ -77,4 +77,16 @@ jobs:
       - name: Install ruff
         run: pip install ruff
       - name: Ruff check
-        run: ruff check . || true
+        run: ruff check .
+  types:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install mypy and deps
+        run: |
+          pip install mypy
+      - name: Run mypy
+        run: mypy src/reactor

@@ -25,6 +25,7 @@ def main():
     ap.add_argument("--fail-on-gate", action="store_true", help="Exit non-zero if any feasibility gate fails")
     ap.add_argument("--dry-run", action="store_true", help="Do not write file; just print summary")
     ap.add_argument("--validate", action="store_true", help="Validate JSON with jsonschema if available")
+    ap.add_argument("--schema", default="schemas/feasibility.schema.json", help="Path to feasibility JSON schema")
     args = ap.parse_args()
 
     thr = Thresholds()
@@ -85,16 +86,8 @@ def main():
     if args.validate:
         try:
             import jsonschema  # type: ignore
-            schema = {
-                "type": "object",
-                "properties": {
-                    "stable": {"type": "boolean"},
-                    "gamma_ok": {"type": "boolean"},
-                    "b_ok": {"type": "boolean"},
-                    "dens_ok": {"type": "boolean"}
-                },
-                "required": ["stable", "gamma_ok", "b_ok", "dens_ok"]
-            }
+            with open(args.schema, "r", encoding="utf-8") as f:
+                schema = json.load(f)
             jsonschema.validate(instance=payload, schema=schema)
         except Exception as e:
             print(json.dumps({"warning": f"validation failed or jsonschema missing: {e}"}))

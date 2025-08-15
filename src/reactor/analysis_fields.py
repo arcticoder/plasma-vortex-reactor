@@ -3,7 +3,7 @@ import numpy as np
 
 
 def simulate_b_field_ripple(n: int, base_T: float = 5.0, ripple_pct: float = 0.005, seed: int = 0) -> np.ndarray:
-    rng = np.random.default_rng(seed)
+    rng = np.random.default_rng(int(seed))
     noise = rng.normal(0.0, ripple_pct, size=int(n))
     series = base_T * (1.0 + noise)
     return series

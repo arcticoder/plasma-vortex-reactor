@@ -86,3 +86,11 @@ def test_windowed_gamma_and_thresholds_from_json(tmp_path):
     _json.dump({"gamma_min": 150.0, "b_field_min_T": 4.5}, open(m, "w"))
     thr = thresholds_from_json(str(m))
     assert thr.gamma_min == 150.0 and thr.b_field_min_T == 4.5
+
+
+def test_ema_smoothing_behavior():
+    from reactor.analysis_stat import ema
+    x = np.array([0.0, 10.0, 0.0, 10.0, 0.0])
+    y_fast = ema(x, alpha=0.8)
+    y_slow = ema(x, alpha=0.2)
+    assert y_fast.var() > y_slow.var()

@@ -60,9 +60,14 @@ def cmd_param_sweep(args: argparse.Namespace) -> None:
 def cmd_feasibility(args: argparse.Namespace) -> None:
     # Thin wrapper around generate_feasibility_report behavior: expect precomputed arrays via JSON strings
     import numpy as np
-    from .thresholds import Thresholds
+    from .thresholds import Thresholds, thresholds_from_json
     import sys
     thr = Thresholds()
+    # If user did not override thresholds, try to load from metrics.json present in repo
+    try:
+        thr = thresholds_from_json("metrics.json")
+    except Exception:
+        pass
     def _load_series(s):
         return np.array(json.loads(s), dtype=float) if s else None
     gamma_series = _load_series(args.gamma_series)
@@ -107,6 +112,8 @@ def cmd_feasibility(args: argparse.Namespace) -> None:
         "b_stats": b_stats,
         "density_stats": dens_stats,
     }
+    if args.fail_on_gate and not payload.get("stable", False):
+        payload["exit_reason"] = "feasibility_gate_failed"
     print(json.dumps(payload))
     if args.fail_on_gate and not payload.get("stable", False):
         sys.exit(2)
@@ -146,6 +153,18 @@ def build_parser() -> argparse.ArgumentParser:
     p_feas.add_argument("--b-ripple-max", type=float, default=0.01)
     p_feas.add_argument("--fail-on-gate", action="store_true", help="Exit non-zero if any feasibility gate fails")
     p_feas.set_defaults(func=cmd_feasibility)
+    # econ report
+    from .analysis_econ import write_economic_report
+    p_econ = sp.add_parser("econ")
+    p_econ.add_argument("--out", default="economic_report.json")
+    p_econ.add_argument("--energy-J", type=float, default=1000.0)
+    p_econ.add_argument("--n-pbar", type=float, default=1e6)
+    p_econ.add_argument("--price", type=float, default=1e-3)
+    p_econ.add_argument("--overhead", type=float, default=100.0)
+    def _cmd_econ(a: argparse.Namespace) -> None:
+        payload = write_economic_report(a.out, a.energy_J, a.n_pbar, a.price, a.overhead)
+        print(json.dumps(payload))
+    p_econ.set_defaults(func=_cmd_econ)
     return ap
 
 

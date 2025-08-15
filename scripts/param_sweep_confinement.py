@@ -19,6 +19,7 @@ def main():
     ap.add_argument("--ripple-steps", type=int, default=10)
     ap.add_argument("--out", default="confinement_sweep.csv")
     ap.add_argument("--plot", default=None, help="Optional PNG output; requires matplotlib")
+    ap.add_argument("--heatmap", default=None, help="Optional PNG heatmap path; requires matplotlib")
     args = ap.parse_args()
 
     xi_vals = [args.xi_min + i*(args.xi_max-args.xi_min)/max(args.xi_steps-1,1) for i in range(args.xi_steps)]
@@ -44,6 +45,25 @@ def main():
             quick_scatter(xs, ys, args.plot, xlabel="xi", ylabel="mean efficiency", title="Mean efficiency vs xi")
         except Exception as e:  # pragma: no cover
             print(f"Plot failed: {e}")
+    if args.heatmap and quick_scatter is not None:
+        try:
+            import numpy as np
+            from reactor.plotting import _mpl
+            plt = _mpl()
+            Z = np.zeros((len(xi_vals), len(ripple_vals)))
+            for i, xi in enumerate(xi_vals):
+                for j, rp in enumerate(ripple_vals):
+                    Z[i, j] = confinement_efficiency_estimator(xi, rp)
+            fig, ax = plt.subplots(figsize=(5, 4))
+            im = ax.imshow(Z, origin='lower', aspect='auto', extent=[min(ripple_vals), max(ripple_vals), min(xi_vals), max(xi_vals)])
+            ax.set_xlabel('b_field_ripple_pct')
+            ax.set_ylabel('xi')
+            fig.colorbar(im, ax=ax, label='efficiency')
+            fig.tight_layout()
+            fig.savefig(args.heatmap, dpi=150)
+            plt.close(fig)
+        except Exception as e:  # pragma: no cover
+            print(f"Heatmap plot failed: {e}")
 
 
 if __name__ == "__main__":

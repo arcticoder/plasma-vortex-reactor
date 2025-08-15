@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Feasibility Gates Report",
+  "type": "object",
+  "properties": {
+    "stable": {"type": "boolean"},
+    "gamma_ok": {"type": "boolean"},
+    "b_ok": {"type": "boolean"},
+    "dens_ok": {"type": "boolean"},
+    "gamma_stats": {
+      "type": "object",
+      "properties": {
+        "gamma_min": {"type": "number"},
+        "gamma_max": {"type": "number"},
+        "gamma_mean": {"type": "number"},
+        "gamma_variance": {"type": "number"},
+        "dt": {"type": "number"}
+      },
+      "additionalProperties": true
+    },
+    "b_stats": {"type": "object"},
+    "density_stats": {"type": "object"},
+    "timestamp": {"type": "string"},
+    "scenario_id": {"type": ["string", "null"]},
+    "exit_reason": {"type": ["string", "null"]}
+  },
+  "required": ["stable", "gamma_ok", "b_ok", "dens_ok"]
+}

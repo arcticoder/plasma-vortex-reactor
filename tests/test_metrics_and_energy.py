@@ -8,7 +8,7 @@ from reactor.metrics import (
     antiproton_yield_estimator,
     save_feasibility_gates_report,
 )
-from reactor.energy import EnergyLedger, fom
+from reactor.energy import EnergyLedger, fom, merge_ledgers
 from reactor.plasma import debye_length
 from reactor.logging_utils import append_event
 from reactor.uq import run_uq_sampling
@@ -49,6 +49,27 @@ def test_energy_ledger_and_fom(tmp_path):
     el.add_channel_energy("heaters", power_w=100.0, dt_s=1.0)
     ch = el.channels()
     assert ch.get("coils", 0) > ch.get("heaters", 0)
+    # merge channels
+    el2 = EnergyLedger()
+    el2.add_channel_energy("coils", power_w=50.0, dt_s=2.0)
+    M = merge_ledgers(el, el2)
+    assert M.channels()["coils"] >= ch["coils"]
+
+
+def test_metrics_gate_script(tmp_path):
+    import json, subprocess, sys
+    metrics = {"gamma_min": 140.0}
+    report_pass = {"stable": True, "gamma_ok": True, "b_ok": True, "dens_ok": True, "gamma_stats": {"gamma_max": 200}}
+    report_fail = {"stable": False, "gamma_ok": False, "b_ok": True, "dens_ok": True, "gamma_stats": {"gamma_max": 100}}
+    mp = tmp_path / "metrics.json"
+    rp = tmp_path / "feas.json"
+    mp.write_text(json.dumps(metrics))
+    rp.write_text(json.dumps(report_pass))
+    code = subprocess.call([sys.executable, "scripts/metrics_gate.py", "--metrics", str(mp), "--report", str(rp)])
+    assert code == 0
+    rp.write_text(json.dumps(report_fail))
+    code2 = subprocess.call([sys.executable, "scripts/metrics_gate.py", "--metrics", str(mp), "--report", str(rp)])
+    assert code2 != 0
 
 
 def test_plasma_debye_length():
