@@ -255,6 +255,32 @@ def build_parser() -> argparse.ArgumentParser:
         payload = write_economic_report(a.out, energy, a.n_pbar, a.price, a.overhead)
         print(json.dumps(payload))
     p_econ.set_defaults(func=_cmd_econ)
+    # run-report (merge artifacts)
+    def _cmd_run_report(a: argparse.Namespace) -> None:
+        data = {}
+        try:
+            with open(a.feasibility, "r", encoding="utf-8") as f:
+                data["feasibility"] = json.load(f)
+        except Exception:
+            data["feasibility"] = {"error": f"missing: {a.feasibility}"}
+        try:
+            with open(a.timeline_summary, "r", encoding="utf-8") as f:
+                data["timeline_summary"] = json.load(f)
+        except Exception:
+            data["timeline_summary"] = {"error": f"missing: {a.timeline_summary}"}
+        try:
+            data["gate_summary_md"] = open(a.gate_md, "r", encoding="utf-8").read()
+        except Exception:
+            data["gate_summary_md"] = f"missing: {a.gate_md}"
+        with open(a.out, "w", encoding="utf-8") as f:
+            json.dump(data, f, indent=2)
+        print(json.dumps({"wrote": a.out}))
+    p_rr = sp.add_parser("run-report")
+    p_rr.add_argument("--feasibility", default="feasibility_gates_report.json")
+    p_rr.add_argument("--gate-md", default="gate_summary.md")
+    p_rr.add_argument("--timeline-summary", default="timeline_summary.json")
+    p_rr.add_argument("--out", default="run_report.json")
+    p_rr.set_defaults(func=_cmd_run_report)
     return ap
 
 

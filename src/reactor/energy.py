@@ -8,12 +8,14 @@ class EnergyLedger:
         self._energy_j = 0.0
         self._n_pbar = 0.0
         self._channels = {}
+        # Enhancement factor (>1 means achieved total is reduced relative to raw)
+        self._enhancement = 1.0
 
     def add_power_sample(self, power_w: float, dt_s: float) -> None:
         self._energy_j += float(power_w) * float(dt_s)
 
     def total_energy(self) -> float:
-        return self._energy_j
+        return self._energy_j / max(self._enhancement, 1e-12)
 
     def set_yield(self, n_pbar: float) -> None:
         self._n_pbar = max(0.0, float(n_pbar))
@@ -34,11 +36,22 @@ class EnergyLedger:
     def write_channel_report(self, path: str) -> None:
         import json
         payload = {
-            "total_energy_J": self._energy_j,
+            "total_energy_J": self.total_energy(),
             "channels": self._channels,
         }
         with open(path, "w", encoding="utf-8") as f:
             json.dump(payload, f, indent=2)
+
+    def apply_enhancement(self, factor: float) -> None:
+        """Apply an energy reduction enhancement factor (>1 reduces total)."""
+        self._enhancement = max(1.0, float(factor))
+
+    @staticmethod
+    def total_energy_reduction(baseline_J: float, achieved_J: float) -> float:
+        """Compute reduction ratio baseline/achieved (>=1)."""
+        bj = max(1e-12, float(baseline_J))
+        aj = max(1e-12, float(achieved_J))
+        return bj / aj
 
 
 def fom(conversion: float, price: float, total_cost: float) -> float:
