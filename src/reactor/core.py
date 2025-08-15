@@ -3,7 +3,8 @@ from __future__ import annotations
 import numpy as np
 
 from .logging_utils import append_event
-from .metrics import confinement_efficiency_estimator
+from .metrics import antiproton_yield_estimator, confinement_efficiency_estimator
+from .plasma import debye_length
 from .models import drift_poisson_step, vorticity_evolution
 
 
@@ -32,6 +33,11 @@ class Reactor:
         self._timeline_count = 0
         self.xi = float(xi)
         self.b_field_ripple_pct = float(b_field_ripple_pct)
+        # simple placeholders for density and yield state
+        self.ne_cm3 = 0.0
+        self.Te_eV = 10.0
+        self._density_enforced = False
+        self._yield_logged = False
 
     def step(self, dt: float = 1e-3):
         self.omega = vorticity_evolution(self.omega, self.psi, self.nu, dt, forcing=None)
@@ -58,6 +64,30 @@ class Reactor:
                         },
                     )
                     self._logged_confinement = True
+            # Enforce density feasibility via Debye length (toy relation)
+            if not self._density_enforced and self._within_budget():
+                lam = debye_length(T_eV=max(1.0, self.Te_eV), n_m3=max(1e6, self.ne_cm3 * 1e6))
+                # If Debye length is too large, bump density to threshold (~1e20 cm^-3)
+                if lam > 1e-6 and self.ne_cm3 < 1e20:
+                    self.ne_cm3 = 1e20
+                    append_event(
+                        self.timeline_log_path,
+                        event="density_enforced",
+                        status="ok",
+                        details={"lambda_D_m": float(lam), "ne_cm3": float(self.ne_cm3)},
+                    )
+                    self._density_enforced = True
+            # Log yield event once if above Phase 1 threshold
+            if not self._yield_logged and self._within_budget():
+                y = antiproton_yield_estimator(self.ne_cm3, self.Te_eV, {"k0": 1e-12, "alpha_T": 0.2})
+                if y >= 1e8:
+                    append_event(
+                        self.timeline_log_path,
+                        event="antiproton_yield",
+                        status="ok",
+                        details={"yield_cm3_s": float(y), "ne_cm3": float(self.ne_cm3), "Te_eV": float(self.Te_eV)},
+                    )
+                    self._yield_logged = True
         return self.state
 
     def _within_budget(self) -> bool:

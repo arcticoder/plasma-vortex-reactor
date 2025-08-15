@@ -13,7 +13,7 @@ from reactor.analysis import (
     estimate_density_from_em,
     stability_variance,
 )
-from reactor.metrics import save_feasibility_gates_report
+from reactor.metrics import antiproton_yield_estimator, save_feasibility_gates_report
 from reactor.thresholds import Thresholds
 
 
@@ -56,6 +56,19 @@ def main():
         action="store_true",
         help="Validate JSON with jsonschema if available",
     )
+    ap.add_argument(
+        "--yield-threshold",
+        type=float,
+        default=1e8,
+        help="Antiproton yield threshold [1/(cm^3 s)] to pass",
+    )
+    ap.add_argument(
+        "--yield-model",
+        default=None,
+        help='Yield model selector (e.g., "threshold"); when provided, computes antiproton_yield_pass',
+    )
+    ap.add_argument("--n-cm3", type=float, default=None)
+    ap.add_argument("--Te-eV", type=float, default=None)
     ap.add_argument(
         "--schema",
         default="docs/schemas/feasibility.schema.json",
@@ -106,6 +119,13 @@ def main():
         dens_stats = {"ne_max_cm3": float(np.max(ne))}
         dens_ok = float(np.max(ne)) >= args.density_threshold
 
+    # Optional yield estimation
+    antiproton_yield_pass = None
+    y_val = None
+    if args.yield_model and (args.n_cm3 is not None) and (args.Te_eV is not None or args.Te_eV is not None):
+        y_val = antiproton_yield_estimator(float(args.n_cm3), float(args.Te_eV or 0.0), {"model": args.yield_model})
+        antiproton_yield_pass = bool(y_val >= float(args.yield_threshold))
+
     payload = {
         "stable": gamma_ok and b_ok and dens_ok,
         "gamma_ok": gamma_ok,
@@ -114,6 +134,8 @@ def main():
         "gamma_stats": gamma_stats,
         "b_stats": b_stats,
         "density_stats": dens_stats,
+        "antiproton_yield_pass": antiproton_yield_pass,
+        "antiproton_yield_value": y_val,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "scenario_id": args.scenario_id,
     }

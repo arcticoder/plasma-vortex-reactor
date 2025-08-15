@@ -72,17 +72,32 @@ def antiproton_yield_estimator(
     Te_eV: float,
     params: Optional[Dict[str, float]] = None,
 ) -> float:
-    """Simple placeholder: yield rate density [1/(cm^3 s)] ~ k0 * n * Te^alpha.
+    """Yield rate density [1/(cm^3 s)] estimator.
+
+    Default model (legacy): k0 * n * Te^alpha.
+    Threshold model (set params["model"]="threshold"): k0 * n * max(Te - E_th, 0)^alpha.
 
     Args:
         n_cm3: electron density [cm^-3], clamped to >=0
         Te_eV: electron temperature [eV], clamped to >0
-        params: optional dict with k0 and alpha_T
+        params: optional dict with keys:
+            - model: "threshold" to use threshold-inspired form
+            - k0 or sigma0: prefactor [1/(cm^3 s eV^alpha)]
+            - alpha_T: temperature exponent
+            - E_th: threshold temperature [eV]
     """
     p = params or {}
-    k0 = float(p.get("k0", 1e-12))
+    model = str(p.get("model", "legacy"))
+    k0 = float(p.get("k0", p.get("sigma0", 1e-12)))
     alpha = float(p.get("alpha_T", 0.25))
-    return max(0.0, k0 * max(0.0, float(n_cm3)) * (max(1e-9, float(Te_eV)) ** alpha))
+    n = max(0.0, float(n_cm3))
+    T = max(1e-12, float(Te_eV))
+    if model == "threshold":
+        E_th = float(p.get("E_th", 0.0))
+        excess = max(0.0, T - E_th)
+        return max(0.0, k0 * n * (excess ** alpha))
+    # legacy
+    return max(0.0, k0 * n * (T ** alpha))
 
 
 def save_feasibility_gates_report(path: str, data: Dict) -> None:

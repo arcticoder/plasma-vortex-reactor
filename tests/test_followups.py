@@ -37,8 +37,9 @@ def test_progress_events_budget(tmp_path):
     for _ in range(5):
         R.step(dt=1e-3)
     lines = timeline.read_text().strip().splitlines()
-    # Expect at most 2 events: vortex_stabilized, confinement_achieved
-    assert len(lines) <= 2
+    # Expect at most 4 events after new logging: vortex_stabilized, confinement_achieved,
+    # density_enforced, antiproton_yield
+    assert len(lines) <= 4
 
 
 def test_b_field_ripple_and_variance():
