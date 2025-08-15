@@ -8,3 +8,18 @@ A research and prototyping repository for a plasma vortex reactor targeting high
 - tests/: pytest/unittest-style sanity and smoke tests
 
 Open the multi-repo workspace: plasma-vortex-reactor.code-workspace
+
+## Metrics Quickstart
+
+- Run demo with timeline logging:
+  ```
+  python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 10 --dt 1e-3
+  ```
+- Generate feasibility report from synthetic series:
+  ```
+  python scripts/generate_feasibility_report.py --gamma-series "[150,150,150,120]" --dt 0.002 \
+    --b-series "[5,5.01,4.99,5.02]" --E-mag "[0,1,2,3]" --out feasibility_gates_report.json
+  ```
+- UQ results can be produced via `reactor.uq.run_uq_sampling` and saved to `uq_results.json`.
+
+See `docs/ARTIFACT_SCHEMA.md` for artifact structures.

@@ -27,3 +27,30 @@ def fom(conversion: float, price: float, total_cost: float) -> float:
     if total_cost == 0:
         return float("inf")
     return float(conversion) * float(price) / float(total_cost)
+
+
+class energy_interval:
+    """Context manager to accumulate power over an interval.
+
+    with energy_interval(ledger, power_w, dt_s):
+        ...  # do work
+    """
+    def __init__(self, ledger: EnergyLedger, power_w: float, dt_s: float):
+        self.ledger = ledger
+        self.power_w = float(power_w)
+        self.dt_s = float(dt_s)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        self.ledger.add_power_sample(self.power_w, self.dt_s)
+        return False
+
+
+def merge_ledgers(*ledgers: EnergyLedger) -> EnergyLedger:
+    out = EnergyLedger()
+    for L in ledgers:
+        out._energy_j += L._energy_j
+        out._n_pbar += L._n_pbar
+    return out

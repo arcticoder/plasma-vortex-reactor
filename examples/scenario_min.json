@@ -1,0 +1,9 @@
+{
+  "grid": [32, 32],
+  "nu": 0.001,
+  "timeline_log_path": "./timeline.ndjson",
+  "feasibility_report_path": "./feasibility_gates_report.json",
+  "xi": 2.0,
+  "b_field_ripple_pct": 0.005,
+  "uq": {"samples": 5, "seed": 123}
+}
