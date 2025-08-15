@@ -2,6 +2,7 @@ import numpy as np
 
 from reactor.analysis import (
     b_field_rms_fluctuation,
+    bennett_confinement_check,
     estimate_density_from_em,
     simulate_b_field_ripple,
     stability_variance,
@@ -108,3 +109,10 @@ def test_ema_smoothing_behavior():
     y_fast = ema(x, alpha=0.8)
     y_slow = ema(x, alpha=0.2)
     assert y_fast.var() > y_slow.var()
+
+
+def test_bennett_confinement_check():
+    # Good case
+    assert bennett_confinement_check(1e20, 2.0, 5.5, 5e-4) is True
+    # Bad ripple
+    assert bennett_confinement_check(1e20, 2.0, 5.5, 5e-3) is False

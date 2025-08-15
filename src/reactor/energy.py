@@ -61,6 +61,40 @@ def fom(conversion: float, price: float, total_cost: float) -> float:
     return float(conversion) * float(price) / float(total_cost)
 
 
+def lg_mode_enhancement(power_W: float, l_index: int, coupling_params: dict | None = None) -> float:
+    """Toy LG OAM-derived enhancement factor.
+
+    Increases with |l| and available power; returns factor>=1.
+    factor = 1 + c0 * |l|^beta * (power_W ^ alpha)
+    Defaults: c0=1e-4, alpha=0.25, beta=0.5
+    """
+    p = coupling_params or {}
+    c0 = float(p.get("c0", 1e-4))
+    alpha = float(p.get("alpha", 0.25))
+    beta = float(p.get("beta", 0.5))
+    val = 1.0 + c0 * (abs(int(l_index)) ** beta) * (max(0.0, float(power_W)) ** alpha)
+    return max(1.0, float(val))
+
+
+class apply_lg_enhancement:
+    """Context manager to apply LG enhancement to an EnergyLedger temporarily."""
+
+    def __init__(self, ledger: EnergyLedger, power_W: float, l_index: int, coupling_params: dict | None = None):
+        self.ledger = ledger
+        self.factor = lg_mode_enhancement(power_W, l_index, coupling_params)
+        self._prev = None
+
+    def __enter__(self):
+        self._prev = self.ledger._enhancement
+        self.ledger.apply_enhancement(self.factor)
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        # restore previous enhancement
+        self.ledger._enhancement = self._prev if self._prev is not None else 1.0
+        return False
+
+
 class energy_interval:
     """Context manager to accumulate power over an interval.
 

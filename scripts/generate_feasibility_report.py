@@ -14,6 +14,7 @@ from reactor.analysis import (
     stability_variance,
 )
 from reactor.metrics import antiproton_yield_estimator, save_feasibility_gates_report
+from reactor.analysis import bennett_confinement_check
 from reactor.thresholds import Thresholds
 
 
@@ -69,6 +70,10 @@ def main():
     )
     ap.add_argument("--n-cm3", type=float, default=None)
     ap.add_argument("--Te-eV", type=float, default=None)
+    ap.add_argument("--bennett-n0", type=float, default=None)
+    ap.add_argument("--bennett-xi", type=float, default=None)
+    ap.add_argument("--bennett-B", type=float, default=None)
+    ap.add_argument("--bennett-ripple", type=float, default=None)
     ap.add_argument(
         "--schema",
         default="docs/schemas/feasibility.schema.json",
@@ -126,6 +131,19 @@ def main():
         y_val = antiproton_yield_estimator(float(args.n_cm3), float(args.Te_eV or 0.0), {"model": args.yield_model})
         antiproton_yield_pass = bool(y_val >= float(args.yield_threshold))
 
+    bennett_ok = None
+    if (
+        args.bennett_n0 is not None
+        and args.bennett_xi is not None
+        and args.bennett_B is not None
+        and args.bennett_ripple is not None
+    ):
+        bennett_ok = bool(
+            bennett_confinement_check(
+                float(args.bennett_n0), float(args.bennett_xi), float(args.bennett_B), float(args.bennett_ripple)
+            )
+        )
+
     payload = {
         "stable": gamma_ok and b_ok and dens_ok,
         "gamma_ok": gamma_ok,
@@ -136,6 +154,7 @@ def main():
         "density_stats": dens_stats,
         "antiproton_yield_pass": antiproton_yield_pass,
         "antiproton_yield_value": y_val,
+        "bennett_ok": bennett_ok,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "scenario_id": args.scenario_id,
     }

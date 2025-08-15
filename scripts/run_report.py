@@ -16,6 +16,8 @@ def main():
     ap.add_argument("--gate-md", default="gate_summary.md")
     ap.add_argument("--timeline-summary", default="timeline_summary.json")
     ap.add_argument("--out", default="run_report.json")
+    ap.add_argument("--channel-report", default="channel_report.json")
+    ap.add_argument("--yield-report", default=None)
     args = ap.parse_args()
     data = {}
     try:
@@ -28,6 +30,24 @@ def main():
             data["timeline_summary"] = json.load(f)
     except Exception:
         data["timeline_summary"] = {"error": f"missing: {args.timeline_summary}"}
+    # channel report merge
+    try:
+        with open(args.channel_report, "r", encoding="utf-8") as f:
+            ch = json.load(f)
+        data["channel_report"] = ch
+        data["channel_fom_summary"] = {
+            "total_fom": ch.get("total_fom"),
+            "top_channels": sorted((ch.get("channel_fom") or {}).items(), key=lambda kv: kv[1], reverse=True)[:3],
+        }
+    except Exception:
+        data["channel_report"] = {"error": f"missing: {args.channel_report}"}
+    # yield report merge (if provided)
+    if args.yield_report:
+        try:
+            with open(args.yield_report, "r", encoding="utf-8") as f:
+                data["yield_report"] = json.load(f)
+        except Exception:
+            data["yield_report"] = {"error": f"missing: {args.yield_report}"}
     try:
         # embed markdown as text
         data["gate_summary_md"] = open(args.gate_md, "r", encoding="utf-8").read()

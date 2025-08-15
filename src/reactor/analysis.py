@@ -8,3 +8,4 @@ from .analysis_fields import (
     simulate_b_field_ripple,  # noqa: F401
 )
 from .analysis_stat import stability_variance, windowed_gamma  # noqa: F401
+from .analysis_confinement import bennett_confinement_check  # noqa: F401

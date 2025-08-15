@@ -280,6 +280,24 @@ def build_parser() -> argparse.ArgumentParser:
             data["gate_summary_md"] = open(a.gate_md, "r", encoding="utf-8").read()
         except Exception:
             data["gate_summary_md"] = f"missing: {a.gate_md}"
+        # channel report merge
+        try:
+            with open(a.channel_report, "r", encoding="utf-8") as f:
+                ch = json.load(f)
+            data["channel_report"] = ch
+            data["channel_fom_summary"] = {
+                "total_fom": ch.get("total_fom"),
+                "top_channels": sorted((ch.get("channel_fom") or {}).items(), key=lambda kv: kv[1], reverse=True)[:3],
+            }
+        except Exception:
+            data["channel_report"] = {"error": f"missing: {a.channel_report}"}
+        # yield report merge (optional)
+        if getattr(a, "yield_report", None):
+            try:
+                with open(a.yield_report, "r", encoding="utf-8") as f:
+                    data["yield_report"] = json.load(f)
+            except Exception:
+                data["yield_report"] = {"error": f"missing: {a.yield_report}"}
         with open(a.out, "w", encoding="utf-8") as f:
             json.dump(data, f, indent=2)
         print(json.dumps({"wrote": a.out}))
@@ -288,6 +306,8 @@ def build_parser() -> argparse.ArgumentParser:
     p_rr.add_argument("--gate-md", default="gate_summary.md")
     p_rr.add_argument("--timeline-summary", default="timeline_summary.json")
     p_rr.add_argument("--out", default="run_report.json")
+    p_rr.add_argument("--channel-report", default="channel_report.json")
+    p_rr.add_argument("--yield-report", default=None)
     p_rr.set_defaults(func=_cmd_run_report)
     return ap
 

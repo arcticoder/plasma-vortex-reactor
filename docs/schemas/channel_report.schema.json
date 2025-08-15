@@ -7,7 +7,12 @@
     "channels": {
       "type": "object",
       "additionalProperties": { "type": "number" }
-    }
+    },
+    "channel_fom": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    },
+    "total_fom": { "type": "number" }
   },
   "required": ["total_energy_J", "channels"],
   "additionalProperties": false

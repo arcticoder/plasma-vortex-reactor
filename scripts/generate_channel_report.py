@@ -2,8 +2,18 @@
 from __future__ import annotations
 
 import argparse
+import os
+import sys
+
+# Ensure repository sources are importable when running from scripts/ directly
+_here = os.path.dirname(os.path.abspath(__file__))
+_root = os.path.dirname(_here)
+_src = os.path.join(_root, "src")
+if _src not in sys.path:
+    sys.path.insert(0, _src)
 
 from reactor.energy import EnergyLedger
+from reactor.energy import fom as _fom
 
 
 def main():
@@ -31,7 +41,18 @@ def main():
     }
     for name, p in channels.items():
         L.add_channel_energy(name, power_w=p, dt_s=args.duration)
-    L.write_channel_report(args.out)
+    # Compute simple FOM proxy per channel as inverse energy fraction proxy
+    total = sum(L.channels().values()) or 1.0
+    ch_fom = {k: float((total / max(v, 1e-12))) for k, v in L.channels().items()}
+    payload = {
+        "total_energy_J": L.total_energy(),
+        "channels": L.channels(),
+        "channel_fom": ch_fom,
+        "total_fom": float(sum(ch_fom.values())),
+    }
+    import json as _json
+    with open(args.out, "w", encoding="utf-8") as f:
+        _json.dump(payload, f, indent=2)
     # Optional validate against schema if jsonschema is available
     try:
         import json  # type: ignore
@@ -43,8 +64,8 @@ def main():
         ) as f:
             schema = json.load(f)
         with open(args.out, "r", encoding="utf-8") as f:
-            payload = json.load(f)
-        jsonschema.validate(instance=payload, schema=schema)
+            _payload = json.load(f)
+        jsonschema.validate(instance=_payload, schema=schema)
     except Exception:
         pass
 
