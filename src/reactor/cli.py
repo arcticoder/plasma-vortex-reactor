@@ -224,12 +224,20 @@ def build_parser() -> argparse.ArgumentParser:
         if gthr is not None and rep.get("gamma_stats"):
             if rep["gamma_stats"].get("gamma_max", 0.0) < float(gthr):
                 ok = False
+        if getattr(a, "require_yield", False):
+            if not rep.get("antiproton_yield_pass", False):
+                ok = False
         print(json.dumps({"gate": "feasibility", "ok": bool(ok)}))
         if not ok:
             sys.exit(2)
     p_gate = sp.add_parser("gate")
     p_gate.add_argument("--metrics", default="metrics.json")
     p_gate.add_argument("--report", default="feasibility_gates_report.json")
+    p_gate.add_argument(
+        "--require-yield",
+        action="store_true",
+        help="Also require antiproton_yield_pass=true in the report",
+    )
     p_gate.set_defaults(func=_cmd_gate)
     # econ report
     from .analysis_econ import write_economic_report

@@ -10,3 +10,4 @@
 {"event":"EnergyLedger enhancement factor integrated and syntax errors fixed","status":"completed","refs":["src/reactor/energy.py"],"details":{"apply_enhancement":true,"total_energy_reduction":true}}
 {"event":"CLI and scripts extended for run-report and ns timing","status":"completed","refs":["src/reactor/cli.py","scripts/demo_runner.py","scripts/timeline_summary.py"],"details":{"ns_percentiles":true,"json_out":true,"run_started_event":true}}
 {"event":"metrics_gate supports optional antiproton yield gate","status":"completed","refs":["scripts/metrics_gate.py"],"details":{"flag":"--require-yield"}}
+{"event":"Sanitized docs/roadmap.ndjson (removed control characters)","status":"completed","refs":["scripts/sanitize_ndjson.py","docs/roadmap.ndjson"]}
