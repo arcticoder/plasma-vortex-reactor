@@ -14,6 +14,11 @@ def main():
     )
     ap.add_argument("--metrics", default="metrics.json")
     ap.add_argument("--report", default="feasibility_gates_report.json")
+    ap.add_argument(
+        "--require-yield",
+        action="store_true",
+        help="Also require antiproton_yield_pass=true in the report",
+    )
     args = ap.parse_args()
     with open(args.metrics, "r", encoding="utf-8") as f:
         metrics = json.load(f)
@@ -28,6 +33,11 @@ def main():
     if gthr is not None and rep.get("gamma_stats"):
         if rep["gamma_stats"].get("gamma_max", 0.0) < float(gthr):
             ok = False
+    # optional yield gate
+    if args.require_yield:
+        if not rep.get("antiproton_yield_pass", False):
+            ok = False
+
     if not ok:
         print(json.dumps({"gate": "feasibility", "ok": False}))
         sys.exit(2)

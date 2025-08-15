@@ -1,0 +1,2 @@
+{"milestone":"Energy ledger enhancement and reporting","status":"completed","refs":["src/reactor/energy.py","scripts/run_report.py"],"notes":"Enhancement factor and total energy reduction utilities available; channel reports reflect total_energy()"}
+{"milestone":"Run report CLI parity and ns timing","status":"completed","refs":["src/reactor/cli.py","scripts/timeline_summary.py","scripts/demo_runner.py"],"notes":"CLI subcommand run-report added; ns-resolution performance captured in timeline summary and demo runner"}

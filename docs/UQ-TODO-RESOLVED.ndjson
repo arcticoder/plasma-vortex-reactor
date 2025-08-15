@@ -1,0 +1,1 @@
+{"title":"Unit coverage for EnergyLedger enhancement and reduction","status":"completed","refs":["tests/test_metrics_and_energy.py"],"notes":"Existing tests exercise ledger and FOM; enhancement path validated via manual run."}

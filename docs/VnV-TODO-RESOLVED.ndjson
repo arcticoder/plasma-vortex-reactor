@@ -1,0 +1,1 @@
+{"title":"Gate supports optional yield check","status":"completed","refs":["scripts/metrics_gate.py"],"notes":"--require-yield flag adds antiproton_yield_pass requirement to feasibility gate."}
