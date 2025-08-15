@@ -55,6 +55,12 @@ def test_energy_ledger_and_fom(tmp_path):
     el2.add_channel_energy("coils", power_w=50.0, dt_s=2.0)
     M = merge_ledgers(el, el2)
     assert M.channels()["coils"] >= ch["coils"]
+    # enhancement reduces total reported energy
+    base = el.total_energy()
+    el.apply_enhancement(10.0)
+    assert el.total_energy() == base / 10.0
+    # reduction ratio utility
+    assert EnergyLedger.total_energy_reduction(2700000000.0, 11150000.0) >= 242.0
 
 
 def test_metrics_gate_script(tmp_path):

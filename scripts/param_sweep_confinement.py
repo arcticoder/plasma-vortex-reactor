@@ -32,6 +32,7 @@ def main():
         help="Optional PNG heatmap path; requires matplotlib",
     )
     ap.add_argument("--json-out", default=None, help="Optional JSON output path for rows")
+    ap.add_argument("--jsonl-out", default=None, help="Optional JSONL (NDJSON) output path; one row per line")
     args = ap.parse_args()
 
     xi_vals = [
@@ -65,10 +66,15 @@ def main():
                 eff = confinement_efficiency_estimator(xi, rp)
                 w.writerow([xi, rp, eff])
                 rows.append({"xi": xi, "b_field_ripple_pct": rp, "efficiency": eff})
-    if args.json_out:
+    if args.json_out or args.jsonl_out:
         import json
-        with open(args.json_out, "w", encoding="utf-8") as jf:
-            json.dump({"rows": rows}, jf, indent=2)
+        if args.json_out:
+            with open(args.json_out, "w", encoding="utf-8") as jf:
+                json.dump({"rows": rows}, jf, indent=2)
+        if args.jsonl_out:
+            with open(args.jsonl_out, "w", encoding="utf-8") as jlf:
+                for r in rows:
+                    jlf.write(json.dumps(r) + "\n")
     if args.plot and quick_scatter is not None:
         # flatten to a simple scatter over xi dimension by averaging over ripple
         import numpy as np
