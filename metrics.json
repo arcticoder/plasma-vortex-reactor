@@ -1,0 +1,11 @@
+{
+  "gamma_min": 140.0,
+  "gamma_duration_s": 0.01,
+  "density_min_cm3": 1e20,
+  "confinement_min": 0.94,
+  "b_field_min_T": 5.0,
+  "b_ripple_max_pct": 0.01,
+  "energy_per_pbar_max_J": 1e12,
+  "total_energy_reduction_min": 242.0,
+  "fom_min": 0.1
+}

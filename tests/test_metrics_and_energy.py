@@ -12,6 +12,7 @@ from reactor.energy import EnergyLedger, fom
 from reactor.plasma import debye_length
 from reactor.logging_utils import append_event
 from reactor.uq import run_uq_sampling
+from reactor.thresholds import Thresholds
 
 
 def test_compute_gamma_and_duration():
@@ -20,8 +21,9 @@ def test_compute_gamma_and_duration():
     g = compute_gamma(rho, p)
     assert g.shape == rho.shape
     # build gamma_series with sustained threshold
+    thr = Thresholds()
     series = np.array([10, 50, 200, 300, 50, 10], dtype=float)
-    ok = stability_duration(series, dt=0.002, threshold=140.0, min_duration=0.004)
+    ok = stability_duration(series, dt=0.002, threshold=thr.gamma_min, min_duration=0.004)
     assert ok is True
 
 

@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 from reactor.core import Reactor
+import time, random
 from reactor.config import load_json
 
 
@@ -13,6 +14,8 @@ def main():
     ap.add_argument("--timeline-log", default=None, help="NDJSON path for timeline events")
     ap.add_argument("--steps", type=int, default=10)
     ap.add_argument("--dt", type=float, default=1e-3)
+    ap.add_argument("--seed", type=int, default=123)
+    ap.add_argument("--timeline-budget", type=int, default=10, help="Max events to log; beyond this, suppress")
     args = ap.parse_args()
 
     cfg = {}
@@ -25,10 +28,19 @@ def main():
     grid = tuple(cfg.get("grid", [32, 32]))
     nu = float(cfg.get("nu", 1e-3))
 
+    random.seed(args.seed)
     R = Reactor(grid=grid, nu=nu, timeline_log_path=timeline_path, xi=xi, b_field_ripple_pct=br)
+    t0 = time.perf_counter()
+    # naive budget enforcement: just stop logging after N events by nulling the path
+    events_logged = 0
     for _ in range(int(args.steps)):
         R.step(dt=float(args.dt))
-    print(json.dumps({"done": True, "timeline": timeline_path or None}))
+        if timeline_path and events_logged >= args.timeline_budget:
+            R.timeline_log_path = None
+        else:
+            events_logged += 1
+    t1 = time.perf_counter()
+    print(json.dumps({"done": True, "timeline": timeline_path or None, "elapsed_s": t1 - t0}))
 
 
 if __name__ == "__main__":

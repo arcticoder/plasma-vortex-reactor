@@ -1,0 +1,4 @@
+[
+  {"n_cm3": 1e20, "Te_eV": 10.0, "k0": 1e-12, "alpha_T": 0.2, "min_yield": 1e8},
+  {"n_cm3": 5e19, "Te_eV": 20.0, "k0": 1e-12, "alpha_T": 0.2, "min_yield": 5e7}
+]

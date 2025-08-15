@@ -6,6 +6,8 @@ import numpy as np
 from reactor.thresholds import Thresholds
 from reactor.metrics import save_feasibility_gates_report
 from reactor.analysis import b_field_rms_fluctuation, estimate_density_from_em, stability_variance
+from datetime import datetime, timezone
+import sys
 
 
 def main():
@@ -19,6 +21,8 @@ def main():
     ap.add_argument("--gamma-duration", type=float, default=Thresholds.gamma_duration_s)
     ap.add_argument("--density-threshold", type=float, default=Thresholds.density_min_cm3)
     ap.add_argument("--b-ripple-max", type=float, default=Thresholds.b_ripple_max_pct)
+    ap.add_argument("--scenario-id", default=None, help="Identifier for the scenario/config used")
+    ap.add_argument("--fail-on-gate", action="store_true", help="Exit non-zero if any feasibility gate fails")
     args = ap.parse_args()
 
     thr = Thresholds()
@@ -72,9 +76,13 @@ def main():
         "gamma_stats": gamma_stats,
         "b_stats": b_stats,
         "density_stats": dens_stats,
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "scenario_id": args.scenario_id,
     }
     save_feasibility_gates_report(args.out, payload)
     print(json.dumps(payload, indent=2))
+    if args.fail_on_gate and not payload["stable"]:
+        sys.exit(2)
 
 
 if __name__ == "__main__":
