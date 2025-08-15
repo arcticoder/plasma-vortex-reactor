@@ -1,3 +1,5 @@
+{"event":"Roadmap extended with Phase 1-3 milestones and metrics","status":"planned","refs":["docs/roadmap.ndjson"],"details":{"phases":["Phase 1: Core Development","Phase 2: Simulation and Optimization","Phase 3: Production Scaling"],"metrics":["stability","yield","confinement","energy","density","B-field","FOM"]}}
+{"event":"CI validation plan updated for metrics gates","status":"planned","refs":[".github/workflows/ci.yml","scripts/metrics_gate.py","scripts/run_report.py"],"details":{"gates":["yield >= 1e8 cm^-3 s^-1","Gamma duration 10 ms","confinement >= 94%","E/pbar thresholds"],"artifacts":["feasibility_gates_report.json","run_report.json","channel_report.json"]}}
 {"event":"Repository created and scaffolded","status":"completed","refs":["README.md","plasma-vortex-reactor.code-workspace","docs/roadmap.ndjson"]}
 {"event":"Added src/reactor package with math/control stubs","status":"completed","refs":["src/reactor/__init__.py","src/reactor/models.py","src/reactor/core.py"]}
 {"event":"Initial tests added (integration smoke, units/shapes)","status":"completed","refs":["tests/test_integration_framework.py"]}
