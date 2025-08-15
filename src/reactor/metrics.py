@@ -1,6 +1,8 @@
 from __future__ import annotations
+
 import json
-from typing import Optional, Dict, Tuple
+from typing import Dict, Optional, Tuple
+
 import numpy as np
 
 
@@ -29,7 +31,12 @@ def compute_gamma(rho: np.ndarray, p: np.ndarray, eps: float = 1e-12) -> np.ndar
     return np.abs(cross) / denom
 
 
-def stability_duration(gamma_series: np.ndarray, dt: float, threshold: float, min_duration: float) -> bool:
+def stability_duration(
+    gamma_series: np.ndarray,
+    dt: float,
+    threshold: float,
+    min_duration: float,
+) -> bool:
     """True if Γ >= threshold holds continuously for at least min_duration seconds."""
     gamma_series = np.asarray(gamma_series, dtype=float)
     needed = int(np.ceil(min_duration / max(dt, 1e-12)))
@@ -60,7 +67,11 @@ def confinement_efficiency_estimator(xi: float, b_field_ripple_pct: float) -> fl
     return float(np.clip(base - ripple_pen - xi_pen, 0.0, 1.0))
 
 
-def antiproton_yield_estimator(n_cm3: float, Te_eV: float, params: Optional[Dict[str, float]] = None) -> float:
+def antiproton_yield_estimator(
+    n_cm3: float,
+    Te_eV: float,
+    params: Optional[Dict[str, float]] = None,
+) -> float:
     """Simple placeholder: yield rate density [1/(cm^3 s)] ~ k0 * n * Te^alpha.
 
     Args:

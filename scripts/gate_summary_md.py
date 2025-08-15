@@ -1,10 +1,16 @@
 #!/usr/bin/env python
 from __future__ import annotations
-import argparse, json
+
+import argparse
+import json
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Generate a simple gate summary markdown from feasibility report")
+    ap = argparse.ArgumentParser(
+        description=(
+            "Generate a simple gate summary markdown from feasibility report"
+        )
+    )
     ap.add_argument("--report", default="feasibility_gates_report.json")
     ap.add_argument("--out", default="gate_summary.md")
     args = ap.parse_args()

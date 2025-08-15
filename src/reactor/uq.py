@@ -1,7 +1,8 @@
 from __future__ import annotations
+
 import json
 import random
-from typing import Callable, Dict, Tuple, List, Any
+from typing import Any, Callable, Dict, List, Tuple
 
 
 def sample_uniform(a: float, b: float, rng: random.Random) -> float:

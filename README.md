@@ -36,3 +36,29 @@ Open the multi-repo workspace: plasma-vortex-reactor.code-workspace
   ```
 
 See `docs/ARTIFACT_SCHEMA.md` for artifact structures.
+
+## Artifacts and Schemas
+
+Artifacts produced by this repo:
+
+- feasibility_gates_report.json (scripts/generate_feasibility_report.py)
+- timeline.ndjson (scripts/demo_runner.py and Reactor timeline logging)
+- gate_summary.md (scripts/gate_summary_md.py)
+- channel_report.json (scripts/generate_channel_report.py)
+- run_report.json (scripts/run_report.py)
+
+Schemas live under `docs/schemas/`:
+
+- docs/schemas/metrics.schema.json
+- docs/schemas/feasibility.schema.json
+- docs/schemas/channel_report.schema.json
+
+You can validate with `jsonschema` if installed.
+
+## Optional extras
+
+Install optional plotting/progress/validation extras:
+
+```
+pip install -r requirements-plot.txt
+```

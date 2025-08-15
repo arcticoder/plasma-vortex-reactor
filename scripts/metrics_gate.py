@@ -1,10 +1,17 @@
 #!/usr/bin/env python
 from __future__ import annotations
-import argparse, json, sys
+
+import argparse
+import json
+import sys
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Check feasibility_gates_report.json against metrics.json gates")
+    ap = argparse.ArgumentParser(
+        description=(
+            "Check feasibility_gates_report.json against metrics.json gates"
+        )
+    )
     ap.add_argument("--metrics", default="metrics.json")
     ap.add_argument("--report", default="feasibility_gates_report.json")
     args = ap.parse_args()

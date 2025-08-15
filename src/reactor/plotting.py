@@ -1,11 +1,11 @@
 from __future__ import annotations
 
+from typing import Optional, Sequence
+
 """Lightweight plotting helpers with optional matplotlib dependency.
 
 Functions will no-op or raise a clear error if matplotlib is not available.
 """
-
-from typing import Sequence, Optional
 
 
 def _mpl():

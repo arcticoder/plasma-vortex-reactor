@@ -1,11 +1,18 @@
 #!/usr/bin/env python
 from __future__ import annotations
-import argparse, json
+
+import argparse
+import json
+
 import numpy as np
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Generate tiny synthetic datasets for gamma, b-field, and E_mag")
+    ap = argparse.ArgumentParser(
+        description=(
+            "Generate tiny synthetic datasets for gamma, b-field, and E_mag"
+        )
+    )
     ap.add_argument("--n", type=int, default=10)
     ap.add_argument("--seed", type=int, default=123)
     ap.add_argument("--outdir", default="datasets")

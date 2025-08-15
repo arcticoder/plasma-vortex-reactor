@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 from __future__ import annotations
-import argparse, csv
+
+import argparse
+import csv
+
 from reactor.uq import run_uq_sampling, save_results
 
 
@@ -16,7 +19,12 @@ def main():
         # trivial score: linear combination
         return {"score": 2*params["a"] + params["b"]}
 
-    out = run_uq_sampling(args.samples, args.seed, param_ranges={"a": (0, 1), "b": (0, 1)}, eval_fn=eval_fn)
+    out = run_uq_sampling(
+        args.samples,
+        args.seed,
+        param_ranges={"a": (0, 1), "b": (0, 1)},
+        eval_fn=eval_fn,
+    )
     save_results(args.out_json, out)
     # Write CSV of results
     rows = out.get("results", [])

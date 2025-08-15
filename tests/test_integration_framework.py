@@ -1,13 +1,14 @@
 import numpy as np
+
 from reactor import (
     Reactor,
-    bennett_profile,
-    vorticity_evolution,
-    drift_poisson_step,
-    microwave_maxwell,
-    lg_mode,
-    kinetics_update,
     adiabatic_mu,
+    bennett_profile,
+    drift_poisson_step,
+    kinetics_update,
+    lg_mode,
+    microwave_maxwell,
+    vorticity_evolution,
 )
 
 

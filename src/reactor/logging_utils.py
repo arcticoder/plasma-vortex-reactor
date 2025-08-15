@@ -1,11 +1,21 @@
 from __future__ import annotations
+
 import json
-from typing import Optional, Dict, Any
 from datetime import datetime, timezone
+from typing import Any, Dict, Optional
 
 
-def append_event(path: str, event: str, status: str = "info", details: Optional[Dict[str, Any]] = None) -> None:
-    rec: Dict[str, Any] = {"event": event, "status": status, "ts": datetime.now(timezone.utc).isoformat()}
+def append_event(
+    path: str,
+    event: str,
+    status: str = "info",
+    details: Optional[Dict[str, Any]] = None,
+) -> None:
+    rec: Dict[str, Any] = {
+        "event": event,
+        "status": status,
+        "ts": datetime.now(timezone.utc).isoformat(),
+    }
     if details is not None:
         rec["details"] = dict(details)
     with open(path, "a", encoding="utf-8") as f:
@@ -15,7 +25,8 @@ def append_event(path: str, event: str, status: str = "info", details: Optional[
 def summarize_timeline(path: str) -> Dict[str, Any]:
     """Summarize a timeline NDJSON file.
 
-    Returns counts per event and first/last timestamps if present, and simple min/max for common details.
+    Returns counts per event and first/last timestamps if present,
+    and simple min/max for common details.
     """
     import math
     counts: Dict[str, int] = {}

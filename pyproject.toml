@@ -1,7 +1,9 @@
 [tool.ruff]
 line-length = 100
-select = ["E", "F", "I"]
-ignore = ["E501"]
+extend-exclude = ["notebooks/**/*.ipynb", "**/*.ipynb"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "A", "B", "C4"]
 
 [tool.mypy]
 python_version = "3.12"

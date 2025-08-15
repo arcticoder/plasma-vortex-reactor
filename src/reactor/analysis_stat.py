@@ -1,5 +1,7 @@
 from __future__ import annotations
-from typing import Iterable, Dict
+
+from typing import Dict, Iterable
+
 import numpy as np
 
 
@@ -16,7 +18,11 @@ def windowed_gamma(series: Iterable[float], window_size: int) -> Dict[str, np.nd
     if w <= 0:
         raise ValueError("window_size must be >= 1")
     if arr.size < w:
-        return {"min": np.array([], dtype=float), "max": np.array([], dtype=float), "mean": np.array([], dtype=float)}
+        return {
+            "min": np.array([], dtype=float),
+            "max": np.array([], dtype=float),
+            "mean": np.array([], dtype=float),
+        }
     means = (np.convolve(arr, np.ones(w), mode="valid") / w)
     mins = np.array([np.min(arr[i:i+w]) for i in range(arr.size - w + 1)], dtype=float)
     maxs = np.array([np.max(arr[i:i+w]) for i in range(arr.size - w + 1)], dtype=float)

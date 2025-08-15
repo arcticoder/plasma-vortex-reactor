@@ -1,31 +1,66 @@
 #!/usr/bin/env python
 from __future__ import annotations
+
 import argparse
 import json
-import numpy as np
-from reactor.thresholds import Thresholds
-from reactor.metrics import save_feasibility_gates_report
-from reactor.analysis import b_field_rms_fluctuation, estimate_density_from_em, stability_variance
-from datetime import datetime, timezone
 import sys
+from datetime import datetime, timezone
+
+import numpy as np
+
+from reactor.analysis import (
+    b_field_rms_fluctuation,
+    estimate_density_from_em,
+    stability_variance,
+)
+from reactor.metrics import save_feasibility_gates_report
+from reactor.thresholds import Thresholds
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Generate feasibility_gates_report.json from synthetic/collected stats")
+    ap = argparse.ArgumentParser(
+        description=(
+            "Generate feasibility_gates_report.json from synthetic/collected stats"
+        )
+    )
     ap.add_argument("--out", default="feasibility_gates_report.json")
     ap.add_argument("--gamma-series", help="JSON array of gamma values over time", default=None)
     ap.add_argument("--dt", type=float, default=1e-3)
     ap.add_argument("--b-series", help="JSON array of B-field time series [T]", default=None)
-    ap.add_argument("--E-mag", help="JSON array of E-field magnitude for density estimate", default=None)
+    ap.add_argument(
+        "--E-mag",
+        help="JSON array of E-field magnitude for density estimate",
+        default=None,
+    )
     ap.add_argument("--gamma-threshold", type=float, default=Thresholds.gamma_min)
     ap.add_argument("--gamma-duration", type=float, default=Thresholds.gamma_duration_s)
     ap.add_argument("--density-threshold", type=float, default=Thresholds.density_min_cm3)
     ap.add_argument("--b-ripple-max", type=float, default=Thresholds.b_ripple_max_pct)
-    ap.add_argument("--scenario-id", default=None, help="Identifier for the scenario/config used")
-    ap.add_argument("--fail-on-gate", action="store_true", help="Exit non-zero if any feasibility gate fails")
-    ap.add_argument("--dry-run", action="store_true", help="Do not write file; just print summary")
-    ap.add_argument("--validate", action="store_true", help="Validate JSON with jsonschema if available")
-    ap.add_argument("--schema", default="schemas/feasibility.schema.json", help="Path to feasibility JSON schema")
+    ap.add_argument(
+        "--scenario-id",
+        default=None,
+        help="Identifier for the scenario/config used",
+    )
+    ap.add_argument(
+        "--fail-on-gate",
+        action="store_true",
+        help="Exit non-zero if any feasibility gate fails",
+    )
+    ap.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Do not write file; just print summary",
+    )
+    ap.add_argument(
+        "--validate",
+        action="store_true",
+        help="Validate JSON with jsonschema if available",
+    )
+    ap.add_argument(
+        "--schema",
+        default="docs/schemas/feasibility.schema.json",
+        help="Path to feasibility JSON schema",
+    )
     args = ap.parse_args()
 
     thr = Thresholds()

@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 from __future__ import annotations
+
 import argparse
 import json
-from pathlib import Path
-from reactor.core import Reactor
-import time, random
+import random
+import time
+
 from reactor.config import load_json
+from reactor.core import Reactor
 
 
 def main():
@@ -15,7 +17,12 @@ def main():
     ap.add_argument("--steps", type=int, default=10)
     ap.add_argument("--dt", type=float, default=1e-3)
     ap.add_argument("--seed", type=int, default=123)
-    ap.add_argument("--timeline-budget", type=int, default=10, help="Max events to log; beyond this, suppress")
+    ap.add_argument(
+        "--timeline-budget",
+        type=int,
+        default=10,
+        help="Max events to log; beyond this, suppress",
+    )
     args = ap.parse_args()
 
     cfg = {}
@@ -29,7 +36,18 @@ def main():
     nu = float(cfg.get("nu", 1e-3))
 
     random.seed(args.seed)
-    R = Reactor(grid=grid, nu=nu, timeline_log_path=timeline_path, xi=xi, b_field_ripple_pct=br)
+    from reactor.random_utils import set_seed
+    set_seed(int(args.seed))
+    R = Reactor(
+        grid=grid,
+        nu=nu,
+        timeline_log_path=timeline_path,
+        xi=xi,
+        b_field_ripple_pct=br,
+        timeline_budget=int(args.timeline_budget)
+        if args.timeline_budget is not None
+        else None,
+    )
     t0 = time.perf_counter()
     # naive budget enforcement: just stop logging after N events by nulling the path
     events_logged = 0
@@ -40,13 +58,32 @@ def main():
         # include timing in timeline events by emitting a generic step event
         if timeline_path and events_logged < args.timeline_budget:
             from reactor.logging_utils import append_event
-            append_event(str(timeline_path), event="step", status="ok", details={"i": i, "dt": float(args.dt), "elapsed_s": et - st, "seed": int(args.seed)})
+            append_event(
+                str(timeline_path),
+                event="step",
+                status="ok",
+                details={
+                    "i": i,
+                    "dt": float(args.dt),
+                    "elapsed_s": et - st,
+                    "seed": int(args.seed),
+                },
+            )
         if timeline_path and events_logged >= args.timeline_budget:
             R.timeline_log_path = None
         else:
             events_logged += 1
     t1 = time.perf_counter()
-    print(json.dumps({"done": True, "timeline": timeline_path or None, "elapsed_s": t1 - t0, "seed": int(args.seed)}))
+    print(
+        json.dumps(
+            {
+                "done": True,
+                "timeline": timeline_path or None,
+                "elapsed_s": t1 - t0,
+                "seed": int(args.seed),
+            }
+        )
+    )
 
 
 if __name__ == "__main__":

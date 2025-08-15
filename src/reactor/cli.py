@@ -1,11 +1,18 @@
 from __future__ import annotations
+
 import argparse
 import json
+
+from .analysis import (
+    b_field_rms_fluctuation,
+    estimate_density_from_em,
+    stability_variance,
+)
 from .config import load_json
 from .core import Reactor
-from .metrics import save_feasibility_gates_report, confinement_efficiency_estimator
-from .analysis import b_field_rms_fluctuation, estimate_density_from_em, stability_variance
 from .logging_utils import append_event
+from .metrics import confinement_efficiency_estimator
+
 try:
     from . import plotting as plotting_helpers  # type: ignore
 except Exception:  # pragma: no cover
@@ -19,20 +26,50 @@ def cmd_demo(args: argparse.Namespace) -> None:
     br = cfg.get("b_field_ripple_pct", 0.005)
     grid = tuple(cfg.get("grid", [32, 32]))
     nu = float(cfg.get("nu", 1e-3))
-    R = Reactor(grid=grid, nu=nu, timeline_log_path=timeline_path, xi=xi, b_field_ripple_pct=br)
+    from .random_utils import set_seed
+    set_seed(int(args.seed))
+    R = Reactor(
+        grid=grid,
+        nu=nu,
+        timeline_log_path=timeline_path,
+        xi=xi,
+        b_field_ripple_pct=br,
+        timeline_budget=args.timeline_budget,
+    )
     # log run seed for reproducibility, if timeline is enabled
     if timeline_path:
-        append_event(timeline_path, event="run_started", status="ok", details={"seed": int(args.seed)})
+        append_event(
+            timeline_path,
+            event="run_started",
+            status="ok",
+            details={"seed": int(args.seed)},
+        )
     for _ in range(int(args.steps)):
         R.step(dt=float(args.dt))
     print(json.dumps({"done": True, "timeline": timeline_path or None, "seed": int(args.seed)}))
 
 
 def cmd_param_sweep(args: argparse.Namespace) -> None:
-    xi_vals = [args.xi_min + i*(args.xi_max-args.xi_min)/max(args.xi_steps-1,1) for i in range(args.xi_steps)]
-    ripple_vals = [args.ripple_min + j*(args.ripple_max-args.ripple_min)/max(args.ripple_steps-1,1) for j in range(args.ripple_steps)]
+    xi_vals = [
+        args.xi_min + i * (args.xi_max - args.xi_min) / max(args.xi_steps - 1, 1)
+        for i in range(args.xi_steps)
+    ]
+    ripple_vals = [
+        args.ripple_min + j * (args.ripple_max - args.ripple_min) / max(args.ripple_steps - 1, 1)
+        for j in range(args.ripple_steps)
+    ]
     rows = []
-    for xi in xi_vals:
+    def _progress_iter(x):
+        return x
+    try:
+        from tqdm import tqdm  # type: ignore
+        def _progress_iter_tqdm(x):  # type: ignore
+            return tqdm(x)
+    except Exception:  # pragma: no cover
+        # keep default
+        ...
+    prog_iter = locals().get("_progress_iter_tqdm", _progress_iter)
+    for xi in prog_iter(xi_vals):
         for rp in ripple_vals:
             eff = confinement_efficiency_estimator(xi, rp)
             rows.append({"xi": xi, "b_field_ripple_pct": rp, "efficiency": eff})
@@ -49,19 +86,33 @@ def cmd_param_sweep(args: argparse.Namespace) -> None:
         try:
             xs = [r["xi"] for r in rows]
             ys = [r["efficiency"] for r in rows]
-            plotting_helpers.quick_scatter(xs, ys, args.plot, xlabel="xi", ylabel="efficiency", title="Confinement efficiency sweep")
+            plotting_helpers.quick_scatter(
+                xs,
+                ys,
+                args.plot,
+                xlabel="xi",
+                ylabel="efficiency",
+                title="Confinement efficiency sweep",
+            )
         except Exception as e:
             # keep CLI robust if plotting unavailable
             print(json.dumps({"warning": f"plotting failed: {e}"}))
+    # Optional JSON output file
+    if args.json_out:
+        with open(args.json_out, "w", encoding="utf-8") as f:
+            json.dump({"rows": rows}, f, indent=2)
     # Always print JSON summary for programmatic consumption
     print(json.dumps({"rows": rows}))
 
 
 def cmd_feasibility(args: argparse.Namespace) -> None:
-    # Thin wrapper around generate_feasibility_report behavior: expect precomputed arrays via JSON strings
-    import numpy as np
-    from .thresholds import Thresholds, thresholds_from_json
+    # Thin wrapper around generate_feasibility_report behavior:
+    # expect precomputed arrays via JSON strings
     import sys
+
+    import numpy as np
+
+    from .thresholds import Thresholds, thresholds_from_json
     thr = Thresholds()
     # If user did not override thresholds, try to load from metrics.json present in repo
     try:
@@ -129,6 +180,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_demo.add_argument("--steps", type=int, default=10)
     p_demo.add_argument("--dt", type=float, default=1e-3)
     p_demo.add_argument("--seed", type=int, default=123)
+    p_demo.add_argument("--timeline-budget", type=int, default=None)
     p_demo.set_defaults(func=cmd_demo)
     # param sweep
     p_sweep = sp.add_parser("param-sweep")
@@ -140,6 +192,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_sweep.add_argument("--ripple-steps", type=int, default=10)
     p_sweep.add_argument("--out", default=None, help="Optional CSV output path")
     p_sweep.add_argument("--plot", default=None, help="Optional PNG path; requires matplotlib")
+    p_sweep.add_argument("--json-out", default=None, help="Optional JSON output path")
     p_sweep.set_defaults(func=cmd_param_sweep)
     # feasibility
     p_feas = sp.add_parser("feasibility")
@@ -151,8 +204,33 @@ def build_parser() -> argparse.ArgumentParser:
     p_feas.add_argument("--gamma-duration", type=float, default=0.01)
     p_feas.add_argument("--density-threshold", type=float, default=1e20)
     p_feas.add_argument("--b-ripple-max", type=float, default=0.01)
-    p_feas.add_argument("--fail-on-gate", action="store_true", help="Exit non-zero if any feasibility gate fails")
+    p_feas.add_argument(
+        "--fail-on-gate",
+        action="store_true",
+        help="Exit non-zero if any feasibility gate fails",
+    )
     p_feas.set_defaults(func=cmd_feasibility)
+    # metrics gate
+    def _cmd_gate(a: argparse.Namespace) -> None:
+        import sys
+        with open(a.metrics, "r", encoding="utf-8") as f:
+            metrics = json.load(f)
+        with open(a.report, "r", encoding="utf-8") as f:
+            rep = json.load(f)
+        ok = True
+        if not rep.get("stable", False):
+            ok = False
+        gthr = metrics.get("gamma_min", None)
+        if gthr is not None and rep.get("gamma_stats"):
+            if rep["gamma_stats"].get("gamma_max", 0.0) < float(gthr):
+                ok = False
+        print(json.dumps({"gate": "feasibility", "ok": bool(ok)}))
+        if not ok:
+            sys.exit(2)
+    p_gate = sp.add_parser("gate")
+    p_gate.add_argument("--metrics", default="metrics.json")
+    p_gate.add_argument("--report", default="feasibility_gates_report.json")
+    p_gate.set_defaults(func=_cmd_gate)
     # econ report
     from .analysis_econ import write_economic_report
     p_econ = sp.add_parser("econ")
@@ -161,8 +239,20 @@ def build_parser() -> argparse.ArgumentParser:
     p_econ.add_argument("--n-pbar", type=float, default=1e6)
     p_econ.add_argument("--price", type=float, default=1e-3)
     p_econ.add_argument("--overhead", type=float, default=100.0)
+    p_econ.add_argument(
+        "--channel-report",
+        default=None,
+        help="If provided, read total_energy_J from this JSON",
+    )
     def _cmd_econ(a: argparse.Namespace) -> None:
-        payload = write_economic_report(a.out, a.energy_J, a.n_pbar, a.price, a.overhead)
+        energy = a.energy_J
+        if a.channel_report:
+            try:
+                with open(a.channel_report, "r", encoding="utf-8") as f:
+                    energy = float(json.load(f).get("total_energy_J", energy))
+            except Exception:
+                pass
+        payload = write_economic_report(a.out, energy, a.n_pbar, a.price, a.overhead)
         print(json.dumps(payload))
     p_econ.set_defaults(func=_cmd_econ)
     return ap

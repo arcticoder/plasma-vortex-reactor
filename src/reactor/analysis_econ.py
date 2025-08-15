@@ -1,9 +1,16 @@
 from __future__ import annotations
+
 import json
-from typing import Dict, Any
+from typing import Any, Dict
 
 
-def write_economic_report(path: str, energy_J: float, n_pbar: float, price_per_unit: float, overhead_cost: float) -> Dict[str, Any]:
+def write_economic_report(
+    path: str,
+    energy_J: float,
+    n_pbar: float,
+    price_per_unit: float,
+    overhead_cost: float,
+) -> Dict[str, Any]:
     revenue = n_pbar * price_per_unit
     cost = overhead_cost + energy_J
     fom = (revenue / cost) if cost > 0 else float('inf')

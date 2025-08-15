@@ -75,7 +75,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install ruff
-        run: pip install ruff
+  run: pip install ruff
       - name: Ruff check
         run: ruff check .
   types:
@@ -89,4 +89,4 @@ jobs:
         run: |
           pip install mypy
       - name: Run mypy
-        run: mypy src/reactor
+  run: mypy src/reactor scripts tests

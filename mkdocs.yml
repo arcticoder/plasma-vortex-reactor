@@ -1,0 +1,9 @@
+site_name: Plasma Vortex Reactor Docs
+nav:
+  - Home: index.md
+  - Guides:
+      - Metrics Guide: docs/METRICS_GUIDE.md
+      - Artifact Schema: docs/ARTIFACT_SCHEMA.md
+  - API: api.md
+theme:
+  name: material

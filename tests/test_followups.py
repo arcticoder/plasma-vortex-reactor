@@ -1,11 +1,15 @@
-import json
 import numpy as np
-from reactor.metrics import antiproton_yield_estimator
-from reactor.energy import EnergyLedger, energy_interval, merge_ledgers
-from reactor.analysis import simulate_b_field_ripple, b_field_rms_fluctuation, stability_variance
+
+from reactor.analysis import (
+    b_field_rms_fluctuation,
+    estimate_density_from_em,
+    simulate_b_field_ripple,
+    stability_variance,
+)
 from reactor.core import Reactor
-from reactor.analysis import estimate_density_from_em
-from reactor.thresholds import Thresholds, thresholds_from_json
+from reactor.energy import EnergyLedger, energy_interval, merge_ledgers
+from reactor.metrics import antiproton_yield_estimator
+from reactor.thresholds import thresholds_from_json
 
 
 def test_yield_proxy_reaches_phase1_threshold_note():
@@ -57,16 +61,24 @@ def test_energy_interval_and_merge_ledgers():
 
 
 def test_yield_calibration_dataset():
-    import json, pathlib
-    from reactor.metrics import antiproton_yield_estimator
-    data = json.loads(pathlib.Path("datasets/antiproton_yield_calibration.json").read_text())
+    import json as _json
+    import pathlib
+
+    from reactor.metrics import antiproton_yield_estimator as _yield
+
+    data = _json.loads(
+        pathlib.Path("datasets/antiproton_yield_calibration.json").read_text()
+    )
     for row in data:
-        y = antiproton_yield_estimator(row["n_cm3"], row["Te_eV"], {"k0": row["k0"], "alpha_T": row["alpha_T"]})
+        y = _yield(
+            row["n_cm3"],
+            row["Te_eV"],
+            {"k0": row["k0"], "alpha_T": row["alpha_T"]},
+        )
         assert y >= row["min_yield"]
 
 
 def test_density_attainment_and_artifact(tmp_path):
-    thr = Thresholds()
     E_mag = np.array([0.0, 1.0, 2.0, 3.0])
     ne = estimate_density_from_em(E_mag, gamma=1.0, Emin=0.0, ne_min=0.0)
     # Save a tiny artifact (csv-like)
@@ -77,6 +89,7 @@ def test_density_attainment_and_artifact(tmp_path):
 
 def test_windowed_gamma_and_thresholds_from_json(tmp_path):
     import json as _json
+
     from reactor.analysis import windowed_gamma
     series = np.array([100, 150, 160, 130, 200], dtype=float)
     stats = windowed_gamma(series, window_size=3)

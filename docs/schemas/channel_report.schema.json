@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Energy Channel Report",
+  "type": "object",
+  "properties": {
+    "total_energy_J": { "type": "number" },
+    "channels": {
+      "type": "object",
+      "additionalProperties": { "type": "number" }
+    }
+  },
+  "required": ["total_energy_J", "channels"],
+  "additionalProperties": false
+}
