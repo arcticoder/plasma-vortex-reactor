@@ -1,0 +1,5 @@
+{"event":"Repository created and scaffolded","status":"completed","refs":["README.md","plasma-vortex-reactor.code-workspace","docs/roadmap.ndjson"]}
+{"event":"Added src/reactor package with math/control stubs","status":"completed","refs":["src/reactor/__init__.py","src/reactor/models.py","src/reactor/core.py"]}
+{"event":"Initial tests added (integration smoke, units/shapes)","status":"completed","refs":["tests/test_integration_framework.py"]}
+{"event":"Roadmap and UQ/V&V NDJSON initialized","status":"completed","refs":["docs/roadmap.ndjson","docs/UQ-TODO.ndjson","docs/VnV-TODO.ndjson"]}
+{"event":"Cross-repo workspace configured","status":"completed","refs":["plasma-vortex-reactor.code-workspace"]}

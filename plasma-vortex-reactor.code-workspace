@@ -1,0 +1,21 @@
+{
+  "folders": [
+    { "name": "plasma-vortex-reactor", "path": "." },
+    { "name": "negative-energy-generator", "path": "../negative-energy-generator" },
+    { "name": "elemental-transmutator", "path": "../elemental-transmutator" },
+    { "name": "warp-field-coils", "path": "../warp-field-coils" },
+    { "name": "enhanced-simulation-hardware-abstraction-framework", "path": "../enhanced-simulation-hardware-abstraction-framework" },
+    { "name": "unified-lqg", "path": "../unified-lqg" },
+    { "name": "polymerized-lqg-matter-transporter", "path": "../polymerized-lqg-matter-transporter" },
+    { "name": "lqg-ftl-metric-engineering", "path": "../lqg-ftl-metric-engineering" },
+    { "name": "warp-bubble-optimizer", "path": "../warp-bubble-optimizer" },
+    { "name": "unified-gut-polymerization", "path": "../unified-gut-polymerization" },
+    { "name": "lqg-polymer-field-generator", "path": "../lqg-polymer-field-generator" }
+  ],
+  "settings": {
+    "files.exclude": {"**/.venv": true, "**/__pycache__": true},
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestArgs": ["tests"],
+    "python.analysis.typeCheckingMode": "basic"
+  }
+}
