@@ -3,3 +3,5 @@
 {"event":"Initial tests added (integration smoke, units/shapes)","status":"completed","refs":["tests/test_integration_framework.py"]}
 {"event":"Roadmap and UQ/V&V NDJSON initialized","status":"completed","refs":["docs/roadmap.ndjson","docs/UQ-TODO.ndjson","docs/VnV-TODO.ndjson"]}
 {"event":"Cross-repo workspace configured","status":"completed","refs":["plasma-vortex-reactor.code-workspace"]}
+{"event":"Metrics and thresholds defined across roadmap","status":"completed","refs":["docs/roadmap.ndjson"],"details":{"feasibility":["vortex stability","yield","confinement"],"energy":["E per antiproton","total reduction"],"supporting":["density","B-field","FOM"]}}
+{"event":"UQ/V&V TODOs extended for metrics tracking","status":"completed","refs":["docs/UQ-TODO.ndjson","docs/VnV-TODO.ndjson"],"details":{"ci":"warp-bubble-optimizer timeline/perf validators","integration":["elemental-transmutator","warp-field-coils"]}}
