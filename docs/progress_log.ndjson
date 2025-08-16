@@ -1,3 +1,10 @@
+{"event":"perf_budget_enforced","status":"ok","details":{"file":"scripts/performance_budget.py","ci":"wired"},"date":"2025-08-16"}
+{"event":"release_workflow_added","status":"ok","details":{"file":".github/workflows/release.yml"},"date":"2025-08-16"}
+{"event":"pr_summary_comment","status":"ok","details":{"ci":"github-script"},"date":"2025-08-16"}
+{"event":"dashboard_filters_export","status":"ok","details":{"html":"progress_dashboard.html","json":"progress_dashboard.json"},"date":"2025-08-16"}
+{"event":"cost_and_snr","status":"ok","details":{"scripts":["cost_model_sweep.py","snr_propagation.py"]},"date":"2025-08-16"}
+{"event":"nox_and_make","status":"ok","details":{"noxfile":"present","make":"targets"},"date":"2025-08-16"}
+{"event":"hardware_dry_run","status":"ok","details":{"script":"hardware_runner.py"},"date":"2025-08-16"}
 {"event":"timeline_anomalies_generator","status":"ok","details":{"script":"scripts/generate_timeline_anomalies.py","cli":"pv-anomalies"},"date":"2025-08-16"}
 {"event":"dashboard_navbar","status":"ok","details":{"file":"scripts/generate_progress_dashboard.py","features":["navbar","anchors","anomalies_section"]},"date":"2025-08-16"}
 {"event":"cli_exposed","status":"ok","details":{"scripts":["pv-anomalies","pv-validate-schemas"]},"date":"2025-08-16"}

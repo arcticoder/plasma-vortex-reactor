@@ -583,6 +583,21 @@ def test_cost_sweep_and_snr_propagation(tmp_path):
         _os.chdir(cwd)
 
 
+def test_hardware_runner_dry_run(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        script = _pl.Path(cwd) / "scripts" / "hardware_runner.py"
+        res = subprocess.run([_sys.executable, str(script), "--dry-run", "--steps", "10", "--out", "hardware_run.json"], capture_output=True)
+        assert res.returncode == 0
+        js = _json.loads(_pl.Path("hardware_run.json").read_text())
+        assert js.get("ok") is True and js.get("steps", 0) >= 10 and js.get("errors", 0) == 0
+    finally:
+        _os.chdir(cwd)
+
+
 @pytest.mark.hardware
 def test_hardware_runner_simulated(tmp_path):
     import subprocess, sys as _sys, os as _os, json as _json
