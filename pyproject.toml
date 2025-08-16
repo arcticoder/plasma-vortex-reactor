@@ -28,6 +28,9 @@ pv-bench = "reactor.cli_entry:bench_step_loop"
 pv-build-artifacts = "reactor.cli_entry:build_artifacts"
 pv-anomalies = "reactor.cli_entry:generate_timeline_anomalies"
 pv-validate-schemas = "reactor.cli_entry:validate_schemas"
+pv-cost-sweep = "scripts.cost_model_sweep:main"
+pv-snr-prop = "scripts.snr_propagation:main"
+pv-perf-budget = "scripts.performance_budget:main"
 [tool.ruff]
 line-length = 100
 extend-exclude = ["notebooks/**/*.ipynb", "**/*.ipynb"]

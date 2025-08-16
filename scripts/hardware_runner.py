@@ -23,6 +23,7 @@ def main():
     ap.add_argument("--dt", type=float, default=1e-3)
     ap.add_argument("--timeout", type=float, default=0.05)
     ap.add_argument("--simulate", action="store_true", help="Use a built-in simulated hardware function")
+    ap.add_argument("--dry-run", action="store_true", help="Do not call hardware; just iterate and sleep 0")
     ap.add_argument("--out", default="hardware_run.json")
     args = ap.parse_args()
 
@@ -48,6 +49,11 @@ def main():
     t0 = time.perf_counter()
     for _ in range(args.steps):
         try:
+            if args.dry_run:
+                # emulate time passage and a successful step
+                R._time_s += args.dt  # type: ignore[attr-defined]
+                stats["steps"] += 1
+                continue
             R.step_with_real_hardware(dt=args.dt, timeout=args.timeout)
             stats["steps"] += 1
         except TimeoutError:

@@ -563,6 +563,26 @@ def test_timeline_anomalies_generator_and_dashboard_resilience(tmp_path):
         _os.chdir(cwd)
 
 
+def test_cost_sweep_and_snr_propagation(tmp_path):
+    import subprocess, sys as _sys, os as _os
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        # cost sweep
+        cs = _pl.Path(cwd) / "scripts" / "cost_model_sweep.py"
+        res = subprocess.run([_sys.executable, str(cs), "--n", "5"], capture_output=True)
+        assert res.returncode == 0
+        assert _pl.Path("cost_sweep.json").exists() and _pl.Path("cost_sweep.csv").exists() and _pl.Path("cost_sweep.png").exists()
+        # snr propagation
+        snr = _pl.Path(cwd) / "scripts" / "snr_propagation.py"
+        res2 = subprocess.run([_sys.executable, str(snr), "--snr", "30"], capture_output=True)
+        assert res2.returncode == 0
+        assert _pl.Path("snr_propagation.json").exists() and _pl.Path("snr_propagation.png").exists()
+    finally:
+        _os.chdir(cwd)
+
+
 @pytest.mark.hardware
 def test_hardware_runner_simulated(tmp_path):
     import subprocess, sys as _sys, os as _os, json as _json

@@ -99,6 +99,31 @@ python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_das
 ```
 Open progress_dashboard.html in a browser.
 
+### Additional CLI entry points
+
+Console scripts installed with the package:
+
+- pv-plot-fom, pv-plot-stability
+- pv-run-report, pv-kpi
+- pv-sweep-time, pv-sweep-dyn
+- pv-dashboard
+- pv-hw-runner
+- pv-snr, pv-bench
+- pv-build-artifacts
+- pv-anomalies, pv-validate-schemas
+- pv-cost-sweep, pv-snr-prop, pv-perf-budget
+
+## Releases and Artifacts
+
+The CI workflow uploads a bundle of artifacts on each push/PR, including:
+
+- integrated_report.json, production_kpi.json, feasibility_gates_report.json
+- time_to_metrics.{json,png}, calibration.json
+- key plots: production_fom_yield.png, stability.png, dynamic_stability_ripple.png
+- dashboard: progress_dashboard.html (+ progress_dashboard.json)
+- utility outputs: sensor_noise.png, bench_step_loop.json, bench_trend.jsonl
+- analysis outputs: cost_sweep.{json,csv,png}, snr_propagation.{json,png}
+
 ## Try it: Three Scenarios
 
 - Minimal:

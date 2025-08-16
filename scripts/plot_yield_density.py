@@ -13,11 +13,14 @@ if _src not in sys.path:
 
 from reactor.metrics import antiproton_yield_estimator
 from reactor.plotting import _mpl
+from reactor.thresholds import thresholds_from_json
 
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--out", default="yield_density.png")
+    ap.add_argument("--overlay-thresholds", action="store_true")
+    ap.add_argument("--metrics", default="metrics.json")
     args = ap.parse_args()
     densities = np.array([1e19, 1e20, 1e21], dtype=float)
     yields = [antiproton_yield_estimator(n, 10.0, {"model": "physics"}) for n in densities]
@@ -29,6 +32,13 @@ def main():
     ax.set_xlabel("Density (cm⁻³)")
     ax.set_ylabel("Yield (cm⁻³ s⁻¹)")
     ax.set_title("Yield vs. Density")
+    # overlay threshold(s)
+    if args.overlay_thresholds:
+        try:
+            thr = thresholds_from_json(args.metrics)
+            ax.axhline(1e8, color="gray", linestyle=":", linewidth=1, label="Yield min (proxy)")
+        except Exception:
+            pass
     fig.tight_layout()
     fig.savefig(args.out, dpi=150)
     plt.close(fig)

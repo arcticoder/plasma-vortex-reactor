@@ -59,6 +59,10 @@ jobs:
           python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html
           python scripts/sensor_noise_model.py --out sensor_noise.png --snr 20
           python scripts/bench_step_loop.py --steps 200 --dt 1e-4 --out bench_step_loop.json
+          python scripts/cost_model_sweep.py --n 8
+          python scripts/snr_propagation.py --snr 25
+          python scripts/performance_budget.py --bench bench_step_loop.json --max-elapsed-s 2.0 --trend-out bench_trend.jsonl
+          python scripts/validate_schemas.py > validation_report.json || true
       - name: Run energy reduction demo
         run: |
           . .venv/bin/activate
@@ -94,6 +98,30 @@ jobs:
             progress_dashboard.html
             sensor_noise.png
             bench_step_loop.json
+            bench_trend.jsonl
+            progress_dashboard.json
+            cost_sweep.json
+            cost_sweep.csv
+            cost_sweep.png
+            snr_propagation.json
+            snr_propagation.png
+            validation_report.json
+
+      - name: PR summary comment
+        if: ${{ github.event_name == 'pull_request' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let kpi = {};
+            try { kpi = JSON.parse(fs.readFileSync('production_kpi.json','utf8')); } catch {}
+            const msg = `CI artifacts ready. KPI stable=${kpi.stable ?? 'n/a'}, FOM=${kpi.fom ?? 'n/a'}\n\nArtifacts: progress_dashboard.html, production_kpi.json, integrated_report.json, time_to_metrics.*`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: msg
+            });
             uq_optimized.json
             uq_production.json
             uq_results.json

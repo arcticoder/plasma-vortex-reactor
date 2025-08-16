@@ -14,3 +14,16 @@ types:
 
 smoke:
 	python scripts/smoke_all.py
+
+nox-lint:
+	nox -s lint || true
+
+nox-tests:
+	nox -s tests || true
+
+nox-types:
+	nox -s types || true
+
+paper:
+	@echo "Building docs/paper.tex -> paper.pdf (requires pdflatex)"
+	@pdflatex -interaction=nonstopmode -output-directory=docs docs/paper.tex || true

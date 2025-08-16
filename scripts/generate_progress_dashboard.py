@@ -75,6 +75,7 @@ def build_html(docs_dir: Path) -> str:
         ) + "</ul>")
 
     nav_items: List[str] = []
+    export_summary: Dict[str, Any] = {"generated": now, "sections": []}
     for name in NDJSON_FILES:
         p = docs_dir / name
         items = _read_ndjson(p)
@@ -86,6 +87,7 @@ def build_html(docs_dir: Path) -> str:
             continue
         # Show up to 10 most recent items
         recent = items[-10:]
+        export_summary["sections"].append({"name": name, "count": len(items), "recent": recent})
         sections.append("<ul>")
         for it in recent:
             # pick a nice title-ish field
@@ -98,11 +100,9 @@ def build_html(docs_dir: Path) -> str:
                 or str(it)[:120]
             )
             status = it.get("status") or it.get("state") or it.get("category") or ""
-            sections.append(
-                f"<li><strong>{html.escape(str(title))}</strong>"
-                + (f" <code>{html.escape(str(status))}</code>" if status else "")
-                + "</li>"
-            )
+            cls = "status-ok" if status == "ok" else ("status-warn" if status == "warn" else ("status-fail" if status == "fail" else ""))
+            badge = f"<span class='badge {cls}'>{html.escape(str(status))}</span>" if status else ""
+            sections.append(f"<li class='item {cls}'><strong>{html.escape(str(title))}</strong> {badge}</li>")
         sections.append("</ul>")
 
     navbar = (
@@ -119,24 +119,51 @@ def build_html(docs_dir: Path) -> str:
         ".navbar{position:sticky;top:0;background:#fff8;border-bottom:1px solid #ddd;padding:8px 0;margin-bottom:16px}"
         ".navbar a{margin-right:8px;text-decoration:none;color:#06c}"
         ".navbar a:hover{text-decoration:underline}"
+        ".badge{padding:1px 6px;border-radius:10px;font-size:12px;margin-left:6px}"
+        ".status-ok .badge{background:#e6ffed;color:#22863a;border:1px solid #34d058}"
+        ".status-warn .badge{background:#fff5e6;color:#b08800;border:1px solid #ffd33d}"
+        ".status-fail .badge{background:#ffeef0;color:#cb2431;border:1px solid #d73a49}"
+        ".filters{margin:8px 0} .filters label{margin-right:12px}"
+        ".item{margin:2px 0} .hidden{display:none}"
         "</style>"
         "</head><body>\n<h1>Plasma Vortex Reactor — Progress Dashboard</h1>\n"
         + navbar
+        + "<div class='filters'>\n"
+        + "<label><input type='checkbox' id='toggle-ok' checked> ok</label>"
+        + "<label><input type='checkbox' id='toggle-warn' checked> warn</label>"
+        + "<label><input type='checkbox' id='toggle-fail' checked> fail</label>"
+        + "</div>\n"
         + "\n".join(sections)
+        + f"\n<script>const toggles={{ok:true,warn:true,fail:true}};function apply(){{['ok','warn','fail'].forEach(s=>document.querySelectorAll('.status-'+s).forEach(el=>el.style.display=(toggles[s]?'':'none')));}}document.getElementById('toggle-ok').addEventListener('change',e=>{{toggles.ok=e.target.checked;apply();}});document.getElementById('toggle-warn').addEventListener('change',e=>{{toggles.warn=e.target.checked;apply();}});document.getElementById('toggle-fail').addEventListener('change',e=>{{toggles.fail=e.target.checked;apply();}});apply();</script>"
         + "\n</body></html>\n"
     )
     return doc
+
+
+def export_json(docs_dir: Path, out: Path) -> None:
+    # Reuse build_html logic to collect the same summary but write JSON only
+    now = _dt.datetime.utcnow().isoformat() + "Z"
+    summary: Dict[str, Any] = {"generated": now, "sections": []}
+    for name in NDJSON_FILES:
+        p = docs_dir / name
+        items = _read_ndjson(p)
+        recent = items[-10:]
+        summary["sections"].append({"name": name, "count": len(items), "recent": recent})
+    out.write_text(json.dumps(summary))
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--docs-dir", default="docs", help="Docs directory containing NDJSON files")
     ap.add_argument("--out", default="progress_dashboard.html", help="Output HTML path")
+    ap.add_argument("--json-out", default="progress_dashboard.json", help="Optional JSON summary export")
     args = ap.parse_args()
     docs_dir = Path(args.docs_dir)
     os.makedirs(docs_dir, exist_ok=True)
     html_doc = build_html(docs_dir)
     Path(args.out).write_text(html_doc)
+    if args.json_out:
+        export_json(docs_dir, Path(args.json_out))
 
 
 if __name__ == "__main__":
