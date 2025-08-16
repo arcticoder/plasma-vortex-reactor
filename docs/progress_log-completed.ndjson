@@ -5,3 +5,13 @@
 {"event":"Phase 3: Time sweep and dynamic ripple sweep added","status":"completed","refs":["scripts/param_sweep_confinement.py"],"details":{"csv":["full_sweep_with_time.csv","full_sweep_with_dynamic_ripple.csv"]}}
 {"event":"Phase 3: Dashboard generator added","status":"completed","refs":["scripts/generate_progress_dashboard.py",".github/workflows/ci.yml"],"details":{"artifact":"progress_dashboard.html"}}
 {"event":"Phase 3: Test markers and CI split runs","status":"completed","refs":["pytest.ini",".github/workflows/ci.yml"]}
+{"event":"Phase 3: KPI cost model wiring","status":"completed","refs":["scripts/production_kpi.py","configs/cost_model.json"]}
+{"event":"Phase 3: Local JSON Schemas added","status":"completed","refs":["docs/schemas/integrated_report.schema.json","docs/schemas/production_kpi.schema.json"]}
+{"event":"Phase 3: Sensor noise model utility","status":"completed","refs":["scripts/sensor_noise_model.py"]}
+{"event":"Phase 3: Bench step loop micro-benchmark","status":"completed","refs":["scripts/bench_step_loop.py"]}
+{"event":"Phase 3: Plot overlays enabled","status":"completed","refs":["scripts/plot_production_fom.py","scripts/plot_stability.py"]}
+{"event":"Phase 3: Hardware runner CLI and test","status":"completed","refs":["scripts/hardware_runner.py","tests/test_followups.py"]}
+{"event":"Phase 3: CI hardware job","status":"completed","refs":[".github/workflows/ci.yml"]}
+{"event":"Phase 3: Dashboard artifact links","status":"completed","refs":["scripts/generate_progress_dashboard.py"]}
+{"event":"Phase 3: README badges and CLI catalog","status":"completed","refs":["README.md"]}
+{"event":"Phase 3: Time-to-metrics headless fallback","status":"completed","refs":["scripts/time_to_stability_yield.py"]}

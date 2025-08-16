@@ -46,3 +46,25 @@
 	{"id":23,"title":"Schema sanity test for integrated_report and KPI","refs":["tests/test_followups.py","scripts/run_report.py","scripts/production_kpi.py"]},
 	{"id":24,"title":"Progress dashboard generator (HTML) + CI artifact","refs":["scripts/generate_progress_dashboard.py",".github/workflows/ci.yml","docs/ARTIFACT_SCHEMA.md"]}
 ]}
+{"section":"Phase 3: Scaling/Production - Next 20 Tasks (Batch 2)","status":"planned","as_of":"2025-08-16","tasks":[
+	{"idx":1, "title":"Wire cost model into KPI with fallback FOM and flag","refs":["scripts/production_kpi.py","configs/cost_model.json"]},
+	{"idx":2, "title":"Add local JSON Schemas for integrated_report and KPI","refs":["docs/schemas/integrated_report.schema.json","docs/schemas/production_kpi.schema.json"]},
+	{"idx":3, "title":"Sensor SNR model utility and PNG artifact","refs":["scripts/sensor_noise_model.py",".github/workflows/ci.yml"]},
+	{"idx":4, "title":"Micro-benchmark step loop and JSON artifact","refs":["scripts/bench_step_loop.py",".github/workflows/ci.yml"]},
+	{"idx":5, "title":"Overlay thresholds on production FOM plot","refs":["scripts/plot_production_fom.py","metrics.json"]},
+	{"idx":6, "title":"Overlay thresholds on stability plot","refs":["scripts/plot_stability.py","metrics.json"]},
+	{"idx":7, "title":"Hardware runner CLI for HIL smoke runs","refs":["scripts/hardware_runner.py"]},
+	{"idx":8, "title":"Add @hardware pytest marker and split job in CI","refs":["pytest.ini",".github/workflows/ci.yml","tests/test_followups.py"]},
+	{"idx":9, "title":"Dashboard: list common artifact hyperlinks","refs":["scripts/generate_progress_dashboard.py"]},
+	{"idx":10, "title":"README polish: badges and CLI catalog","refs":["README.md"]},
+	{"idx":11, "title":"Time-to-metrics plotting fallback in headless CI","refs":["scripts/time_to_stability_yield.py"]},
+	{"idx":12, "title":"Default configs/cost_model.json with assumptions","refs":["configs/cost_model.json"]},
+	{"idx":13, "title":"Type-safe module injection in hardware runner","refs":["scripts/hardware_runner.py"]},
+	{"idx":14, "title":"Include cost_model_used flag in KPI output","refs":["scripts/production_kpi.py"]},
+	{"idx":15, "title":"CI: upload sensor_noise and bench_step artifacts","refs":[".github/workflows/ci.yml"]},
+	{"idx":16, "title":"Schema-driven validation in tests when available","refs":["tests/test_followups.py","docs/schemas/"]},
+	{"idx":17, "title":"Hardware runner simulated smoke test","refs":["tests/test_followups.py","scripts/hardware_runner.py"]},
+	{"idx":18, "title":"README Try-it scenarios section","refs":["README.md","scripts/demo_runner.py","examples/"]},
+	{"idx":19, "title":"Progress dashboard minor UX improvements","refs":["scripts/generate_progress_dashboard.py"]},
+	{"idx":20, "title":"Plan: packaging entry points and repo metadata updates","refs":["pyproject.toml","gh CLI (follow-up)"]}
+]}

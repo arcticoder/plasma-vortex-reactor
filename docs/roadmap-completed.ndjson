@@ -12,3 +12,13 @@
 {"milestone":"Phase 3 task: UQ production mode coverage test","status":"completed","refs":["tests/test_followups.py","scripts/uq_optimize.py"],"notes":"uq_production.json validated by test"}
 {"milestone":"Phase 3 task: Schema sanity tests (integrated/KPI)","status":"completed","refs":["tests/test_followups.py","scripts/run_report.py","scripts/production_kpi.py"],"notes":"jsonschema optional via importorskip"}
 {"milestone":"Phase 3 task: Progress dashboard generator","status":"completed","refs":["scripts/generate_progress_dashboard.py","docs/ARTIFACT_SCHEMA.md",".github/workflows/ci.yml"],"notes":"progress_dashboard.html emitted in CI"}
+{"milestone":"Phase 3 task: KPI cost model wiring and fallback FOM","status":"completed","refs":["scripts/production_kpi.py","configs/cost_model.json"],"notes":"Adds --cost-model and cost_model_used flag; safe fallback when FOM missing"}
+{"milestone":"Phase 3 task: Local JSON Schemas (integrated/KPI)","status":"completed","refs":["docs/schemas/integrated_report.schema.json","docs/schemas/production_kpi.schema.json"],"notes":"Schemas added (draft-07); tests use when available"}
+{"milestone":"Phase 3 task: Sensor SNR utility and artifact","status":"completed","refs":["scripts/sensor_noise_model.py",".github/workflows/ci.yml"],"notes":"Generates sensor_noise.png at chosen SNR"}
+{"milestone":"Phase 3 task: Micro-benchmark step loop","status":"completed","refs":["scripts/bench_step_loop.py",".github/workflows/ci.yml"],"notes":"Emits bench_step_loop.json with elapsed_s"}
+{"milestone":"Phase 3 task: Plot thresholds overlays (FOM, Γ)","status":"completed","refs":["scripts/plot_production_fom.py","scripts/plot_stability.py","metrics.json"],"notes":"Adds --overlay-thresholds for visibility"}
+{"milestone":"Phase 3 task: Hardware runner CLI and smoke test","status":"completed","refs":["scripts/hardware_runner.py","tests/test_followups.py"],"notes":"@hardware test plus standalone CLI with --simulate"}
+{"milestone":"Phase 3 task: Hardware tests CI job","status":"completed","refs":[".github/workflows/ci.yml","pytest.ini"],"notes":"Separate job runs -m hardware"}
+{"milestone":"Phase 3 task: Dashboard artifact links","status":"completed","refs":["scripts/generate_progress_dashboard.py"],"notes":"Lists common artifacts when present"}
+{"milestone":"Phase 3 task: README badges + CLI catalog + Try-it","status":"completed","refs":["README.md"],"notes":"Adds badges and quick commands"}
+{"milestone":"Phase 3 task: Headless-safe time-to-metrics PNG","status":"completed","refs":["scripts/time_to_stability_yield.py"],"notes":"Writes placeholder image if plotting not available"}

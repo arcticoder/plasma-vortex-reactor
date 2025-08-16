@@ -23,3 +23,13 @@
 {"event":"Phase 3: UQ production mode CLI test added","status":"completed","refs":["tests/test_followups.py","scripts/uq_optimize.py"],"details":{"artifact":"uq_production.json"}}
 {"event":"Phase 3: Schema sanity tests for integrated/KPI","status":"completed","refs":["tests/test_followups.py","scripts/run_report.py","scripts/production_kpi.py"],"details":{"guard":"jsonschema optional"}}
 {"event":"Phase 3: Progress dashboard generator + artifact","status":"completed","refs":["scripts/generate_progress_dashboard.py",".github/workflows/ci.yml","docs/ARTIFACT_SCHEMA.md"],"details":{"artifact":"progress_dashboard.html"}}
+{"event":"Phase 3: KPI cost model wiring","status":"completed","refs":["scripts/production_kpi.py","configs/cost_model.json"],"details":{"flag":"--cost-model","fields_added":["cost_model_used"]}}
+{"event":"Phase 3: Added local JSON schemas for validation","status":"completed","refs":["docs/schemas/integrated_report.schema.json","docs/schemas/production_kpi.schema.json"],"details":{"draft":"07"}}
+{"event":"Phase 3: Sensor SNR model utility","status":"completed","refs":["scripts/sensor_noise_model.py"],"details":{"artifact":"sensor_noise.png"}}
+{"event":"Phase 3: Micro-benchmark step loop","status":"completed","refs":["scripts/bench_step_loop.py"],"details":{"artifact":"bench_step_loop.json"}}
+{"event":"Phase 3: Plot thresholds overlays (FOM, Γ)","status":"completed","refs":["scripts/plot_production_fom.py","scripts/plot_stability.py"],"details":{"source":"metrics.json"}}
+{"event":"Phase 3: Hardware runner CLI and test","status":"completed","refs":["scripts/hardware_runner.py","tests/test_followups.py"],"details":{"marker":"hardware"}}
+{"event":"Phase 3: CI hardware-tests job","status":"completed","refs":[".github/workflows/ci.yml"],"details":{"selector":"pytest -m hardware"}}
+{"event":"Phase 3: Dashboard artifact links","status":"completed","refs":["scripts/generate_progress_dashboard.py"],"details":{"list":"common artifacts"}}
+{"event":"Phase 3: README polish and CLI catalog","status":"completed","refs":["README.md"],"details":{"badges":true}}
+{"event":"Phase 3: Headless-safe time_to_metrics.png","status":"completed","refs":["scripts/time_to_stability_yield.py"],"details":{"placeholder":true}}
