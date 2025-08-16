@@ -31,6 +31,8 @@ NDJSON_FILES = [
     "UQ-TODO-RESOLVED.ndjson",
     "VnV-TODO.ndjson",
     "VnV-TODO-RESOLVED.ndjson",
+    # Optional synthetic anomaly stream
+    "timeline_anomalies.ndjson",
 ]
 
 
@@ -72,10 +74,13 @@ def build_html(docs_dir: Path) -> str:
             f"<li><a href='{html.escape(a)}'>{html.escape(a)}</a></li>" for a in found
         ) + "</ul>")
 
+    nav_items: List[str] = []
     for name in NDJSON_FILES:
         p = docs_dir / name
         items = _read_ndjson(p)
-        sections.append(f"<h2>{html.escape(name)} ({len(items)})</h2>")
+        sec_id = html.escape(name.replace(".ndjson", "").replace("_", "-").replace(" ", "-").lower())
+        nav_items.append(f"<a href='#sec-{sec_id}'>{html.escape(name)}</a>")
+        sections.append(f"<h2 id='sec-{sec_id}'>" + html.escape(name) + f" ({len(items)})</h2>")
         if not items:
             sections.append("<p><em>No entries</em></p>")
             continue
@@ -100,11 +105,23 @@ def build_html(docs_dir: Path) -> str:
             )
         sections.append("</ul>")
 
+    navbar = (
+        "<nav class='navbar'>"
+        + " | ".join(nav_items)
+        + "</nav>"
+    )
     doc = (
         "<!doctype html>\n<html><head><meta charset='utf-8'>"
         "<title>Progress Dashboard</title>"
-        "<style>body{font-family:sans-serif;margin:24px}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}</style>"
+        "<style>"
+        "body{font-family:sans-serif;margin:24px}"
+        "code{background:#f4f4f4;padding:1px 4px;border-radius:3px}"
+        ".navbar{position:sticky;top:0;background:#fff8;border-bottom:1px solid #ddd;padding:8px 0;margin-bottom:16px}"
+        ".navbar a{margin-right:8px;text-decoration:none;color:#06c}"
+        ".navbar a:hover{text-decoration:underline}"
+        "</style>"
         "</head><body>\n<h1>Plasma Vortex Reactor — Progress Dashboard</h1>\n"
+        + navbar
         + "\n".join(sections)
         + "\n</body></html>\n"
     )

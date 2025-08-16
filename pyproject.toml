@@ -1,3 +1,33 @@
+[project]
+name = "plasma-vortex-reactor"
+version = "0.0.0"
+description = "Plasma Vortex Reactor modeling and production scaling tools"
+requires-python = ">=3.10"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [
+	{ name = "arcticoder" }
+]
+
+[project.optional-dependencies]
+plot = [
+	"matplotlib>=3.6"
+]
+
+[project.scripts]
+pv-plot-fom = "reactor.cli_entry:plot_production_fom"
+pv-plot-stability = "reactor.cli_entry:plot_stability"
+pv-run-report = "reactor.cli_entry:run_report"
+pv-kpi = "reactor.cli_entry:production_kpi"
+pv-sweep-time = "reactor.cli_entry:sweep_time"
+pv-sweep-dyn = "reactor.cli_entry:sweep_dynamic_ripple"
+pv-dashboard = "reactor.cli_entry:generate_dashboard"
+pv-hw-runner = "reactor.cli_entry:hardware_runner"
+pv-snr = "reactor.cli_entry:sensor_noise"
+pv-bench = "reactor.cli_entry:bench_step_loop"
+pv-build-artifacts = "reactor.cli_entry:build_artifacts"
+pv-anomalies = "reactor.cli_entry:generate_timeline_anomalies"
+pv-validate-schemas = "reactor.cli_entry:validate_schemas"
 [tool.ruff]
 line-length = 100
 extend-exclude = ["notebooks/**/*.ipynb", "**/*.ipynb"]
