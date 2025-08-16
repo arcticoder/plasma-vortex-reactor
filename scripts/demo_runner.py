@@ -171,6 +171,13 @@ def main():
             R.log_production_failure(timeline_path or "progress.ndjson")
     except Exception:
         pass
+    # Log edge-case failure for scenarios specifically labeled edge
+    try:
+        if args.scenario and os.path.basename(args.scenario).startswith("scenario_edge"):
+            if hasattr(R, "log_edge_production_failure"):
+                R.log_edge_production_failure(timeline_path or "progress.ndjson")
+    except Exception:
+        pass
     try:
         # Log edge case too (lower density / higher energy) for diagnostics
         y_low = antiproton_yield_estimator(1e19, 5.0, {"model": "physics"})

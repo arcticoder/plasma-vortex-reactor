@@ -37,7 +37,7 @@ jobs:
           python scripts/plot_stability.py --out stability.png
           python -c "import sys; sys.path.insert(0, 'src'); from reactor.analysis_stat import plot_stability_ripple; plot_stability_ripple([5e-5,1e-4,2e-4],[0.999,0.998,0.995],'stability_ripple.png')"
           python scripts/plot_fom.py --out fom_yield.png
-          python scripts/plot_production_fom.py --out production_fom.png
+          python scripts/plot_production_fom.py --fixed --out production_fom_yield.png
           python scripts/plot_yield_density.py --out yield_density.png
           python scripts/plot_hardware_metrics.py --out hardware_metrics.png
           python scripts/full_sweep.py --out full_sweep.csv
@@ -60,7 +60,7 @@ jobs:
             stability.png
             stability_ripple.png
             fom_yield.png
-            production_fom.png
+            production_fom_yield.png
             yield_density.png
             hardware_metrics.png
             energy_reduction.png
@@ -78,6 +78,7 @@ jobs:
           - examples/scenario_high_ripple.json
           - examples/scenario_high_density.json
           - examples/scenario_low_temp.json
+          - examples/scenario_edge.json
           - examples/scenario_high_load.json
     steps:
       - uses: actions/checkout@v4

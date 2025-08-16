@@ -185,8 +185,36 @@ class Reactor:
         except Exception:
             pass
 
+    def log_edge_production_failure(self, path: str = "progress.ndjson") -> None:
+        """Log failures for edge-case production conditions using current state proxy.
+
+        Uses the same physics yield estimator and an energy proxy from accumulated time.
+        """
+        try:
+            n_e = float(getattr(self, "ne_cm3", 0.0))
+            T_e = float(getattr(self, "Te_eV", 0.0))
+            y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
+            E_total = max(1e-9, self._time_s) * 1e6
+            f = total_fom(y, E_total)
+            if (f < 0.1) or (y < 1e12):
+                append_event(path, event="edge_production_failure", status="fail", details={"fom": float(f), "yield": float(y)})
+        except Exception:
+            pass
+
+    def log_high_load_hardware_error(self, error: Exception, path: str = "progress.ndjson") -> None:
+        try:
+            append_event(path, event="high_load_hardware_error", status="fail", details={"error": str(error)})
+        except Exception:
+            pass
+
+    def log_high_load_timeout(self, path: str = "progress.ndjson") -> None:
+        try:
+            append_event(path, event="high_load_timeout", status="fail")
+        except Exception:
+            pass
+
     # Real hardware integration with timeout and error/timeout logging
-    def step_with_real_hardware(self, dt: float, timeout: float = 30.0) -> None:
+    def step_with_real_hardware(self, dt: float, timeout: float = 60.0) -> None:
         try:
             from enhanced_simulation_hardware_abstraction_framework import simulate_hardware  # type: ignore
         except Exception as e:
@@ -203,6 +231,9 @@ class Reactor:
             if (_time.time() - t0) > float(timeout):
                 try:
                     append_event(self.timeline_log_path or "progress.ndjson", event="hardware_timeout", status="fail")
+                    # high-load specific timeout marker
+                    if isinstance(getattr(self, "hw_state", {}).get("load", None), str):
+                        self.log_high_load_timeout(self.timeline_log_path or "progress.ndjson")
                 except Exception:
                     pass
                 raise TimeoutError("Hardware timeout")
@@ -225,6 +256,8 @@ class Reactor:
                     status="fail",
                     details={"error": str(e)},
                 )
+                if evt == "production_hardware_error":
+                    self.log_high_load_hardware_error(e, self.timeline_log_path or "progress.ndjson")
             except Exception:
                 pass
             return
