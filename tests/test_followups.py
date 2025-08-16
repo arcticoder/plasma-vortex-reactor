@@ -360,3 +360,52 @@ def test_hardware_timeout(monkeypatch):
         # expected
         return
     assert False, "Expected TimeoutError"
+
+
+def test_time_sweep(tmp_path, monkeypatch):
+    # Run the time sweep function and verify CSV structure
+    import subprocess, sys as _sys, os as _os
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        # call the script from repo path
+        import pathlib as _pl
+        repo_root = _pl.Path(cwd)
+        script = repo_root / "scripts" / "param_sweep_confinement.py"
+        res = subprocess.run([_sys.executable, str(script), "--full-sweep-with-time"], capture_output=True)
+        assert res.returncode == 0
+        csvp = _pl.Path("full_sweep_with_time.csv")
+        assert csvp.exists() and csvp.stat().st_size > 0
+        # Inspect header
+        head = csvp.read_text().splitlines()[0]
+        for col in ["t", "yield", "E_total", "fom", "ripple", "eta"]:
+            assert col in head
+    finally:
+        _os.chdir(cwd)
+
+
+def test_dynamic_ripple_time(tmp_path):
+    import subprocess, sys as _sys, os as _os
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        repo_root = _pl.Path(cwd)
+        script = repo_root / "scripts" / "param_sweep_confinement.py"
+        res = subprocess.run([_sys.executable, str(script), "--full-sweep-with-dynamic-ripple"], capture_output=True)
+        assert res.returncode == 0
+        csvp = _pl.Path("full_sweep_with_dynamic_ripple.csv")
+        assert csvp.exists() and csvp.stat().st_size > 0
+        text = csvp.read_text().splitlines()
+        assert "ripple_initial" in text[0] and "ripple_dynamic" in text[0]
+    finally:
+        _os.chdir(cwd)
+
+
+def test_dynamic_stability_plot(tmp_path):
+    # Use built-in plotting function to generate a dynamic stability vs ripple plot
+    from reactor.analysis_stat import plot_stability_ripple
+    import os as _os
+    out = tmp_path / "dynamic_stability_ripple.png"
+    plot_stability_ripple([5e-5, 1e-4, 2e-4], [0.999, 0.998, 0.995], str(out))
+    assert out.exists() and out.stat().st_size > 0

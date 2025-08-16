@@ -38,6 +38,8 @@ def main():
     ap.add_argument("--plot", default=None, help="Optional PNG output; requires matplotlib")
     ap.add_argument("--plot-confinement-energy", default=None, help="Optional PNG plotting confinement vs synthetic energy reduction factor")
     ap.add_argument("--full-sweep-with-ripple", action="store_true", help="Write full_sweep_with_ripple.csv for small demo ranges")
+    ap.add_argument("--full-sweep-with-time", action="store_true", help="Write full_sweep_with_time.csv including time and FOM columns")
+    ap.add_argument("--full-sweep-with-dynamic-ripple", action="store_true", help="Write full_sweep_with_dynamic_ripple.csv including time-varying ripple via Reactor.adjust_ripple")
     ap.add_argument(
         "--heatmap",
         default=None,
@@ -180,6 +182,74 @@ def main():
             w.writeheader()
             for r in rows:
                 w.writerow(r)
+
+    if args.full_sweep_with_time:
+        # Include time dimension and compute FOM using a simple energy proxy E_total = t * 1e6
+        from itertools import product
+        import csv as _csv
+        import math as _math
+
+        n_e_range = [1e19, 1e20, 1e21]
+        T_e_range = [5.0, 10.0, 20.0]
+        B_range = [4.5, 5.0, 5.5]
+        xi_range = [1.0, 2.0, 4.0]
+        alpha_range = [0.0, 0.01]
+        t_range = [0.01, 0.1, 1.0]  # seconds
+        rows = []
+        for n_e, T_e, B, xi, alpha, t in product(n_e_range, T_e_range, B_range, xi_range, alpha_range, t_range):
+            ripple = 0.01 * max(0.0, 1.0 - alpha * t)
+            y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
+            # energy proxy and FOM
+            E_total = max(1e-9, t) * 1e6
+            from reactor.metrics import total_fom as _fom
+            f = _fom(y, E_total)
+            eta_ok = bennett_confinement_check(n_e, xi, B, ripple)
+            rows.append({"n_e": n_e, "T_e": T_e, "B": B, "xi": xi, "alpha": alpha, "t": t, "ripple": ripple, "yield": y, "E_total": E_total, "fom": f, "eta": bool(eta_ok)})
+        with open("full_sweep_with_time.csv", "w", newline="", encoding="utf-8") as f:
+            w = _csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+            w.writeheader()
+            for r in rows:
+                w.writerow(r)
+
+    if args.full_sweep_with_dynamic_ripple:
+        # Use Reactor.adjust_ripple to evolve ripple vs time given a synthetic B_series around mean B
+        from itertools import product
+        import numpy as _np
+        from reactor.core import Reactor as _Reactor
+        from reactor.analysis_fields import b_field_rms_fluctuation as _ripple
+
+        n_e_range = [1e19, 1e20, 1e21]
+        T_e_range = [5.0, 10.0, 20.0]
+        B_range = [5.0]  # use single mean for series generation
+        xi_range = [1.0, 2.0, 4.0]
+        alpha_range = [0.0, 0.01]
+        t_range = [0.01, 0.1, 1.0]
+        rows = []
+        for n_e, T_e, B, xi, alpha, t in product(n_e_range, T_e_range, B_range, xi_range, alpha_range, t_range):
+            # build B_series around B with small Gaussian ripple
+            base = float(B)
+            series = _np.ones(256) * base + _np.random.normal(0, 5e-5, 256)
+            R = _Reactor(grid=(16, 16), nu=1e-3, b_series=series)
+            R._time_s = float(t)
+            ripple0 = _ripple(R.B_series if R.B_series is not None else series)
+            ripple1 = R.adjust_ripple(alpha=float(alpha))
+            y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
+            E_total = max(1e-9, t) * 1e6
+            from reactor.metrics import total_fom as _fom
+            f = _fom(y, E_total)
+            eta_ok = bennett_confinement_check(n_e, xi, base, ripple1)
+            rows.append({
+                "n_e": n_e, "T_e": T_e, "B": base, "xi": xi, "alpha": alpha, "t": t,
+                "ripple_initial": ripple0, "ripple_dynamic": ripple1,
+                "yield": y, "E_total": E_total, "fom": f, "eta": bool(eta_ok)
+            })
+        if rows:
+            import csv as _csv
+            with open("full_sweep_with_dynamic_ripple.csv", "w", newline="", encoding="utf-8") as f:
+                w = _csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+                w.writeheader()
+                for r in rows:
+                    w.writerow(r)
 
 
 def full_sweep(n_e_range, T_e_range, B_range, xi_range, out_csv: str = "full_sweep.csv") -> None:
