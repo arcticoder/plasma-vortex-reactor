@@ -19,10 +19,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest ruff jsonschema
-      - name: Run tests
+      - name: Run tests (fast)
         run: |
           . .venv/bin/activate
-          pytest -q
+          pytest -q -m "not slow and not production"
+      - name: Run tests (production)
+        run: |
+          . .venv/bin/activate
+          pytest -q -m "production"
       - name: Demo run and artifacts
         run: |
           . .venv/bin/activate

@@ -1,5 +1,6 @@
 import numpy as np
 import sys
+import pytest
 
 from reactor.analysis import (
     b_field_rms_fluctuation,
@@ -239,6 +240,7 @@ def test_production_fom():
     assert total_fom(y, E_total) >= 0.1
 
 
+@pytest.mark.production
 def test_high_load_stability():
     from reactor.analysis_stat import stability_probability
     series = np.ones(1_000_000) * 150.0 + np.random.normal(0, 0.01, 1_000_000)
@@ -275,15 +277,15 @@ def test_production_timeout(monkeypatch):
     assert False, "Expected TimeoutError"
 
 
+@pytest.mark.production
 def test_high_load_fom():
-    # FOM should meet threshold under high-load pulsed production
     y = pulsed_yield_enhancement(antiproton_yield_estimator(1e21, 20.0, {"model": "physics"}))
     E_total = 1e10
     assert total_fom(y, E_total) >= 0.1
 
 
+@pytest.mark.production
 def test_high_load_hardware(monkeypatch):
-    # High-load hardware integration should set hw flag in state
     def _fake_sim(state):
         d = dict(state)
         d["hw"] = True
@@ -309,8 +311,8 @@ def test_dynamic_ripple_high_load():
     assert r2 < r1
 
 
+@pytest.mark.production
 def test_high_load_timeout(monkeypatch):
-    # A very small timeout should cause TimeoutError on slow hardware
     import time as _time
     def _slow_sim(state):
         _time.sleep(0.02)
@@ -362,8 +364,8 @@ def test_hardware_timeout(monkeypatch):
     assert False, "Expected TimeoutError"
 
 
+@pytest.mark.slow
 def test_time_sweep(tmp_path, monkeypatch):
-    # Run the time sweep function and verify CSV structure
     import subprocess, sys as _sys, os as _os
     cwd = _os.getcwd()
     try:
@@ -383,7 +385,58 @@ def test_time_sweep(tmp_path, monkeypatch):
     finally:
         _os.chdir(cwd)
 
+@pytest.mark.production
+def test_uq_optimize_production(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        script = _pl.Path(cwd) / "scripts" / "uq_optimize.py"
+        res = subprocess.run([_sys.executable, str(script), "--samples", "5", "--production"], capture_output=True)
+        assert res.returncode == 0
+        p = _pl.Path("uq_production.json")
+        assert p.exists() and p.stat().st_size > 0
+        data = _json.loads(p.read_text())
+        assert data.get("n_samples", 0) >= 5
+    finally:
+        _os.chdir(cwd)
 
+
+def test_schema_validation_for_integrated_and_kpi(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    jsonschema = pytest.importorskip("jsonschema")
+    validate = jsonschema.validate
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        # Minimal files to build reports
+        _pl.Path("feasibility_gates_report.json").write_text(_json.dumps({"stable": True, "fom": 0.12}))
+        _pl.Path("timeline_summary.json").write_text(_json.dumps({}))
+        _pl.Path("uq_optimized.json").write_text(_json.dumps({"n_samples": 1, "means": {}}))
+        _pl.Path("uq_production.json").write_text(_json.dumps({"n_samples": 1, "means": {}}))
+        _pl.Path("full_sweep_with_time.csv").write_text("n_e,T_e,B,xi,alpha,t,ripple,yield,E_total,fom,eta\n")
+        _pl.Path("full_sweep_with_dynamic_ripple.csv").write_text("n_e,T_e,B,xi,alpha,t,ripple_initial,ripple_dynamic,yield,E_total,fom,eta\n")
+        run_report = _pl.Path(cwd) / "scripts" / "run_report.py"
+        res = subprocess.run([_sys.executable, str(run_report), "--integrated-out", "integrated_report.json"], capture_output=True)
+        assert res.returncode == 0
+        # KPI
+        kpi = _pl.Path(cwd) / "scripts" / "production_kpi.py"
+        res2 = subprocess.run([_sys.executable, str(kpi)], capture_output=True)
+        assert res2.returncode == 0
+        # Validate schemas (minimal)
+        integrated = _json.loads(_pl.Path("integrated_report.json").read_text())
+        kpi_js = _json.loads(_pl.Path("production_kpi.json").read_text())
+        integrated_schema = {"type": "object", "properties": {"feasibility": {"type": "object"}, "uq": {"type": "object"}, "uq_production": {"type": "object"}, "sweeps": {"type": "object"}}, "required": ["feasibility", "sweeps"]}
+        kpi_schema = {"type": "object", "properties": {"stable": {"type": "boolean"}, "fom": {}}, "required": ["stable"]}
+        validate(instance=integrated, schema=integrated_schema)
+        validate(instance=kpi_js, schema=kpi_schema)
+    finally:
+        _os.chdir(cwd)
+
+
+@pytest.mark.slow
 def test_dynamic_ripple_time(tmp_path):
     import subprocess, sys as _sys, os as _os
     cwd = _os.getcwd()
@@ -402,6 +455,7 @@ def test_dynamic_ripple_time(tmp_path):
         _os.chdir(cwd)
 
 
+@pytest.mark.slow
 def test_dynamic_stability_plot(tmp_path):
     # Use built-in plotting function to generate a dynamic stability vs ripple plot
     from reactor.analysis_stat import plot_stability_ripple
