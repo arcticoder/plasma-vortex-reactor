@@ -13,6 +13,7 @@ from .plasma import debye_length
 from .analysis_fields import b_field_rms_fluctuation
 from .analysis_confinement import log_confinement
 from .models import drift_poisson_step, vorticity_evolution
+from .metrics import total_fom
 
 
 class Reactor:
@@ -157,6 +158,53 @@ class Reactor:
         # out of budget: disable further logging
         self.timeline_log_path = None
         return False
+
+    # Production metrics logging
+    def log_production_metrics(self, path: str = "progress.ndjson") -> None:
+        try:
+            # For simplicity, use current density/temperature if present on state dict
+            n_e = float(getattr(self, "ne_cm3", 0.0))
+            T_e = float(getattr(self, "Te_eV", 0.0))
+            y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
+            # Approximate energy from steps as proxy (not a full ledger here)
+            E_total = max(1e-9, self._time_s) * 1e6
+            f = total_fom(y, E_total)
+            append_event(path, event="production_metrics", status="ok", details={"yield": float(y), "fom": float(f)})
+        except Exception:
+            pass
+
+    # Real hardware integration with timeout and error/timeout logging
+    def step_with_real_hardware(self, dt: float, timeout: float = 10.0) -> None:
+        try:
+            from enhanced_simulation_hardware_abstraction_framework import simulate_hardware  # type: ignore
+        except Exception as e:
+            # Log error if hardware module unavailable
+            try:
+                append_event(self.timeline_log_path or "progress.ndjson", event="hardware_error", status="fail", details={"error": str(e)})
+            except Exception:
+                pass
+            return
+        import time as _time
+        t0 = _time.time()
+        try:
+            hw_state = simulate_hardware(getattr(self, "hw_state", {}))  # type: ignore[misc]
+            if (_time.time() - t0) > float(timeout):
+                try:
+                    append_event(self.timeline_log_path or "progress.ndjson", event="hardware_timeout", status="fail")
+                except Exception:
+                    pass
+                raise TimeoutError("Hardware timeout")
+            # update internal hardware state and advance step
+            self.hw_state = dict(hw_state)
+            self.step(dt)
+        except TimeoutError:
+            raise
+        except Exception as e:
+            try:
+                append_event(self.timeline_log_path or "progress.ndjson", event="hardware_error", status="fail", details={"error": str(e)})
+            except Exception:
+                pass
+            return
 
 
 # Optional ecosystem integration with unified_gut_polymerization

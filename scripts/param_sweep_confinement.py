@@ -37,6 +37,7 @@ def main():
     ap.add_argument("--out", default="confinement_sweep.csv")
     ap.add_argument("--plot", default=None, help="Optional PNG output; requires matplotlib")
     ap.add_argument("--plot-confinement-energy", default=None, help="Optional PNG plotting confinement vs synthetic energy reduction factor")
+    ap.add_argument("--full-sweep-with-ripple", action="store_true", help="Write full_sweep_with_ripple.csv for small demo ranges")
     ap.add_argument(
         "--heatmap",
         default=None,
@@ -159,6 +160,26 @@ def main():
             print(f"Confinement-energy plot failed: {e}")
 
     # Optional full sweep utility can be imported by other scripts
+
+    if args.full_sweep_with_ripple:
+        # Small demo ranges to keep CI fast
+        from itertools import product
+        n_e_range = [1e19, 1e20, 1e21]
+        T_e_range = [5.0, 10.0, 20.0]
+        B_range = [4.5, 5.0, 5.5]
+        xi_range = [1.0, 2.0, 4.0]
+        alpha_range = [0.0, 0.01]
+        rows = []
+        for n_e, T_e, B, xi, alpha in product(n_e_range, T_e_range, B_range, xi_range, alpha_range):
+            ripple = 0.01 * max(0.0, 1.0 - alpha * 0.1)  # t=0.1 proxy
+            y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
+            eta_ok = bennett_confinement_check(n_e, xi, B, ripple)
+            rows.append({"n_e": n_e, "T_e": T_e, "B": B, "xi": xi, "alpha": alpha, "yield": y, "eta": bool(eta_ok)})
+        with open("full_sweep_with_ripple.csv", "w", newline="", encoding="utf-8") as f:
+            w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+            w.writeheader()
+            for r in rows:
+                w.writerow(r)
 
 
 def full_sweep(n_e_range, T_e_range, B_range, xi_range, out_csv: str = "full_sweep.csv") -> None:

@@ -53,6 +53,11 @@ def main():
         action="store_true",
         help="Enable mocked hardware-in-the-loop step",
     )
+    ap.add_argument(
+        "--real-hardware",
+        action="store_true",
+        help="Call real hardware integration wrapper",
+    )
     args = ap.parse_args()
 
     cfg = {}
@@ -110,6 +115,11 @@ def main():
         st = time.perf_counter()
         st_ns = time.perf_counter_ns()
         R.step(dt=float(args.dt))
+        if args.real_hardware:
+            try:
+                R.step_with_real_hardware(dt=float(args.dt), timeout=0.01)
+            except Exception:
+                pass
         # Optional hardware simulation step updates timeline
         if args.hardware_simulation and timeline_path:
             try:
@@ -147,6 +157,12 @@ def main():
     try:
         y = antiproton_yield_estimator(1e20, 10.0, {"model": "physics"})
         log_fom(y, ledger.total_energy(), timeline_path or "progress.ndjson")
+    except Exception:
+        pass
+    # Optionally log production metrics summary
+    try:
+        if hasattr(R, "log_production_metrics"):
+            R.log_production_metrics(timeline_path or "progress.ndjson")
     except Exception:
         pass
     try:

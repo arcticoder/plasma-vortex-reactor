@@ -1,0 +1,9 @@
+{
+  "grid": [32, 32],
+  "nu": 0.001,
+  "xi": 2.0,
+  "b_field_ripple_pct": 0.0001,
+  "timeline_log_path": "timeline.ndjson",
+  "n_cm3": 1e21,
+  "Te_eV": 10.0
+}

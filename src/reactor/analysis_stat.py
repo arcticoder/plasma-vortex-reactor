@@ -72,3 +72,21 @@ def plot_stability_curve(time_ms: Sequence[float], gamma_series: Sequence[float]
     fig.tight_layout()
     fig.savefig(out_png, dpi=150)
     plt.close(fig)
+
+
+def plot_stability_ripple(ripples: Sequence[float], probabilities: Sequence[float], out_png: str) -> None:
+    """Plot stability probability vs. ripple fraction to PNG."""
+    from .plotting import _mpl
+
+    import numpy as _np
+    r = _np.asarray(list(ripples), dtype=float)
+    p = _np.asarray(list(probabilities), dtype=float)
+    plt = _mpl()
+    fig, ax = plt.subplots(figsize=(5, 4))
+    ax.scatter(r, p, color="royalblue")
+    ax.set_xlabel("Ripple (fraction)")
+    ax.set_ylabel("Stability Probability")
+    ax.set_title("Stability vs. Ripple")
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=150)
+    plt.close(fig)

@@ -35,8 +35,12 @@ jobs:
           python scripts/uq_demo.py --samples 10 --seed 42 --out-json uq_results.json --out-csv uq_results.csv
           python scripts/analysis_fields_plot.py --out b_field_ripple.png
           python scripts/plot_stability.py --out stability.png
+          python -c "import sys; sys.path.insert(0, 'src'); from reactor.analysis_stat import plot_stability_ripple; plot_stability_ripple([5e-5,1e-4,2e-4],[0.999,0.998,0.995],'stability_ripple.png')"
           python scripts/plot_fom.py --out fom_yield.png
+          python scripts/plot_yield_density.py --out yield_density.png
+          python scripts/plot_hardware_metrics.py --out hardware_metrics.png
           python scripts/full_sweep.py --out full_sweep.csv
+          python scripts/param_sweep_confinement.py --full-sweep-with-ripple
           python scripts/uq_optimize.py --samples 10 --seed 123 --out uq_optimized.json
       - name: Run energy reduction demo
         run: |
@@ -53,9 +57,13 @@ jobs:
             confinement_energy.png
             b_field_ripple.png
             stability.png
+            stability_ripple.png
             fom_yield.png
+            yield_density.png
+            hardware_metrics.png
             energy_reduction.png
             full_sweep.csv
+            full_sweep_with_ripple.csv
             uq_optimized.json
             uq_results.json
             uq_results.csv
@@ -63,7 +71,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scenario: [examples/scenario_min.json, examples/scenario_high_ripple.json]
+        scenario: [examples/scenario_min.json, examples/scenario_high_ripple.json, examples/scenario_high_density.json, examples/scenario_low_temp.json]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -80,7 +88,7 @@ jobs:
           python scripts/demo_runner.py --scenario ${{ matrix.scenario }} --steps 5 --dt 1e-3 --seed 7
           python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
             --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
-            --out feasibility_gates_report.json --scenario-id ${{ matrix.scenario }} --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield || true
+            --out feasibility_gates_report.json --scenario-id ${{ matrix.scenario }} --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield --require-fom || true
           # metrics_gate enforces failure for high_ripple scenario demonstrating gated failure
           python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
   lint:
