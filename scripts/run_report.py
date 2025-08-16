@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
+from typing import Any, Dict, List
 
 
 def main():
@@ -18,6 +20,12 @@ def main():
     ap.add_argument("--out", default="run_report.json")
     ap.add_argument("--channel-report", default="channel_report.json")
     ap.add_argument("--yield-report", default=None)
+    # Optional integrated report inputs
+    ap.add_argument("--uq", default="uq_optimized.json")
+    ap.add_argument("--uq-production", default="uq_production.json")
+    ap.add_argument("--sweep-time", default="full_sweep_with_time.csv")
+    ap.add_argument("--sweep-dyn", default="full_sweep_with_dynamic_ripple.csv")
+    ap.add_argument("--integrated-out", default="integrated_report.json")
     args = ap.parse_args()
     data = {}
     try:
@@ -56,6 +64,41 @@ def main():
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
     print(json.dumps({"wrote": args.out}))
+
+    # Write integrated_report.json (optional)
+    def _read_json(path: str) -> Dict[str, Any]:
+        try:
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {"_missing": True, "path": path}
+
+    def _read_csv_head(path: str, limit: int = 200) -> Dict[str, Any]:
+        try:
+            rows: List[Dict[str, Any]] = []
+            with open(path, newline="", encoding="utf-8") as f:
+                r = csv.DictReader(f)
+                for i, row in enumerate(r):
+                    if i >= limit:
+                        break
+                    rows.append(row)
+            return {"path": path, "rows": rows, "n_rows": i + 1 if rows else 0}
+        except Exception:
+            return {"_missing": True, "path": path}
+
+    integrated: Dict[str, Any] = {
+        "feasibility": data.get("feasibility"),
+        "run_report": data,
+        "uq": _read_json(args.uq),
+        "uq_production": _read_json(args.uq_production),
+        "sweeps": {
+            "time": _read_csv_head(args.sweep_time),
+            "dynamic_ripple": _read_csv_head(args.sweep_dyn),
+        },
+    }
+    with open(args.integrated_out, "w", encoding="utf-8") as f:
+        json.dump(integrated, f, indent=2)
+    print(json.dumps({"wrote": args.integrated_out}))
 
 
 if __name__ == "__main__":

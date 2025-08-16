@@ -30,6 +30,37 @@ Each line is a JSON object with:
 }
 ```
 
+## uq_production.json
+Same structure as uq_results.json, generated with production-focused parameter ranges.
+
+## full_sweep_with_time.csv
+CSV with headers:
+- n_e, T_e, B, xi, alpha, t, ripple, yield, E_total, fom, eta
+
+## full_sweep_with_dynamic_ripple.csv
+CSV with headers:
+- n_e, T_e, B, xi, alpha, t, ripple_initial, ripple_dynamic, yield, E_total, fom, eta
+
+## dynamic_stability_ripple.png
+PNG scatter plot of stability probability vs ripple fraction.
+
+## high_load_hardware_metrics.png
+PNG time series of hardware metric under high-load conditions (synthetic or ingested).
+
+## integrated_report.json
+```
+{
+  "feasibility": { ... },
+  "run_report": { ... },
+  "uq": { ... },
+  "uq_production": { ... },
+  "sweeps": {
+    "time": { "path": str, "n_rows": int, "rows": [ {csv_row...}, ... ] },
+    "dynamic_ripple": { "path": str, "n_rows": int, "rows": [ {csv_row...}, ... ] }
+  }
+}
+```
+
 ## fom_report.json
 ```
 {

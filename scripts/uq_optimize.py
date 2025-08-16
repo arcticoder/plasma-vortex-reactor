@@ -23,6 +23,7 @@ def main():
     ap.add_argument("--seed", type=int, default=123)
     ap.add_argument("--out", default="uq_optimized.json")
     ap.add_argument("--out-all", default=None)
+    ap.add_argument("--production", action="store_true", help="Use production-focused priors/ranges and write uq_production.json")
     args = ap.parse_args()
 
     def eval_fn(params):
@@ -30,6 +31,22 @@ def main():
         E_total = params["E_total"]
         f = total_fom(y, E_total)
         return {"yield": y, "fom": f, "energy": E_total}
+
+    if args.production:
+        # Production-focused narrower ranges and higher energies/yields, emit uq_production.json
+        prod_out = run_uq_sampling(
+            n_samples=max(args.samples, 50),
+            seed=args.seed,
+            param_ranges={
+                "n_e": (1e20, 5e21),
+                "T_e": (8.0, 20.0),
+                "E_total": (5e10, 5e12),
+            },
+            eval_fn=eval_fn,
+        )
+        with open("uq_production.json", "w", encoding="utf-8") as f:
+            json.dump(prod_out, f, indent=2)
+        print(json.dumps({"wrote": "uq_production.json"}))
 
     out = run_uq_sampling(
         n_samples=args.samples,

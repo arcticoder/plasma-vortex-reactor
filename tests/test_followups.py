@@ -409,3 +409,50 @@ def test_dynamic_stability_plot(tmp_path):
     out = tmp_path / "dynamic_stability_ripple.png"
     plot_stability_ripple([5e-5, 1e-4, 2e-4], [0.999, 0.998, 0.995], str(out))
     assert out.exists() and out.stat().st_size > 0
+
+def test_kpi_cli_outputs(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        # Minimal inputs
+        (_pathlib := __import__("pathlib")).Path("feasibility_gates_report.json").write_text(_json.dumps({"stable": True, "gamma_ok": True, "antiproton_yield_pass": True, "fom": 0.12}))
+        (_pathlib.Path("metrics.json")).write_text(_json.dumps({"energy_budget_J": 1.0}))
+        (_pathlib.Path("uq_optimized.json")).write_text(_json.dumps({"n_samples": 10, "means": {"fom": 0.12}}))
+        script = (_pathlib.Path(cwd) / "scripts" / "production_kpi.py")
+        res = subprocess.run([_sys.executable, str(script)], capture_output=True)
+        assert res.returncode == 0
+        assert _pathlib.Path("production_kpi.json").exists()
+    finally:
+        _os.chdir(cwd)
+
+def test_calibration_cli(tmp_path):
+    import subprocess, sys as _sys, os as _os
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        p = _pl.Path("full_sweep_with_dynamic_ripple.csv")
+        p.write_text("n_e,T_e,B,xi,alpha,t,ripple_initial,ripple_dynamic,yield,E_total,fom,eta\n1,2,3,4,0.01,0.0,1e-4,1e-4,1e12,1e11,0.1,True\n1,2,3,4,0.01,10.0,1e-4,5e-5,2e12,1e11,0.2,True\n")
+        script = _pl.Path(cwd) / "scripts" / "calibrate_ripple_alpha.py"
+        res = subprocess.run([_sys.executable, str(script)], capture_output=True)
+        assert res.returncode == 0
+        assert _pl.Path("calibration.json").exists()
+    finally:
+        _os.chdir(cwd)
+
+def test_time_to_metrics_cli(tmp_path):
+    import subprocess, sys as _sys, os as _os
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        p = _pl.Path("full_sweep_with_time.csv")
+        p.write_text("n_e,T_e,B,xi,alpha,t,ripple,yield,E_total,fom,eta\n1,2,3,4,0.01,0.0,1e-4,1e11,1e11,0.05,True\n1,2,3,4,0.01,5.0,1e-4,2e12,1e11,0.2,True\n")
+        script = _pl.Path(cwd) / "scripts" / "time_to_stability_yield.py"
+        res = subprocess.run([_sys.executable, str(script)], capture_output=True)
+        assert res.returncode == 0
+        assert _pl.Path("time_to_metrics.json").exists()
+        assert _pl.Path("time_to_metrics.png").exists()
+    finally:
+        _os.chdir(cwd)

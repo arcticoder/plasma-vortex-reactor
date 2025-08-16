@@ -1,0 +1,11 @@
+{
+  "name": "production",
+  "seed": 777,
+  "steps": 10000,
+  "dt": 0.001,
+  "n_e": 1e21,
+  "T_e": 15.0,
+  "B": 5.0,
+  "xi": 2.0,
+  "notes": "Production-oriented scenario with long run"
+}

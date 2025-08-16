@@ -10,6 +10,7 @@ def append_event(
     event: str,
     status: str = "info",
     details: Optional[Dict[str, Any]] = None,
+    code: Optional[str] = None,
 ) -> None:
     rec: Dict[str, Any] = {
         "event": event,
@@ -18,6 +19,8 @@ def append_event(
     }
     if details is not None:
         rec["details"] = dict(details)
+    if code is not None:
+        rec["code"] = str(code)
     with open(path, "a", encoding="utf-8") as f:
         f.write(json.dumps(rec) + "\n")
 
