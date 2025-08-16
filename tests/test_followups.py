@@ -428,8 +428,18 @@ def test_schema_validation_for_integrated_and_kpi(tmp_path):
         # Validate schemas (minimal)
         integrated = _json.loads(_pl.Path("integrated_report.json").read_text())
         kpi_js = _json.loads(_pl.Path("production_kpi.json").read_text())
-        integrated_schema = {"type": "object", "properties": {"feasibility": {"type": "object"}, "uq": {"type": "object"}, "uq_production": {"type": "object"}, "sweeps": {"type": "object"}}, "required": ["feasibility", "sweeps"]}
-        kpi_schema = {"type": "object", "properties": {"stable": {"type": "boolean"}, "fom": {}}, "required": ["stable"]}
+        # Use schema files if present
+        schema_dir = _pl.Path(cwd) / "docs" / "schemas"
+        is_p = schema_dir / "integrated_report.schema.json"
+        k_p = schema_dir / "production_kpi.schema.json"
+        if is_p.exists():
+            integrated_schema = _json.loads(is_p.read_text())
+        else:
+            integrated_schema = {"type": "object", "properties": {"feasibility": {"type": "object"}, "uq": {"type": "object"}, "uq_production": {"type": "object"}, "sweeps": {"type": "object"}}, "required": ["feasibility", "sweeps"]}
+        if k_p.exists():
+            kpi_schema = _json.loads(k_p.read_text())
+        else:
+            kpi_schema = {"type": "object", "properties": {"stable": {"type": "boolean"}, "fom": {}}, "required": ["stable"]}
         validate(instance=integrated, schema=integrated_schema)
         validate(instance=kpi_js, schema=kpi_schema)
     finally:
@@ -524,5 +534,21 @@ def test_progress_dashboard_generator(tmp_path):
         res = subprocess.run([_sys.executable, str(script), "--docs-dir", "docs", "--out", "progress_dashboard.html"], capture_output=True)
         assert res.returncode == 0
         assert _pl.Path("progress_dashboard.html").exists()
+    finally:
+        _os.chdir(cwd)
+
+
+@pytest.mark.hardware
+def test_hardware_runner_simulated(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        script = _pl.Path(cwd) / "scripts" / "hardware_runner.py"
+        res = subprocess.run([_sys.executable, str(script), "--steps", "5", "--simulate", "--timeout", "0.001"], capture_output=True)
+        assert res.returncode == 0
+        js = _json.loads(_pl.Path("hardware_run.json").read_text())
+        assert js["ok"] is True and js["steps"] >= 1
     finally:
         _os.chdir(cwd)

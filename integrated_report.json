@@ -1,0 +1,67 @@
+{
+  "feasibility": {
+    "stable": true
+  },
+  "run_report": {
+    "feasibility": {
+      "stable": true
+    },
+    "timeline_summary": {
+      "counts": {
+        "events": 0
+      }
+    },
+    "channel_report": {
+      "total_energy_J": 2200.0,
+      "channels": {
+        "heaters": 500.0,
+        "coils": 1200.0,
+        "lasers": 300.0,
+        "rf": 200.0
+      },
+      "channel_fom": {
+        "heaters": 4.4,
+        "coils": 1.8333333333333333,
+        "lasers": 7.333333333333333,
+        "rf": 11.0
+      },
+      "total_fom": 24.566666666666666
+    },
+    "channel_fom_summary": {
+      "total_fom": 24.566666666666666,
+      "top_channels": [
+        [
+          "rf",
+          11.0
+        ],
+        [
+          "lasers",
+          7.333333333333333
+        ],
+        [
+          "heaters",
+          4.4
+        ]
+      ]
+    },
+    "gate_summary_md": "missing: gate_summary.md"
+  },
+  "uq": {
+    "_missing": true,
+    "path": "uq_optimized.json"
+  },
+  "uq_production": {
+    "_missing": true,
+    "path": "uq_production.json"
+  },
+  "sweeps": {
+    "time": {
+      "_missing": true,
+      "path": "full_sweep_with_time.csv"
+    },
+    "dynamic_ripple": {
+      "_missing": true,
+      "path": "full_sweep_with_dynamic_ripple.csv"
+    }
+  }
+}

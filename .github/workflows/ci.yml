@@ -57,6 +57,8 @@ jobs:
           python scripts/calibrate_ripple_alpha.py --from-csv full_sweep_with_dynamic_ripple.csv --out calibration.json
           python scripts/time_to_stability_yield.py --sweep-time full_sweep_with_time.csv --out-json time_to_metrics.json --out-png time_to_metrics.png
           python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html
+          python scripts/sensor_noise_model.py --out sensor_noise.png --snr 20
+          python scripts/bench_step_loop.py --steps 200 --dt 1e-4 --out bench_step_loop.json
       - name: Run energy reduction demo
         run: |
           . .venv/bin/activate
@@ -90,6 +92,8 @@ jobs:
             time_to_metrics.json
             time_to_metrics.png
             progress_dashboard.html
+            sensor_noise.png
+            bench_step_loop.json
             uq_optimized.json
             uq_production.json
             uq_results.json
@@ -150,3 +154,21 @@ jobs:
           pip install mypy
       - name: Run mypy
         run: mypy src/reactor scripts tests
+
+  hardware-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -r requirements.txt
+          pip install pytest
+      - name: Run hardware tests
+        run: |
+          . .venv/bin/activate
+          pytest -q -m "hardware"

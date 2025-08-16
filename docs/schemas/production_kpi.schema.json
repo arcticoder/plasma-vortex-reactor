@@ -1,0 +1,11 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "stable": {"type": "boolean"},
+    "gamma_ok": {"type": "boolean"},
+    "antiproton_yield_pass": {"type": "boolean"},
+    "fom": {"type": "number"}
+  },
+  "required": ["stable"]
+}

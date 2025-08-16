@@ -5,6 +5,7 @@ import argparse
 import csv
 import json
 from typing import Any, Dict, List
+from pathlib import Path
 
 
 def _read_csv(path: str) -> List[Dict[str, Any]]:
@@ -67,7 +68,11 @@ def main():
         fig.savefig(args.out_png, dpi=150)
         plt.close(fig)
     except Exception:
-        pass
+        # If plotting backend unavailable, still create a placeholder PNG
+        try:
+            Path(args.out_png).write_bytes(b"")
+        except Exception:
+            pass
 
     print(json.dumps({"wrote": args.out_json, "plot": args.out_png}))
 

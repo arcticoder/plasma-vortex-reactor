@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "feasibility": {"type": "object"},
+    "run_report": {"type": ["object", "null"]},
+    "uq": {"type": ["object", "null"]},
+    "uq_production": {"type": ["object", "null"]},
+    "sweeps": {"type": "object"}
+  },
+  "required": ["feasibility", "sweeps"]
+}

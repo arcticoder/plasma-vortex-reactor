@@ -55,6 +55,23 @@ def build_html(docs_dir: Path) -> str:
     now = _dt.datetime.utcnow().isoformat() + "Z"
     sections.append(f"<p>Generated: {html.escape(now)}</p>")
 
+    # Artifact links section (if files exist at repo root)
+    artifacts = [
+        "feasibility_gates_report.json",
+        "integrated_report.json",
+        "production_kpi.json",
+        "calibration.json",
+        "time_to_metrics.json",
+        "time_to_metrics.png",
+        "dynamic_stability_ripple.png",
+        "high_load_hardware_metrics.png",
+    ]
+    found = [a for a in artifacts if Path(a).exists()]
+    if found:
+        sections.append("<h2>Artifacts</h2><ul>" + "".join(
+            f"<li><a href='{html.escape(a)}'>{html.escape(a)}</a></li>" for a in found
+        ) + "</ul>")
+
     for name in NDJSON_FILES:
         p = docs_dir / name
         items = _read_ndjson(p)

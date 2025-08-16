@@ -20,6 +20,7 @@ def main():
     ap.add_argument("--out", default="production_fom_yield.png")
     ap.add_argument("--Te-eV", type=float, default=10.0)
     ap.add_argument("--fixed", action="store_true", help="Plot fixed production points for CI artifact")
+    ap.add_argument("--overlay-thresholds", action="store_true")
     args = ap.parse_args()
 
     if args.fixed:
@@ -39,6 +40,18 @@ def main():
             foms.append(f)
 
     plot_fom_vs_yield(np.array(yields), np.array(foms), args.out)
+    if args.overlay_thresholds:
+        try:
+            import json as _json
+            from reactor.plotting import _mpl
+            plt = _mpl()
+            m = _json.loads(open(os.path.join(_root, "metrics.json")).read())
+            thr = float(m.get("fom_min", 0.1))
+            import matplotlib.pyplot as _plt  # type: ignore
+            _plt.axhline(thr, color="red", linestyle="--", label=f"FOM ≥ {thr}")
+            _plt.legend()
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
