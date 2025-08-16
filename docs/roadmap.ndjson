@@ -40,3 +40,9 @@
 	{"id":19,"title":"Production metrics and failure logging","refs":["scripts/demo_runner.py","src/reactor/metrics.py"]},
 	{"id":20,"title":"Document Phase 3 tasks in roadmap & logs","refs":["docs/roadmap.ndjson","docs/progress_log.ndjson"]}
 ]}
+{"section":"Phase 3: Scaling/Production - Additional Tasks","status":"planned","as_of":"2025-08-16","tasks":[
+	{"id":21,"title":"Pytest markers for production/slow and CI selection","refs":["pytest.ini",".github/workflows/ci.yml","tests/test_followups.py"]},
+	{"id":22,"title":"UQ production mode coverage test","refs":["tests/test_followups.py","scripts/uq_optimize.py"]},
+	{"id":23,"title":"Schema sanity test for integrated_report and KPI","refs":["tests/test_followups.py","scripts/run_report.py","scripts/production_kpi.py"]},
+	{"id":24,"title":"Progress dashboard generator (HTML) + CI artifact","refs":["scripts/generate_progress_dashboard.py",".github/workflows/ci.yml","docs/ARTIFACT_SCHEMA.md"]}
+]}

@@ -3,3 +3,5 @@
 {"event":"Phase 3: Added dynamic stability vs ripple CLI & artifact","status":"completed","refs":["scripts/plot_dynamic_stability_ripple.py",".github/workflows/ci.yml"],"details":{"artifact":"dynamic_stability_ripple.png"}}
 {"event":"Phase 3: High-load hardware metrics plot variant","status":"completed","refs":["scripts/plot_hardware_metrics.py",".github/workflows/ci.yml"],"details":{"artifact":"high_load_hardware_metrics.png"}}
 {"event":"Phase 3: Time sweep and dynamic ripple sweep added","status":"completed","refs":["scripts/param_sweep_confinement.py"],"details":{"csv":["full_sweep_with_time.csv","full_sweep_with_dynamic_ripple.csv"]}}
+{"event":"Phase 3: Dashboard generator added","status":"completed","refs":["scripts/generate_progress_dashboard.py",".github/workflows/ci.yml"],"details":{"artifact":"progress_dashboard.html"}}
+{"event":"Phase 3: Test markers and CI split runs","status":"completed","refs":["pytest.ini",".github/workflows/ci.yml"]}

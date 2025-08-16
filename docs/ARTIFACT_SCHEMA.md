@@ -60,6 +60,17 @@ PNG time series of hardware metric under high-load conditions (synthetic or inge
   }
 }
 ```
+## progress_dashboard.html
+
+- Produced by: `scripts/generate_progress_dashboard.py`
+- Purpose: Quick HTML snapshot aggregating counts and recent items from docs/*.ndjson.
+- Schema: HTML document (no strict JSON schema). Contains sections for:
+  - roadmap.ndjson, roadmap-completed.ndjson
+  - progress_log.ndjson, progress_log-completed.ndjson
+  - UQ-TODO(.ndjson), UQ-TODO-RESOLVED(.ndjson)
+  - VnV-TODO(.ndjson), VnV-TODO-RESOLVED(.ndjson)
+  Each section includes a count and up to 10 most recent entries with titles/status.
+
 
 ## fom_report.json
 ```

@@ -46,6 +46,7 @@ Artifacts produced by this repo:
 - gate_summary.md (scripts/gate_summary_md.py)
 - channel_report.json (scripts/generate_channel_report.py)
 - run_report.json (scripts/run_report.py)
+- progress_dashboard.html (scripts/generate_progress_dashboard.py)
 
 Schemas live under `docs/schemas/`:
 
@@ -62,3 +63,12 @@ Install optional plotting/progress/validation extras:
 ```
 pip install -r requirements-plot.txt
 ```
+
+### Progress Dashboard (HTML)
+
+Generate a quick snapshot of roadmap/progress/UQ/VnV NDJSON:
+
+```
+python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html
+```
+Open progress_dashboard.html in a browser.

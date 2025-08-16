@@ -19,3 +19,7 @@
 {"event":"Phase 3: Edge production failure logging","status":"completed","refs":["scripts/demo_runner.py","src/reactor/core.py"]}
 {"event":"Phase 3: Production FOM plot added","status":"completed","refs":["scripts/plot_production_fom.py"],"details":{"artifact":"production_fom_yield.png"}}
 {"event":"Phase 3: CI artifact uploads consolidated","status":"completed","refs":[".github/workflows/ci.yml"],"details":{"artifacts_added":["dynamic_stability_ripple.png","high_load_hardware_metrics.png"]}}
+{"event":"Phase 3: Test markers and CI filters added","status":"completed","refs":["pytest.ini",".github/workflows/ci.yml","tests/test_followups.py"],"details":{"fast":"not slow and not production","production":"production"}}
+{"event":"Phase 3: UQ production mode CLI test added","status":"completed","refs":["tests/test_followups.py","scripts/uq_optimize.py"],"details":{"artifact":"uq_production.json"}}
+{"event":"Phase 3: Schema sanity tests for integrated/KPI","status":"completed","refs":["tests/test_followups.py","scripts/run_report.py","scripts/production_kpi.py"],"details":{"guard":"jsonschema optional"}}
+{"event":"Phase 3: Progress dashboard generator + artifact","status":"completed","refs":["scripts/generate_progress_dashboard.py",".github/workflows/ci.yml","docs/ARTIFACT_SCHEMA.md"],"details":{"artifact":"progress_dashboard.html"}}

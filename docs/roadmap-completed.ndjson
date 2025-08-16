@@ -8,3 +8,7 @@
 {"milestone":"Phase 3 task: Edge production failure logging","status":"completed","refs":["scripts/demo_runner.py","src/reactor/core.py"],"notes":"log_edge_production_failure wired for edge scenarios"}
 {"milestone":"Phase 3 task: Production FOM plot","status":"completed","refs":["scripts/plot_production_fom.py",".github/workflows/ci.yml"],"notes":"production_fom_yield.png generated in CI"}
 {"milestone":"Phase 3 task: Artifact uploads consolidated","status":"completed","refs":[".github/workflows/ci.yml"],"notes":"Uploads include sweep CSVs and plots"}
+{"milestone":"Phase 3 task: Pytest markers & CI selection","status":"completed","refs":["pytest.ini",".github/workflows/ci.yml","tests/test_followups.py"],"notes":"Fast and production suites split"}
+{"milestone":"Phase 3 task: UQ production mode coverage test","status":"completed","refs":["tests/test_followups.py","scripts/uq_optimize.py"],"notes":"uq_production.json validated by test"}
+{"milestone":"Phase 3 task: Schema sanity tests (integrated/KPI)","status":"completed","refs":["tests/test_followups.py","scripts/run_report.py","scripts/production_kpi.py"],"notes":"jsonschema optional via importorskip"}
+{"milestone":"Phase 3 task: Progress dashboard generator","status":"completed","refs":["scripts/generate_progress_dashboard.py","docs/ARTIFACT_SCHEMA.md",".github/workflows/ci.yml"],"notes":"progress_dashboard.html emitted in CI"}

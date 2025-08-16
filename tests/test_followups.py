@@ -510,3 +510,19 @@ def test_time_to_metrics_cli(tmp_path):
         assert _pl.Path("time_to_metrics.png").exists()
     finally:
         _os.chdir(cwd)
+
+
+def test_progress_dashboard_generator(tmp_path):
+    import subprocess, sys as _sys, os as _os
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl, json as _json
+        d = _pl.Path("docs"); d.mkdir()
+        (d/"roadmap.ndjson").write_text(_json.dumps({"milestone":"Test Milestone","status":"planned"})+"\n")
+        script = _pl.Path(cwd) / "scripts" / "generate_progress_dashboard.py"
+        res = subprocess.run([_sys.executable, str(script), "--docs-dir", "docs", "--out", "progress_dashboard.html"], capture_output=True)
+        assert res.returncode == 0
+        assert _pl.Path("progress_dashboard.html").exists()
+    finally:
+        _os.chdir(cwd)

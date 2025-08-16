@@ -11,3 +11,18 @@
    ```
 3. UQ run (programmatic): use `reactor.uq.run_uq_sampling` and save results to `uq_results.json`.
 4. Reporting: see `docs/ARTIFACT_SCHEMA.md` for artifact structures.
+
+## Operational Artifacts
+
+- feasibility_gates_report.json: Feasibility gates and reasons
+- timeline.ndjson: Event stream from demos/runs
+- integrated_report.json: Merged feasibility + UQ + sweep heads
+- production_kpi.json: Key production KPIs and summary
+- calibration.json: Ripple alpha calibration from dynamic sweep
+- time_to_metrics.json/png: Time to reach yield/FOM targets
+- progress_dashboard.html: HTML snapshot of roadmap/progress/UQ/VnV
+
+### Artifact Generation Cheatsheet
+
+- Integrated report: `python scripts/run_report.py --feasibility feasibility_gates_report.json --timeline-summary timeline_summary.json --uq uq_optimized.json --integrated-out integrated_report.json`
+- Dashboard: `python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html`
