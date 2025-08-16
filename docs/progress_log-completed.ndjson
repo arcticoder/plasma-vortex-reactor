@@ -1,3 +1,4 @@
+{"summary":"Added synthetic anomalies generator, improved dashboard with navbar and anchors, exposed new CLIs, and added resilience tests.","status":"done","date":"2025-08-16"}
 {"event":"EnergyLedger enhancement factor integrated and syntax errors fixed","status":"completed","refs":["src/reactor/energy.py"],"details":{"apply_enhancement":true,"total_energy_reduction":true}}
 {"event":"metrics_gate supports optional antiproton yield gate","status":"completed","refs":["scripts/metrics_gate.py"],"details":{"flag":"--require-yield"}}
 {"event":"Phase 3: Added dynamic stability vs ripple CLI & artifact","status":"completed","refs":["scripts/plot_dynamic_stability_ripple.py",".github/workflows/ci.yml"],"details":{"artifact":"dynamic_stability_ripple.png"}}

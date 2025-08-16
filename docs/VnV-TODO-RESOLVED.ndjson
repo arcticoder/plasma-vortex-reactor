@@ -1,3 +1,4 @@
+{"task":"Dashboard tolerance to malformed NDJSON","status":"resolved","notes":"Malformed lines skipped; resilience test added.","date":"2025-08-16"}
 {"title":"Gate supports optional yield check","status":"completed","refs":["scripts/metrics_gate.py"],"notes":"--require-yield flag adds antiproton_yield_pass requirement to feasibility gate."}
 {"category":"V&V","task":"Yield gate  1e8 cm^-3 s^-1 with physics-based estimator","priority":"High","source_file":"src/reactor/metrics.py","status":"completed","refs":["tests/test_metrics.py","tests/test_followups.py"]}
 {"category":"V&V","task":"Plot stability vs ripple from sweep CSV","priority":"Medium","source_file":"scripts/plot_dynamic_stability_ripple.py","status":"completed","refs":["scripts/plot_dynamic_stability_ripple.py",".github/workflows/ci.yml"],"details":{"artifact":"dynamic_stability_ripple.png"}}

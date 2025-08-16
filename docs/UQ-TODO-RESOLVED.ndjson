@@ -1,3 +1,4 @@
+{"task":"Baseline anomaly injection tooling","status":"resolved","notes":"Synthetic generator landed and wired into dashboard; ready for sensitivity studies.","date":"2025-08-16"}
 {"title":"Unit coverage for EnergyLedger enhancement and reduction","status":"completed","refs":["tests/test_metrics_and_energy.py"],"notes":"Existing tests exercise ledger and FOM; enhancement path validated via manual run."}
 {"title":"UQ: High-load stability under dynamic ripple","status":"completed","refs":["scripts/plot_dynamic_stability_ripple.py","tests/test_followups.py"],"notes":"Stability probability plotted from sweep and helper test ensures artifact creation."}
 {"title":"UQ: Economic FOM sensitivity (baseline setup)","status":"completed","refs":["configs/cost_model.json","scripts/production_kpi.py"],"notes":"KPI now honors cost model; full UQ sweep planned later."}
