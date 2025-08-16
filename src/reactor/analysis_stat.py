@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Dict, Iterable
+from typing import Dict, Iterable, Sequence
 
 import numpy as np
 
@@ -42,3 +42,33 @@ def ema(series: Iterable[float], alpha: float) -> np.ndarray:
     for i in range(1, arr.size):
         out[i] = a*arr[i] + (1-a)*out[i-1]
     return out
+
+
+def stability_probability(series: Iterable[float], threshold: float = 140.0, steps: int | None = None) -> float:
+    """Probability that series values are >= threshold over the given number of steps.
+
+    If steps is None, use the full series length.
+    """
+    arr = np.asarray(list(series), dtype=float)
+    if arr.size == 0:
+        return 0.0
+    N = int(steps) if steps is not None else arr.size
+    N = max(1, min(N, arr.size))
+    sel = arr[:N]
+    stable_steps = int(np.sum(sel >= float(threshold)))
+    return float(stable_steps) / float(N)
+
+
+def plot_stability_curve(time_ms: Sequence[float], gamma_series: Sequence[float], out_png: str) -> None:
+    """Plot Γ vs time (ms) to PNG."""
+    from .plotting import _mpl  # lazy import matplotlib
+
+    plt = _mpl()
+    fig, ax = plt.subplots(figsize=(6, 3))
+    ax.plot(list(time_ms), list(gamma_series), color="royalblue")
+    ax.set_xlabel("Time (ms)")
+    ax.set_ylabel("Γ")
+    ax.set_title("Stability (Γ) vs Time")
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=150)
+    plt.close(fig)

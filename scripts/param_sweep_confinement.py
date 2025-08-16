@@ -13,7 +13,8 @@ _src = os.path.join(_root, "src")
 if _src not in sys.path:
     sys.path.insert(0, _src)
 
-from reactor.metrics import confinement_efficiency_estimator
+from reactor.metrics import confinement_efficiency_estimator, antiproton_yield_estimator
+from reactor.analysis import bennett_confinement_check
 
 try:
     from reactor.plotting import quick_scatter  # type: ignore
@@ -156,6 +157,23 @@ def main():
             plt.close(fig)
         except Exception as e:  # pragma: no cover
             print(f"Confinement-energy plot failed: {e}")
+
+    # Optional full sweep utility can be imported by other scripts
+
+
+def full_sweep(n_e_range, T_e_range, B_range, xi_range, out_csv: str = "full_sweep.csv") -> None:
+    from itertools import product
+    import csv as _csv
+    rows = []
+    for n_e, T_e, B, xi in product(n_e_range, T_e_range, B_range, xi_range):
+        y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
+        eta = bennett_confinement_check(n0_cm3=n_e, xi=xi, B_T=B, ripple_frac=5e-4)
+        rows.append({"n_e": n_e, "T_e": T_e, "B": B, "xi": xi, "yield": y, "eta": bool(eta)})
+    with open(out_csv, "w", newline="", encoding="utf-8") as f:
+        w = _csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+        w.writeheader()
+        for r in rows:
+            w.writerow(r)
 
 
 if __name__ == "__main__":

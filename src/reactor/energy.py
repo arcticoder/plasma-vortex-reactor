@@ -123,3 +123,26 @@ def merge_ledgers(*ledgers: EnergyLedger) -> EnergyLedger:
         for k, v in L._channels.items():
             out._channels[k] = out._channels.get(k, 0.0) + v
     return out
+
+
+def optimize_lg_enhancement(E_base: float, gamma: float = 150.0, l_index: int = 2) -> float:
+    """Toy optimization target: E_reduced = E_base / (1 + gamma^2 * l_index)."""
+    factor = 1.0 + (float(gamma) ** 2) * float(l_index)
+    return float(E_base) / float(factor)
+
+
+from typing import Sequence
+
+
+def plot_energy_reduction(time_ms: Sequence[float], energies_J: Sequence[float], out_png: str) -> None:
+    from .plotting import _mpl
+
+    plt = _mpl()
+    fig, ax = plt.subplots(figsize=(6, 3))
+    ax.plot(time_ms, energies_J, color="teal")
+    ax.set_xlabel("Time (ms)")
+    ax.set_ylabel("Energy (J)")
+    ax.set_title("Energy Reduction Over Time")
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=150)
+    plt.close(fig)

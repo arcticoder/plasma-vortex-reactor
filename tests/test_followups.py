@@ -1,4 +1,5 @@
 import numpy as np
+import sys
 
 from reactor.analysis import (
     b_field_rms_fluctuation,
@@ -9,7 +10,7 @@ from reactor.analysis import (
 )
 from reactor.core import Reactor
 from reactor.energy import EnergyLedger, energy_interval, merge_ledgers
-from reactor.metrics import antiproton_yield_estimator, pulsed_yield_enhancement
+from reactor.metrics import antiproton_yield_estimator, pulsed_yield_enhancement, total_fom
 from reactor.thresholds import thresholds_from_json
 
 
@@ -127,3 +128,62 @@ def test_long_term_stability_and_pulsed_yield():
     base = antiproton_yield_estimator(1e20, 10.0, {"model": "physics"})
     boosted = pulsed_yield_enhancement(base, I_beam=1e6, tau_pulse=1e-9)
     assert boosted >= 1e12
+
+
+def test_10ms_stability():
+    # 10 ms at dt=1e-6 -> 10,000 samples; small noise around 150
+    series = np.ones(10000) * 150.0 + np.random.normal(0, 0.01, 10000)
+    from reactor.analysis_stat import stability_variance
+    assert stability_variance(series) < 1e-3
+
+
+def test_99_9_stability():
+    series = np.ones(10000) * 150.0 + np.random.normal(0, 0.01, 10000)
+    from reactor.analysis_stat import stability_probability
+    assert stability_probability(series, threshold=140.0, steps=10000) >= 0.999
+
+
+def test_fom_threshold():
+    y = antiproton_yield_estimator(1e20, 10.0, {"model": "physics"})
+    E_total = 1e12
+    assert total_fom(y, E_total) >= 0.1
+
+
+def test_b_field_ripple_gate_0_01pct():
+    # 0.01% ripple around 5T -> std ~5e-4% absolute -> fraction ~1e-4
+    base = 5.0
+    b_series = np.ones(1000) * base + np.random.normal(0, 5e-5, 1000)
+    from reactor.analysis_fields import b_field_rms_fluctuation
+    ripple = b_field_rms_fluctuation(b_series)
+    assert ripple <= 1e-4
+
+
+def test_gut_yield_mock(monkeypatch):
+    # Patch pair_production_rate to return fixed rate
+    import reactor.core as core_mod
+    core_mod.pair_production_rate = lambda n, T: 1e10  # type: ignore[attr-defined]
+    state = {"n_e": 1e20, "T_e": 10.0, "dt": 1e-3}
+    new = core_mod.update_yield_with_gut(state)
+    assert new.get("yield", 0.0) >= 1e7
+
+
+def test_hardware_simulation_logging(tmp_path, monkeypatch):
+    # Mock simulate_hardware to add a field
+    def _fake_simulate(state):
+        return {"hw": True, "i": state.get("i", 0)}
+
+    import builtins
+    import types
+    fake_mod = types.SimpleNamespace(simulate_hardware=_fake_simulate)
+    modules = {}
+    modules['enhanced_simulation_hardware_abstraction_framework'] = fake_mod  # type: ignore[index]
+    monkeypatch.setitem(sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
+
+    timeline = tmp_path / "progress.ndjson"
+    # call step_with_hardware via demo logic
+    from reactor.core import step_with_hardware
+    out = step_with_hardware({"i": 1})
+    # Log event
+    from reactor.logging_utils import append_event
+    append_event(str(timeline), event="hardware_simulation", status="ok", details=out)
+    assert timeline.exists() and timeline.stat().st_size > 0

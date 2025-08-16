@@ -2,7 +2,7 @@ import json
 
 import numpy as np
 
-from reactor.energy import EnergyLedger, apply_lg_enhancement, fom, lg_mode_enhancement, merge_ledgers
+from reactor.energy import EnergyLedger, apply_lg_enhancement, fom, lg_mode_enhancement, merge_ledgers, optimize_lg_enhancement
 from reactor.logging_utils import append_event
 from reactor.metrics import (
     antiproton_yield_estimator,
@@ -73,6 +73,12 @@ def test_lg_mode_enhancement_and_context():
         assert L.total_energy() <= base / 1.0  # reduced or equal
     # restored
     assert L.total_energy() == base
+
+
+def test_optimize_lg_enhancement():
+    E_base = 1e12
+    E_red = optimize_lg_enhancement(E_base, gamma=150.0, l_index=2)
+    assert E_red <= 1e11
 
 
 def test_metrics_gate_script(tmp_path):

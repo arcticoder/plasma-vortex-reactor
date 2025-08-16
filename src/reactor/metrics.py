@@ -173,6 +173,34 @@ def log_fom(yield_rate: float, E_total_J: float, path: str = "progress.ndjson") 
     )
 
 
+def log_stability(gamma: float, path: str = "progress.ndjson") -> None:
+    from .logging_utils import append_event
+
+    append_event(
+        path,
+        event="stability_check",
+        status="ok" if float(gamma) >= 140.0 else "fail",
+        details={"gamma": float(gamma)},
+    )
+
+
 def save_feasibility_gates_report(path: str, data: Dict) -> None:
     with open(path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2)
+
+
+def plot_fom_vs_yield(yields: np.ndarray, foms: np.ndarray, out_png: str) -> None:
+    """Scatter plot FOM vs Yield to PNG."""
+    from .plotting import _mpl
+
+    ys = np.asarray(yields, dtype=float)
+    fs = np.asarray(foms, dtype=float)
+    plt = _mpl()
+    fig, ax = plt.subplots(figsize=(5, 4))
+    ax.scatter(ys, fs, color="goldenrod")
+    ax.set_xlabel("Yield (cm⁻³ s⁻¹)")
+    ax.set_ylabel("FOM")
+    ax.set_title("FOM vs Yield")
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=150)
+    plt.close(fig)

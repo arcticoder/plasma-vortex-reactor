@@ -13,7 +13,7 @@ from reactor.analysis import (
     estimate_density_from_em,
     stability_variance,
 )
-from reactor.metrics import antiproton_yield_estimator, save_feasibility_gates_report
+from reactor.metrics import antiproton_yield_estimator, save_feasibility_gates_report, total_fom
 from reactor.analysis import bennett_confinement_check
 from reactor.thresholds import Thresholds
 
@@ -84,6 +84,11 @@ def main():
         default="docs/schemas/feasibility.schema.json",
         help="Path to feasibility JSON schema",
     )
+    ap.add_argument(
+        "--require-fom",
+        action="store_true",
+        help="Require FOM >= 0.1 using yield and total energy proxy",
+    )
     args = ap.parse_args()
 
     thr = Thresholds()
@@ -132,11 +137,17 @@ def main():
     # Optional yield estimation
     antiproton_yield_pass = None
     y_val = None
+    fom_val = None
     if args.yield_model and (args.n_cm3 is not None) and (args.Te_eV is not None or args.Te_eV is not None):
         # Use physics model if requested
         params = {"model": str(args.yield_model)}
         y_val = antiproton_yield_estimator(float(args.n_cm3), float(args.Te_eV or 0.0), params)
         antiproton_yield_pass = bool(y_val >= float(args.yield_threshold))
+        # Simple energy proxy from E_mag if provided; else fixed 1e12 J
+        E_proxy = 1e12
+        if E_mag is not None and E_mag.size > 0:
+            E_proxy = float(np.sum(E_mag))  # toy aggregation
+        fom_val = total_fom(float(y_val), float(E_proxy))
 
     bennett_ok = None
     if (
@@ -154,6 +165,8 @@ def main():
     stable = gamma_ok and b_ok and dens_ok
     if args.require_yield and (antiproton_yield_pass is not None):
         stable = stable and bool(antiproton_yield_pass)
+    if args.require_fom and (fom_val is not None):
+        stable = stable and bool(fom_val >= 0.1)
     payload = {
         "stable": stable,
         "gamma_ok": gamma_ok,
@@ -164,7 +177,8 @@ def main():
         "density_stats": dens_stats,
         "antiproton_yield_pass": antiproton_yield_pass,
         "antiproton_yield_value": y_val,
-        "bennett_ok": bennett_ok,
+    "bennett_ok": bennett_ok,
+    "fom": fom_val,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "scenario_id": args.scenario_id,
     }

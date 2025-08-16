@@ -26,14 +26,18 @@ jobs:
       - name: Demo run and artifacts
         run: |
           . .venv/bin/activate
-          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 10 --dt 1e-3 --seed 123 --timeline-budget 50 --enforce-density
+          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 10 --dt 1e-3 --seed 123 --timeline-budget 50 --enforce-density --optimize-energy --hardware-simulation
           python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
             --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
-            --out feasibility_gates_report.json --scenario-id ci-demo --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield
+            --out feasibility_gates_report.json --scenario-id ci-demo --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield --require-fom
           python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
           python scripts/param_sweep_confinement.py --out confinement_sweep.csv --plot-confinement-energy confinement_energy.png
           python scripts/uq_demo.py --samples 10 --seed 42 --out-json uq_results.json --out-csv uq_results.csv
           python scripts/analysis_fields_plot.py --out b_field_ripple.png
+          python scripts/plot_stability.py --out stability.png
+          python scripts/plot_fom.py --out fom_yield.png
+          python scripts/full_sweep.py --out full_sweep.csv
+          python scripts/uq_optimize.py --samples 10 --seed 123 --out uq_optimized.json
       - name: Run energy reduction demo
         run: |
           . .venv/bin/activate
@@ -48,6 +52,11 @@ jobs:
             confinement_sweep.csv
             confinement_energy.png
             b_field_ripple.png
+            stability.png
+            fom_yield.png
+            energy_reduction.png
+            full_sweep.csv
+            uq_optimized.json
             uq_results.json
             uq_results.csv
   gated-matrix:

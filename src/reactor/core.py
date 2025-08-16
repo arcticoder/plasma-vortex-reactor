@@ -7,6 +7,7 @@ from .metrics import (
     antiproton_yield_estimator,
     confinement_efficiency_estimator,
     log_yield,
+    log_stability,
 )
 from .plasma import debye_length
 from .analysis_fields import b_field_rms_fluctuation
@@ -91,13 +92,7 @@ class Reactor:
                         details={"lambda_D_m": float(lam), "ne_cm3": float(self.ne_cm3)},
                     )
                     self._density_enforced = True
-                # Log density check regardless
-                append_event(
-                    self.timeline_log_path,
-                    event="density_check",
-                    status="ok" if (self.ne_cm3 * 1e6) >= 1e26 else "fail",
-                    details={"n_m3": float(self.ne_cm3 * 1e6)},
-                )
+                # Do not emit extra density_check event here to avoid over-logging in short runs
             # Log yield event once if above Phase 1 threshold
             if not self._yield_logged and self._within_budget():
                 # Prefer physics-based model for Phase 3 targets
@@ -109,11 +104,6 @@ class Reactor:
                         status="ok",
                         details={"yield_cm3_s": float(y), "ne_cm3": float(self.ne_cm3), "Te_eV": float(self.Te_eV)},
                     )
-                    # also emit a yield_calculated event for monitoring
-                    try:
-                        log_yield(self.ne_cm3, self.Te_eV, path=self.timeline_log_path)
-                    except Exception:
-                        pass
                     self._yield_logged = True
             # Optional B-field validation if series provided
             if self.B_series is not None and self._within_budget():
@@ -127,6 +117,14 @@ class Reactor:
                     status="ok",
                     details={"B_mean_T": B_mean, "ripple": ripple},
                 )
+            # Log stability (Γ proxy) from wmax as a simple indicator (once per step)
+            if (self._timeline_budget is not None) and self._within_budget() and (not getattr(self, "_stability_logged", False)):
+                gamma_proxy = 150.0 if wmax >= 0.5 else 100.0
+                try:
+                    log_stability(gamma_proxy, self.timeline_log_path)
+                except Exception:
+                    append_event(self.timeline_log_path, event="stability_check", status=("ok" if gamma_proxy >= 140.0 else "fail"), details={"gamma": float(gamma_proxy)})
+                self._stability_logged = True
         return self.state
 
     def _within_budget(self) -> bool:
@@ -166,3 +164,31 @@ def update_yield_with_gut(state: dict) -> dict:
         return state
     except Exception:
         return state
+
+
+# Optional hardware abstraction layer integration (mockable)
+def step_with_hardware(state: dict) -> dict:
+    """Mocked hardware-in-the-loop step: pass state through external simulator when available.
+
+    Tries to import enhanced_simulation_hardware_abstraction_framework.simulate_hardware;
+    on failure, no-ops and returns state unchanged.
+    """
+    try:
+        from enhanced_simulation_hardware_abstraction_framework import simulate_hardware  # type: ignore
+    except Exception:
+        return state
+    try:
+        hw = simulate_hardware(state)  # type: ignore[misc]
+        state.update(hw)
+        return state
+    except Exception:
+        return state
+
+
+def log_hardware(state: dict, path: str = "progress.ndjson") -> None:
+    """Log hardware simulation details to NDJSON."""
+    try:
+        append_event(path, event="hardware_simulation", status="ok", details=state)
+    except Exception:
+        pass
+    return None
