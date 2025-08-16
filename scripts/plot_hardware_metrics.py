@@ -18,6 +18,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--in-json", default=None, help="Path to hardware metrics JSON (list of {t_ms, i})")
     ap.add_argument("--out", default="hardware_metrics.png")
+    ap.add_argument("--high-load", action="store_true", help="Render a high-load variant (synthetic if no JSON)")
     args = ap.parse_args()
 
     data = []
@@ -25,7 +26,12 @@ def main():
         data = json.loads(open(args.in_json, "r").read())
     else:
         # Fallback demo data
-        data = [{"t_ms": i, "i": v} for i, v in enumerate([1.0, 1.1, 1.2, 1.1, 1.0])]
+        if args.high_load:
+            # Slightly elevated and more variable metric to represent high-load conditions
+            vals = [1.0, 1.25, 1.35, 1.3, 1.2, 1.15, 1.1]
+        else:
+            vals = [1.0, 1.1, 1.2, 1.1, 1.0]
+        data = [{"t_ms": i, "i": v} for i, v in enumerate(vals)]
 
     t_ms = [d.get("t_ms", i) for i, d in enumerate(data)]
     i_vals = [d.get("i", 0.0) for d in data]
@@ -35,7 +41,7 @@ def main():
     ax.plot(t_ms, i_vals, color="crimson")
     ax.set_xlabel("Time (ms)")
     ax.set_ylabel("Hardware Metric (i)")
-    ax.set_title("Hardware State vs Time")
+    ax.set_title("Hardware State vs Time" + (" (High Load)" if args.high_load else ""))
     fig.tight_layout()
     fig.savefig(args.out, dpi=150)
     plt.close(fig)

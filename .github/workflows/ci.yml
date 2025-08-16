@@ -40,10 +40,13 @@ jobs:
           python scripts/plot_production_fom.py --fixed --out production_fom_yield.png
           python scripts/plot_yield_density.py --out yield_density.png
           python scripts/plot_hardware_metrics.py --out hardware_metrics.png
+          python scripts/plot_hardware_metrics.py --high-load --out high_load_hardware_metrics.png
           python scripts/full_sweep.py --out full_sweep.csv
           python scripts/param_sweep_confinement.py --full-sweep-with-ripple
           python scripts/param_sweep_confinement.py --full-sweep-with-time
           python scripts/param_sweep_confinement.py --full-sweep-with-dynamic-ripple
+          # Generate dynamic stability vs ripple plot from sweep (fallbacks to defaults if CSV missing)
+          python scripts/plot_dynamic_stability_ripple.py --from-sweep full_sweep_with_dynamic_ripple.csv --out dynamic_stability_ripple.png
           python scripts/uq_optimize.py --samples 10 --seed 123 --out uq_optimized.json
       - name: Run energy reduction demo
         run: |
@@ -61,10 +64,12 @@ jobs:
             b_field_ripple.png
             stability.png
             stability_ripple.png
+            dynamic_stability_ripple.png
             fom_yield.png
             production_fom_yield.png
             yield_density.png
             hardware_metrics.png
+            high_load_hardware_metrics.png
             energy_reduction.png
             full_sweep.csv
             full_sweep_with_ripple.csv
