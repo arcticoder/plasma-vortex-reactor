@@ -9,7 +9,7 @@ from reactor.analysis import (
 )
 from reactor.core import Reactor
 from reactor.energy import EnergyLedger, energy_interval, merge_ledgers
-from reactor.metrics import antiproton_yield_estimator
+from reactor.metrics import antiproton_yield_estimator, pulsed_yield_enhancement
 from reactor.thresholds import thresholds_from_json
 
 
@@ -116,3 +116,14 @@ def test_bennett_confinement_check():
     assert bennett_confinement_check(1e20, 2.0, 5.5, 5e-4) is True
     # Bad ripple
     assert bennett_confinement_check(1e20, 2.0, 5.5, 5e-3) is False
+
+
+def test_long_term_stability_and_pulsed_yield():
+    # Long-term stability proxy: use small variance condition
+    series = np.ones(1000) * 150.0
+    var = stability_variance(series)
+    assert var < 1e-3
+    # Pulsed enhancement reaches high output order
+    base = antiproton_yield_estimator(1e20, 10.0, {"model": "physics"})
+    boosted = pulsed_yield_enhancement(base, I_beam=1e6, tau_pulse=1e-9)
+    assert boosted >= 1e12

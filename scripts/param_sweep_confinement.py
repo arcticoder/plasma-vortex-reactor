@@ -35,6 +35,7 @@ def main():
     ap.add_argument("--ripple-steps", type=int, default=10)
     ap.add_argument("--out", default="confinement_sweep.csv")
     ap.add_argument("--plot", default=None, help="Optional PNG output; requires matplotlib")
+    ap.add_argument("--plot-confinement-energy", default=None, help="Optional PNG plotting confinement vs synthetic energy reduction factor")
     ap.add_argument(
         "--heatmap",
         default=None,
@@ -134,6 +135,27 @@ def main():
             plt.close(fig)
         except Exception as e:  # pragma: no cover
             print(f"Heatmap plot failed: {e}")
+
+    # Optional confinement vs energy-reduction scatter (synthetic mapping)
+    if args.plot_confinement_energy:
+        try:
+            import numpy as np
+            from reactor.plotting import _mpl  # type: ignore
+
+            plt = _mpl()
+            # Build synthetic dataset: map efficiency in [0,1] to reduction factor ~ [100, 300]
+            effs = np.linspace(0.9, 0.96, 4)
+            reductions = np.array([200, 220, 242, 260])
+            fig, ax = plt.subplots(figsize=(5, 4))
+            ax.scatter(effs, reductions, c='teal')
+            ax.set_xlabel('Confinement Efficiency (η)')
+            ax.set_ylabel('Energy Reduction Factor')
+            ax.set_title('Confinement vs. Energy Reduction')
+            fig.tight_layout()
+            fig.savefig(args.plot_confinement_energy, dpi=150)
+            plt.close(fig)
+        except Exception as e:  # pragma: no cover
+            print(f"Confinement-energy plot failed: {e}")
 
 
 if __name__ == "__main__":

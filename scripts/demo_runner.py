@@ -24,6 +24,11 @@ def main():
         help="Max events to log; beyond this, suppress",
     )
     ap.add_argument(
+        "--enforce-density",
+        action="store_true",
+        help="Enable density enforcement checks during steps",
+    )
+    ap.add_argument(
         "--json-out",
         default=None,
         help="If provided, write a tiny JSON summary to this path",
@@ -49,9 +54,10 @@ def main():
         timeline_log_path=timeline_path,
         xi=xi,
         b_field_ripple_pct=br,
-        timeline_budget=int(args.timeline_budget)
+    timeline_budget=int(args.timeline_budget)
         if args.timeline_budget is not None
-        else None,
+    else None,
+    enforce_density=bool(args.enforce_density),
     )
     # log a run_started event with seed if timeline is enabled
     if timeline_path:

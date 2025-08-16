@@ -3,6 +3,8 @@ from __future__ import annotations
 from typing import Optional
 
 import numpy as np
+from .plotting import _mpl  # lazy-import helper for matplotlib
+from typing import Sequence
 
 
 def simulate_b_field_ripple(
@@ -35,3 +37,16 @@ def estimate_density_from_em(
 ) -> np.ndarray:
     E_mag = np.asarray(E_mag, dtype=float)
     return gamma * np.clip(E_mag - Emin, 0.0, None) + ne_min
+
+
+def plot_b_field_ripple(time_ms: Sequence[float], ripple_series: Sequence[float], out_png: str) -> None:
+    """Plot B-field ripple vs time (ms) to PNG."""
+    plt = _mpl()
+    fig, ax = plt.subplots(figsize=(6, 3))
+    ax.plot(time_ms, ripple_series, color='crimson')
+    ax.set_xlabel('Time (ms)')
+    ax.set_ylabel('Ripple (fraction)')
+    ax.set_title('B-Field Ripple')
+    fig.tight_layout()
+    fig.savefig(out_png, dpi=150)
+    plt.close(fig)

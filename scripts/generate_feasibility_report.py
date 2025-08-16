@@ -75,6 +75,11 @@ def main():
     ap.add_argument("--bennett-B", type=float, default=None)
     ap.add_argument("--bennett-ripple", type=float, default=None)
     ap.add_argument(
+        "--require-yield",
+        action="store_true",
+        help="Require yield pass in addition to other gates",
+    )
+    ap.add_argument(
         "--schema",
         default="docs/schemas/feasibility.schema.json",
         help="Path to feasibility JSON schema",
@@ -128,7 +133,9 @@ def main():
     antiproton_yield_pass = None
     y_val = None
     if args.yield_model and (args.n_cm3 is not None) and (args.Te_eV is not None or args.Te_eV is not None):
-        y_val = antiproton_yield_estimator(float(args.n_cm3), float(args.Te_eV or 0.0), {"model": args.yield_model})
+        # Use physics model if requested
+        params = {"model": str(args.yield_model)}
+        y_val = antiproton_yield_estimator(float(args.n_cm3), float(args.Te_eV or 0.0), params)
         antiproton_yield_pass = bool(y_val >= float(args.yield_threshold))
 
     bennett_ok = None
@@ -144,8 +151,11 @@ def main():
             )
         )
 
+    stable = gamma_ok and b_ok and dens_ok
+    if args.require_yield and (antiproton_yield_pass is not None):
+        stable = stable and bool(antiproton_yield_pass)
     payload = {
-        "stable": gamma_ok and b_ok and dens_ok,
+        "stable": stable,
         "gamma_ok": gamma_ok,
         "b_ok": b_ok,
         "dens_ok": dens_ok,

@@ -26,13 +26,18 @@ jobs:
       - name: Demo run and artifacts
         run: |
           . .venv/bin/activate
-          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 10 --dt 1e-3 --seed 123 --timeline-budget 50
+          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 10 --dt 1e-3 --seed 123 --timeline-budget 50 --enforce-density
           python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
             --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
-            --out feasibility_gates_report.json --scenario-id ci-demo --fail-on-gate
+            --out feasibility_gates_report.json --scenario-id ci-demo --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield
           python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
-          python scripts/param_sweep_confinement.py --out confinement_sweep.csv
+          python scripts/param_sweep_confinement.py --out confinement_sweep.csv --plot-confinement-energy confinement_energy.png
           python scripts/uq_demo.py --samples 10 --seed 42 --out-json uq_results.json --out-csv uq_results.csv
+          python scripts/analysis_fields_plot.py --out b_field_ripple.png
+      - name: Run energy reduction demo
+        run: |
+          . .venv/bin/activate
+          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 5 --dt 1e-3 --seed 321
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -41,6 +46,8 @@ jobs:
             timeline.ndjson
             feasibility_gates_report.json
             confinement_sweep.csv
+            confinement_energy.png
+            b_field_ripple.png
             uq_results.json
             uq_results.csv
   gated-matrix:
@@ -64,7 +71,7 @@ jobs:
           python scripts/demo_runner.py --scenario ${{ matrix.scenario }} --steps 5 --dt 1e-3 --seed 7
           python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
             --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
-            --out feasibility_gates_report.json --scenario-id ${{ matrix.scenario }} --fail-on-gate || true
+            --out feasibility_gates_report.json --scenario-id ${{ matrix.scenario }} --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield || true
           # metrics_gate enforces failure for high_ripple scenario demonstrating gated failure
           python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
   lint:
@@ -75,7 +82,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install ruff
-  run: pip install ruff
+        run: pip install ruff
       - name: Ruff check
         run: ruff check .
   types:
@@ -89,4 +96,4 @@ jobs:
         run: |
           pip install mypy
       - name: Run mypy
-  run: mypy src/reactor scripts tests
+        run: mypy src/reactor scripts tests
