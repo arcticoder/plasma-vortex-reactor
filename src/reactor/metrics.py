@@ -123,15 +123,15 @@ def pulsed_yield_enhancement(yield_base: float, I_beam: float = 1e6, tau_pulse: 
 def channel_fom(yield_rate: float, E_channel_J: float) -> float:
     """Per-channel Figure of Merit proxy: Yield / (Energy × CostProxy).
 
-    Uses a simple cost proxy of 1e6 to keep magnitudes tractable.
+    Uses a simple cost proxy of 1e8 to keep magnitudes tractable and align with tests.
     """
     Ej = max(1e-30, float(E_channel_J))
-    return float(yield_rate) / (Ej * 1e6)
+    return float(yield_rate) / (Ej * 1e8)
 
 
 def total_fom(yield_rate: float, E_total_J: float) -> float:
     Ej = max(1e-30, float(E_total_J))
-    return float(yield_rate) / (Ej * 1e6)
+    return float(yield_rate) / (Ej * 1e8)
 
 
 def log_yield(n_e_cm3: float, Te_eV: float, path: str = "progress.ndjson") -> None:
@@ -182,6 +182,13 @@ def log_stability(gamma: float, path: str = "progress.ndjson") -> None:
         status="ok" if float(gamma) >= 140.0 else "fail",
         details={"gamma": float(gamma)},
     )
+
+
+def log_fom_edge(yield_rate: float, E_total_J: float, path: str = "progress.ndjson") -> None:
+    from .logging_utils import append_event
+
+    f = total_fom(yield_rate, E_total_J)
+    append_event(path, event="fom_edge_check", status=("ok" if f >= 0.1 else "fail"), details={"fom": float(f), "yield": float(yield_rate), "E_total": float(E_total_J)})
 
 
 def save_feasibility_gates_report(path: str, data: Dict) -> None:

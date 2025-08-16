@@ -11,6 +11,7 @@ from .metrics import (
 )
 from .plasma import debye_length
 from .analysis_fields import b_field_rms_fluctuation
+from .analysis_confinement import log_confinement
 from .models import drift_poisson_step, vorticity_evolution
 
 
@@ -53,12 +54,15 @@ class Reactor:
         self._enforce_density = bool(enforce_density)
         # Optional B-field series for validation
         self.B_series = b_series
+        # Internal time accumulator (s) for dynamic ripple adjustment
+        self._time_s = 0.0
 
     def step(self, dt: float = 1e-3):
         self.omega = vorticity_evolution(self.omega, self.psi, self.nu, dt, forcing=None)
         self.psi = drift_poisson_step(self.omega, max_iter=3)
         self.state = self.omega.copy()
-    # optional timeline logging
+        self._time_s += float(dt)
+        # optional timeline logging
         if self.timeline_log_path:
             wmax = float(np.max(np.abs(self.omega)))
             if (not self._logged_vortex) and wmax >= 0.5 and self._within_budget():
@@ -126,6 +130,22 @@ class Reactor:
                     append_event(self.timeline_log_path, event="stability_check", status=("ok" if gamma_proxy >= 140.0 else "fail"), details={"gamma": float(gamma_proxy)})
                 self._stability_logged = True
         return self.state
+
+    # Dynamic ripple adjustment utility
+    def adjust_ripple(self, alpha: float = 0.01) -> float:
+        """Reduce B_series ripple over time: ripple_new = ripple * (1 - alpha * t).
+
+        Returns new ripple fraction.
+        """
+        if self.B_series is None or self.B_series.size == 0:
+            return 0.0
+        B_mean = float(np.mean(self.B_series))
+        if B_mean <= 0:
+            return 0.0
+        ripple = b_field_rms_fluctuation(self.B_series)
+        scale = max(0.0, 1.0 - float(alpha) * self._time_s)
+        self.B_series = B_mean + (self.B_series - B_mean) * scale
+        return b_field_rms_fluctuation(self.B_series)
 
     def _within_budget(self) -> bool:
         if self._timeline_budget is None:

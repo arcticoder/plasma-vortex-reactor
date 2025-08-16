@@ -176,5 +176,31 @@ def full_sweep(n_e_range, T_e_range, B_range, xi_range, out_csv: str = "full_swe
             w.writerow(r)
 
 
+def optimize_confinement(I_p_range, r_p_range, B_range, out_csv: str = "optimized_confinement.csv") -> None:
+    """Optimize confinement to achieve eta >= 0.94 using xi derived from I_p, r_p, B.
+
+    xi = I_p / (5π r_p B). Use ripple=5e-4 and n0=1e20 cm^-3 as defaults for Bennett check.
+    Writes rows meeting eta>=0.94.
+    """
+    from itertools import product
+    import math as _math
+    import csv as _csv
+
+    rows = []
+    for I_p, r_p, B in product(I_p_range, r_p_range, B_range):
+        xi = float(I_p) / (5.0 * _math.pi * float(r_p) * float(B) + 1e-12)
+        ripple = 5e-4
+        eta = confinement_efficiency_estimator(xi, ripple)
+        bennett_ok = bennett_confinement_check(1e20, xi, B, ripple)
+        if eta >= 0.94 and bennett_ok:
+            rows.append({"I_p": I_p, "r_p": r_p, "B": B, "xi": xi, "eta": eta})
+    if rows:
+        with open(out_csv, "w", newline="", encoding="utf-8") as f:
+            w = _csv.DictWriter(f, fieldnames=list(rows[0].keys()))
+            w.writeheader()
+            for r in rows:
+                w.writerow(r)
+
+
 if __name__ == "__main__":
     main()

@@ -16,7 +16,7 @@ if _src not in sys.path:
 
 from reactor.config import load_json
 from reactor.core import Reactor
-from reactor.metrics import antiproton_yield_estimator, log_fom
+from reactor.metrics import antiproton_yield_estimator, log_fom, log_fom_edge
 from reactor.energy import EnergyLedger, lg_mode_enhancement, plot_energy_reduction
 
 
@@ -147,6 +147,12 @@ def main():
     try:
         y = antiproton_yield_estimator(1e20, 10.0, {"model": "physics"})
         log_fom(y, ledger.total_energy(), timeline_path or "progress.ndjson")
+    except Exception:
+        pass
+    try:
+        # Log edge case too (lower density / higher energy) for diagnostics
+        y_low = antiproton_yield_estimator(1e19, 5.0, {"model": "physics"})
+        log_fom_edge(y_low, ledger.total_energy() * 10.0, timeline_path or "progress.ndjson")
     except Exception:
         pass
     # Optional energy plot artifact

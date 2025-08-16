@@ -1,0 +1,4 @@
+{"event": "vortex_stabilized", "status": "ok", "ts": "2025-08-16T05:31:13.429780+00:00", "details": {"wmax": 0.999996}}
+{"event": "confinement_achieved", "status": "ok", "ts": "2025-08-16T05:31:13.430017+00:00", "details": {"efficiency": 0.9462005103774477, "xi": 2.0, "b_ripple_pct": 0.005}}
+{"event": "density_enforced", "status": "ok", "ts": "2025-08-16T05:31:13.430071+00:00", "details": {"lambda_D_m": 16.623539707579976, "ne_cm3": 1e+20}}
+{"event": "antiproton_yield", "status": "ok", "ts": "2025-08-16T05:31:13.430138+00:00", "details": {"yield_cm3_s": 3e+21, "ne_cm3": 1e+20, "Te_eV": 10.0}}

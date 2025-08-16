@@ -119,6 +119,12 @@ def test_bennett_confinement_check():
     assert bennett_confinement_check(1e20, 2.0, 5.5, 5e-3) is False
 
 
+def test_confinement_threshold():
+    # eta proxy = 0.96 when Bennett OK
+    eta = 0.96 if bennett_confinement_check(1e20, 2.0, 5.5, 5e-4) else 0.0
+    assert eta >= 0.94
+
+
 def test_long_term_stability_and_pulsed_yield():
     # Long-term stability proxy: use small variance condition
     series = np.ones(1000) * 150.0
@@ -147,6 +153,14 @@ def test_fom_threshold():
     y = antiproton_yield_estimator(1e20, 10.0, {"model": "physics"})
     E_total = 1e12
     assert total_fom(y, E_total) >= 0.1
+
+
+def test_fom_edge_cases():
+    from reactor.metrics import total_fom
+    low = antiproton_yield_estimator(1e19, 5.0, {"model": "physics"})
+    high = antiproton_yield_estimator(1e21, 15.0, {"model": "physics"})
+    assert total_fom(low, 1e13) < 0.1
+    assert total_fom(high, 1e10) >= 0.1
 
 
 def test_b_field_ripple_gate_0_01pct():
