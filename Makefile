@@ -27,3 +27,16 @@ nox-types:
 paper:
 	@echo "Building docs/paper.tex -> paper.pdf (requires pdflatex)"
 	@pdflatex -interaction=nonstopmode -output-directory=docs docs/paper.tex || true
+
+bundle:
+	@echo "Creating repro bundle tarball..."
+	@mkdir -p dist/bundle
+	@cp -f examples/scenario_min.json dist/bundle/
+	@cp -f scripts/demo_runner.py dist/bundle/
+	@cp -f scripts/run_report.py dist/bundle/
+	@cp -f scripts/production_kpi.py dist/bundle/
+	@cp -f scripts/performance_budget.py dist/bundle/
+	@cp -f scripts/plot_bench_trend.py dist/bundle/
+	@cp -f requirements.txt dist/bundle/
+	@cd dist && tar czf repro-bundle.tgz bundle && rm -rf bundle
+	@echo "Bundle at dist/repro-bundle.tgz"

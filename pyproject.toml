@@ -31,6 +31,8 @@ pv-validate-schemas = "reactor.cli_entry:validate_schemas"
 pv-cost-sweep = "scripts.cost_model_sweep:main"
 pv-snr-prop = "scripts.snr_propagation:main"
 pv-perf-budget = "scripts.performance_budget:main"
+pv-envelope = "scripts.envelope_sweep:main"
+pv-ablation-ripple = "scripts.ablation_ripple:main"
 [tool.ruff]
 line-length = 100
 extend-exclude = ["notebooks/**/*.ipynb", "**/*.ipynb"]
@@ -53,6 +55,8 @@ strict_optional = true
 module = [
 	"reactor.analysis_stat",
 	"reactor.metrics",
+	"reactor.core",
+	"reactor.analysis_fields",
 ]
 disallow_untyped_defs = true
 disallow_incomplete_defs = true

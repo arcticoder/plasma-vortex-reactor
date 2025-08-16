@@ -53,6 +53,8 @@ def main():
     ap = argparse.ArgumentParser(description="Plot dynamic stability vs ripple")
     ap.add_argument("--from-sweep", default=None, help="Optional CSV produced by time/dynamic ripple sweeps")
     ap.add_argument("--out", default="dynamic_stability_ripple.png")
+    ap.add_argument("--gate", type=float, default=0.998, help="Horizontal gate level for stability probability")
+    ap.add_argument("--gate-label", default="gate 0.998", help="Gate annotation label")
     args = ap.parse_args()
 
     if args.from_sweep and os.path.exists(args.from_sweep):
@@ -60,7 +62,7 @@ def main():
     else:
         xs, ys = [5e-5, 1e-4, 2e-4], [0.999, 0.998, 0.995]
 
-    plot_stability_ripple(xs, ys, args.out)
+    plot_stability_ripple(xs, ys, args.out, gate_y=args.gate, gate_label=args.gate_label)
 
 
 if __name__ == "__main__":

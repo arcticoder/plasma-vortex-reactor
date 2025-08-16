@@ -11,6 +11,7 @@ def main() -> None:
     ap.add_argument("--integrated", default="integrated_report.json")
     ap.add_argument("--kpi", default="production_kpi.json")
     ap.add_argument("--schema-dir", default="docs/schemas")
+    ap.add_argument("--anomalies-summary", default="anomalies_summary.json")
     args = ap.parse_args()
     errors: list[str] = []
     try:
@@ -37,6 +38,16 @@ def main() -> None:
             jsonschema.validate(instance=js, schema=schema)
         except Exception as e:
             errors.append(f"production_kpi.json: {e}")
+    # Optional anomalies summary validation
+    asum = sdir / "anomalies_summary.schema.json"
+    if asum.exists() and Path(args.anomalies_summary).exists():
+        try:
+            js = json.loads(Path(args.anomalies_summary).read_text())
+            schema = json.loads(asum.read_text())
+            jsonschema.validate(instance=js, schema=schema)
+        except Exception as e:
+            errors.append(f"anomalies_summary.json: {e}")
+
     ok = not errors
     print(json.dumps({"ok": ok, "errors": errors}))
     if errors:

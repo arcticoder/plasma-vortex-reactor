@@ -60,6 +60,8 @@ Artifacts produced by this repo:
 - calibrate_ripple_alpha.py: Fit decay alpha from dynamic ripple sweep CSV.
 - time_to_stability_yield.py: Compute time to reach yield/FOM thresholds and emit JSON/PNG.
 - generate_progress_dashboard.py: Build progress_dashboard.html aggregating docs/*.ndjson.
+- envelope_sweep.py: Density–Temperature operating envelope with FOM contours.
+- ablation_ripple.py: Ablation of ripple control ON vs OFF.
 
 Examples:
 
@@ -112,6 +114,7 @@ Console scripts installed with the package:
 - pv-build-artifacts
 - pv-anomalies, pv-validate-schemas
 - pv-cost-sweep, pv-snr-prop, pv-perf-budget
+- pv-envelope, pv-ablation-ripple
 
 ## Releases and Artifacts
 
@@ -121,8 +124,17 @@ The CI workflow uploads a bundle of artifacts on each push/PR, including:
 - time_to_metrics.{json,png}, calibration.json
 - key plots: production_fom_yield.png, stability.png, dynamic_stability_ripple.png
 - dashboard: progress_dashboard.html (+ progress_dashboard.json)
+- anomalies summary: anomalies_summary.json
+- envelope: operating_envelope.{json,csv,png}; ablation: ablation_ripple.json
 - utility outputs: sensor_noise.png, bench_step_loop.json, bench_trend.jsonl
 - analysis outputs: cost_sweep.{json,csv,png}, snr_propagation.{json,png}
+
+## What's novel
+
+- CI-enforced KPI gates and performance budgets with trend plotting and PR badges.
+- Dynamic ripple adjustment pipeline with ablation study and stability probability gates.
+- Operating envelope characterization (n,T → FOM) feeding into scenario selection.
+- Reproducible artifacts and a minimal repro bundle tarball for reviewers.
 
 ## Try it: Three Scenarios
 

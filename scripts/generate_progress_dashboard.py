@@ -19,7 +19,7 @@ import html
 import json
 import os
 from pathlib import Path
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 
 
 NDJSON_FILES = [
@@ -52,6 +52,16 @@ def _read_ndjson(p: Path) -> List[Dict[str, Any]]:
     return items
 
 
+def _anomalies_counts(items: List[Dict[str, Any]]) -> Dict[str, int]:
+    counts: Dict[str, int] = {}
+    for it in items:
+        sev = str(it.get("status") or it.get("details", {}).get("severity") or "").strip()
+        if not sev:
+            continue
+        counts[sev] = counts.get(sev, 0) + 1
+    return counts
+
+
 def build_html(docs_dir: Path) -> str:
     sections: List[str] = []
     now = _dt.datetime.utcnow().isoformat() + "Z"
@@ -76,6 +86,7 @@ def build_html(docs_dir: Path) -> str:
 
     nav_items: List[str] = []
     export_summary: Dict[str, Any] = {"generated": now, "sections": []}
+    anomalies_counts: Dict[str, int] = {}
     for name in NDJSON_FILES:
         p = docs_dir / name
         items = _read_ndjson(p)
@@ -88,6 +99,32 @@ def build_html(docs_dir: Path) -> str:
         # Show up to 10 most recent items
         recent = items[-10:]
         export_summary["sections"].append({"name": name, "count": len(items), "recent": recent})
+        # Special: show anomaly counts summary badge and trend sparkline for anomalies file
+        if name == "timeline_anomalies.ndjson":
+            anomalies_counts = _anomalies_counts(items)
+            if anomalies_counts:
+                badges = " ".join(
+                    f"<span class='badge'>{html.escape(k)}={v}</span>" for k, v in anomalies_counts.items()
+                )
+                # Build a tiny sparkline for cumulative 'fail' events across the last 50 items
+                last = items[-50:]
+                cum = []
+                c = 0
+                for it in last:
+                    if (it.get('status') == 'fail') or (it.get('details', {}).get('severity') == 'fail'):
+                        c += 1
+                    cum.append(c)
+                if cum:
+                    w, h = 200, 40
+                    mx = max(cum) or 1
+                    points = []
+                    for i, v in enumerate(cum):
+                        x = int(i * (w - 2) / max(1, len(cum) - 1)) + 1
+                        y = int(h - 1 - (v / mx) * (h - 2))
+                        points.append(f"{x},{y}")
+                    svg = f"<svg width='{w}' height='{h}' viewBox='0 0 {w} {h}'><polyline fill='none' stroke='#d73a49' stroke-width='2' points='{" ".join(points)}' /></svg>"
+                    sections.append(f"<div>Fail trend (last {len(cum)}): {svg}</div>")
+                sections.append(f"<p>Severity counts: {badges}</p>")
         sections.append("<ul>")
         for it in recent:
             # pick a nice title-ish field
@@ -137,6 +174,11 @@ def build_html(docs_dir: Path) -> str:
         + f"\n<script>const toggles={{ok:true,warn:true,fail:true}};function apply(){{['ok','warn','fail'].forEach(s=>document.querySelectorAll('.status-'+s).forEach(el=>el.style.display=(toggles[s]?'':'none')));}}document.getElementById('toggle-ok').addEventListener('change',e=>{{toggles.ok=e.target.checked;apply();}});document.getElementById('toggle-warn').addEventListener('change',e=>{{toggles.warn=e.target.checked;apply();}});document.getElementById('toggle-fail').addEventListener('change',e=>{{toggles.fail=e.target.checked;apply();}});apply();</script>"
         + "\n</body></html>\n"
     )
+    # Optionally persist anomalies summary for validation and PR consumption
+    try:
+        (Path("anomalies_summary.json")).write_text(json.dumps({"generated": now, "counts": anomalies_counts}))
+    except Exception:
+        pass
     return doc
 
 

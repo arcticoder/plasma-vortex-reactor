@@ -4,6 +4,8 @@ nav:
   - Guides:
       - Metrics Guide: docs/METRICS_GUIDE.md
       - Artifact Schema: docs/ARTIFACT_SCHEMA.md
+  - Operating Envelope: docs/OPERATING_ENVELOPE.md
+  - Ablation Study: docs/ABLATION.md
   - API: api.md
 theme:
   name: material

@@ -598,6 +598,26 @@ def test_hardware_runner_dry_run(tmp_path):
         _os.chdir(cwd)
 
 
+def test_envelope_and_ablation(tmp_path):
+    import subprocess, sys as _sys, os as _os
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        envs = _pl.Path(cwd) / "scripts" / "envelope_sweep.py"
+        res = subprocess.run([_sys.executable, str(envs), "--n-points", "5"], capture_output=True)
+        assert res.returncode == 0
+        assert _pl.Path("operating_envelope.json").exists()
+        assert _pl.Path("operating_envelope.csv").exists()
+        # ablation
+        abl = _pl.Path(cwd) / "scripts" / "ablation_ripple.py"
+        res2 = subprocess.run([_sys.executable, str(abl), "--n", "1000"], capture_output=True)
+        assert res2.returncode == 0
+        assert _pl.Path("ablation_ripple.json").exists()
+    finally:
+        _os.chdir(cwd)
+
+
 @pytest.mark.hardware
 def test_hardware_runner_simulated(tmp_path):
     import subprocess, sys as _sys, os as _os, json as _json

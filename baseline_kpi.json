@@ -1,0 +1,5 @@
+{
+  "stable": true,
+  "fom": 0.12,
+  "notes": "Baseline KPI for CI delta comparisons; update via CI on release if needed."
+}

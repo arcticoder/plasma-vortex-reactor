@@ -74,8 +74,17 @@ def plot_stability_curve(time_ms: Sequence[float], gamma_series: Sequence[float]
     plt.close(fig)
 
 
-def plot_stability_ripple(ripples: Sequence[float], probabilities: Sequence[float], out_png: str) -> None:
-    """Plot stability probability vs. ripple fraction to PNG."""
+def plot_stability_ripple(
+    ripples: Sequence[float],
+    probabilities: Sequence[float],
+    out_png: str,
+    gate_y: float | None = None,
+    gate_label: str | None = None,
+) -> None:
+    """Plot stability probability vs. ripple fraction to PNG.
+
+    Optional gate_y draws a horizontal gate line with an annotation.
+    """
     from .plotting import _mpl
 
     import numpy as _np
@@ -87,6 +96,21 @@ def plot_stability_ripple(ripples: Sequence[float], probabilities: Sequence[floa
     ax.set_xlabel("Ripple (fraction)")
     ax.set_ylabel("Stability Probability")
     ax.set_title("Stability vs. Ripple")
+    if gate_y is not None:
+        y = float(gate_y)
+        ax.axhline(y, color="#d73a49" if y > 0 else "#999", linestyle="--", linewidth=1.0)
+        if gate_label:
+            # place the label at the right side
+            ax.text(
+                0.98,
+                y,
+                str(gate_label),
+                color="#d73a49",
+                ha="right",
+                va="bottom",
+                fontsize=9,
+                transform=ax.get_yaxis_transform(),
+            )
     fig.tight_layout()
     fig.savefig(out_png, dpi=150)
     plt.close(fig)

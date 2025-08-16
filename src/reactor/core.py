@@ -58,7 +58,7 @@ class Reactor:
         # Internal time accumulator (s) for dynamic ripple adjustment
         self._time_s = 0.0
 
-    def step(self, dt: float = 1e-3):
+    def step(self, dt: float = 1e-3) -> np.ndarray:
         self.omega = vorticity_evolution(self.omega, self.psi, self.nu, dt, forcing=None)
         self.psi = drift_poisson_step(self.omega, max_iter=3)
         self.state = self.omega.copy()
