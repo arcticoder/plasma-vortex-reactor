@@ -1,0 +1,8 @@
+{
+  "timeline_log_path": "timeline.ndjson",
+  "grid": [32, 32],
+  "nu": 0.001,
+  "xi": 2.0,
+  "b_field_ripple_pct": 0.002,
+  "b_series": [5.0, 5.001, 4.999, 5.0, 4.9995, 5.0005, 5.0]
+}

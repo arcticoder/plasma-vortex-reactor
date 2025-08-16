@@ -231,6 +231,50 @@ def test_dynamic_ripple_edge(monkeypatch):
     assert r2 <= r1
 
 
+def test_production_fom():
+    # Production FOM should exceed threshold under high-density, pulsed conditions
+    y_base = antiproton_yield_estimator(1e21, 20.0, {"model": "physics"})
+    y = pulsed_yield_enhancement(y_base)
+    E_total = 1e10
+    assert total_fom(y, E_total) >= 0.1
+
+
+def test_high_load_stability():
+    from reactor.analysis_stat import stability_probability
+    series = np.ones(1_000_000) * 150.0 + np.random.normal(0, 0.01, 1_000_000)
+    assert stability_probability(series, threshold=140.0, steps=1_000_000) >= 0.999
+
+
+def test_dynamic_ripple_production():
+    import numpy as _np
+    b_series = _np.ones(1000) * 5.0 + _np.random.normal(0, 5e-5, 1000)
+    R = Reactor(grid=(16, 16), nu=1e-3, b_series=b_series)
+    R._time_s = 10.0
+    r1 = R.adjust_ripple(alpha=0.01)
+    assert r1 <= 1e-4
+    R._time_s = 100.0
+    r2 = R.adjust_ripple(alpha=0.01)
+    assert r2 < r1
+
+
+def test_production_timeout(monkeypatch):
+    # Reuse slow simulate to trigger timeout quickly
+    import time as _time
+    def _slow_sim(state):
+        _time.sleep(0.02)
+        return state
+    import types, sys as _sys
+    fake_mod = types.SimpleNamespace(simulate_hardware=_slow_sim)
+    monkeypatch.setitem(_sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
+    R = Reactor(grid=(16, 16), nu=1e-3)
+    R.hw_state = {"i": 1, "load": "high"}
+    try:
+        R.step_with_real_hardware(dt=1e-3, timeout=0.001)
+    except TimeoutError:
+        return
+    assert False, "Expected TimeoutError"
+
+
 def test_real_hardware_integration(monkeypatch):
     # Monkeypatch real simulate_hardware to ensure it integrates
     def _fake_sim(state):

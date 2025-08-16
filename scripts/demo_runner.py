@@ -165,6 +165,12 @@ def main():
             R.log_production_metrics(timeline_path or "progress.ndjson")
     except Exception:
         pass
+    # Log production failure if thresholds not met
+    try:
+        if hasattr(R, "log_production_failure"):
+            R.log_production_failure(timeline_path or "progress.ndjson")
+    except Exception:
+        pass
     try:
         # Log edge case too (lower density / higher energy) for diagnostics
         y_low = antiproton_yield_estimator(1e19, 5.0, {"model": "physics"})

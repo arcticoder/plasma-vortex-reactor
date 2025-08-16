@@ -37,6 +37,7 @@ jobs:
           python scripts/plot_stability.py --out stability.png
           python -c "import sys; sys.path.insert(0, 'src'); from reactor.analysis_stat import plot_stability_ripple; plot_stability_ripple([5e-5,1e-4,2e-4],[0.999,0.998,0.995],'stability_ripple.png')"
           python scripts/plot_fom.py --out fom_yield.png
+          python scripts/plot_production_fom.py --out production_fom.png
           python scripts/plot_yield_density.py --out yield_density.png
           python scripts/plot_hardware_metrics.py --out hardware_metrics.png
           python scripts/full_sweep.py --out full_sweep.csv
@@ -59,6 +60,7 @@ jobs:
             stability.png
             stability_ripple.png
             fom_yield.png
+            production_fom.png
             yield_density.png
             hardware_metrics.png
             energy_reduction.png
@@ -71,7 +73,12 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        scenario: [examples/scenario_min.json, examples/scenario_high_ripple.json, examples/scenario_high_density.json, examples/scenario_low_temp.json]
+        scenario:
+          - examples/scenario_min.json
+          - examples/scenario_high_ripple.json
+          - examples/scenario_high_density.json
+          - examples/scenario_low_temp.json
+          - examples/scenario_high_load.json
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -85,7 +92,9 @@ jobs:
       - name: Run demo and feasibility with gate
         run: |
           . .venv/bin/activate
-          python scripts/demo_runner.py --scenario ${{ matrix.scenario }} --steps 5 --dt 1e-3 --seed 7
+          STEPS=5
+          if [ "${{ matrix.scenario }}" = "examples/scenario_high_load.json" ]; then STEPS=10000; fi
+          python scripts/demo_runner.py --scenario ${{ matrix.scenario }} --steps $STEPS --dt 1e-3 --seed 7
           python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
             --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
             --out feasibility_gates_report.json --scenario-id ${{ matrix.scenario }} --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield --require-fom || true

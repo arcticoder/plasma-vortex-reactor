@@ -173,8 +173,20 @@ class Reactor:
         except Exception:
             pass
 
+    def log_production_failure(self, path: str = "progress.ndjson") -> None:
+        try:
+            n_e = float(getattr(self, "ne_cm3", 0.0))
+            T_e = float(getattr(self, "Te_eV", 0.0))
+            y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
+            E_total = max(1e-9, self._time_s) * 1e6
+            f = total_fom(y, E_total)
+            if (f < 0.1) or (y < 1e12):
+                append_event(path, event="production_failure", status="fail", details={"fom": float(f), "yield": float(y)})
+        except Exception:
+            pass
+
     # Real hardware integration with timeout and error/timeout logging
-    def step_with_real_hardware(self, dt: float, timeout: float = 10.0) -> None:
+    def step_with_real_hardware(self, dt: float, timeout: float = 30.0) -> None:
         try:
             from enhanced_simulation_hardware_abstraction_framework import simulate_hardware  # type: ignore
         except Exception as e:
@@ -201,7 +213,18 @@ class Reactor:
             raise
         except Exception as e:
             try:
-                append_event(self.timeline_log_path or "progress.ndjson", event="hardware_error", status="fail", details={"error": str(e)})
+                # Log production-specific hardware error when load is high
+                evt = (
+                    "production_hardware_error"
+                    if isinstance(getattr(self, "hw_state", {}).get("load", None), str)
+                    else "hardware_error"
+                )
+                append_event(
+                    self.timeline_log_path or "progress.ndjson",
+                    event=evt,
+                    status="fail",
+                    details={"error": str(e)},
+                )
             except Exception:
                 pass
             return
