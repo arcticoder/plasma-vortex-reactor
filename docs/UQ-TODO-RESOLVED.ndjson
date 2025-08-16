@@ -1,1 +1,3 @@
 {"title":"Unit coverage for EnergyLedger enhancement and reduction","status":"completed","refs":["tests/test_metrics_and_energy.py"],"notes":"Existing tests exercise ledger and FOM; enhancement path validated via manual run."}
+{"title":"UQ: High-load stability under dynamic ripple","status":"completed","refs":["scripts/plot_dynamic_stability_ripple.py","tests/test_followups.py"],"notes":"Stability probability plotted from sweep and helper test ensures artifact creation."}
+{"title":"UQ: Hardware timeout reliability at 60s","status":"completed","refs":["src/reactor/core.py","tests/test_followups.py"],"notes":"Default timeout set to 60s and tests cover high-load timeout and error logging."}

@@ -1,2 +1,5 @@
 {"event":"EnergyLedger enhancement factor integrated and syntax errors fixed","status":"completed","refs":["src/reactor/energy.py"],"details":{"apply_enhancement":true,"total_energy_reduction":true}}
 {"event":"metrics_gate supports optional antiproton yield gate","status":"completed","refs":["scripts/metrics_gate.py"],"details":{"flag":"--require-yield"}}
+{"event":"Phase 3: Added dynamic stability vs ripple CLI & artifact","status":"completed","refs":["scripts/plot_dynamic_stability_ripple.py",".github/workflows/ci.yml"],"details":{"artifact":"dynamic_stability_ripple.png"}}
+{"event":"Phase 3: High-load hardware metrics plot variant","status":"completed","refs":["scripts/plot_hardware_metrics.py",".github/workflows/ci.yml"],"details":{"artifact":"high_load_hardware_metrics.png"}}
+{"event":"Phase 3: Time sweep and dynamic ripple sweep added","status":"completed","refs":["scripts/param_sweep_confinement.py"],"details":{"csv":["full_sweep_with_time.csv","full_sweep_with_dynamic_ripple.csv"]}}

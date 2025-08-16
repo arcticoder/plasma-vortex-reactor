@@ -18,3 +18,25 @@
 {"metric":"Plasma Density","category":"Supporting","threshold":"ne ≥ 1e20 cm^-3; ρ signals consistent with high-yield regimes","measurement":"Microwave plasma model in elemental-transmutator comprehensive_analyzer; log 'plasma_density_achieved'","target":"Stable density in ≥95% runs"}
 {"metric":"Magnetic Field Strength","category":"Supporting","threshold":"B ≥ 5 T with <1% fluctuation","measurement":"warp-field-coils modeling validated in digital twin; report to feasibility_gates_report.json","target":"Consistent 5 T fields across scenarios"}
 {"metric":"Economic Viability (FOM)","category":"Supporting","threshold":"FOM ≥ 0.1; cost/antiproton ≤ $1e6 for niche apps","measurement":"Compute FOM=(Conversion×Price)/Total Cost using energy_ledger costs; CI validation","target":"FOM ≥ 0.1 by Phase 3"}
+{"section":"Phase 3: Scaling/Production - Tasks","status":"planned","as_of":"2025-08-16","tasks":[
+	{"id":1,"title":"Dynamic stability vs ripple CLI and CI artifact","refs":["scripts/plot_dynamic_stability_ripple.py",".github/workflows/ci.yml"]},
+	{"id":2,"title":"High-load hardware metrics plot variant and artifact","refs":["scripts/plot_hardware_metrics.py",".github/workflows/ci.yml"]},
+	{"id":3,"title":"Extend CI matrix with edge & high-load scenarios","refs":[".github/workflows/ci.yml","examples/scenario_edge.json","examples/scenario_high_load.json"]},
+	{"id":4,"title":"Add time sweep --full-sweep-with-time CSV artifact","refs":["scripts/param_sweep_confinement.py",".github/workflows/ci.yml"]},
+	{"id":5,"title":"Add dynamic ripple time sweep CSV artifact","refs":["scripts/param_sweep_confinement.py",".github/workflows/ci.yml"]},
+	{"id":6,"title":"High-load FOM ≥ 0.1 test","refs":["tests/test_followups.py"]},
+	{"id":7,"title":"High-load hardware tests and 60s timeout default","refs":["src/reactor/core.py","tests/test_followups.py"]},
+	{"id":8,"title":"Edge production failure logging hook","refs":["scripts/demo_runner.py","src/reactor/core.py"]},
+	{"id":9,"title":"Production FOM vs yield plot and artifact","refs":["scripts/plot_production_fom.py",".github/workflows/ci.yml"]},
+	{"id":10,"title":"Dynamic stability plot generation test","refs":["tests/test_followups.py","src/reactor/analysis_stat.py"]},
+	{"id":11,"title":"Integrate UQ optimize run in CI with artifact","refs":["scripts/uq_optimize.py",".github/workflows/ci.yml"]},
+	{"id":12,"title":"Upload sweep CSVs and plots as artifacts","refs":[".github/workflows/ci.yml"]},
+	{"id":13,"title":"Add logging for high-load hardware timeout/error","refs":["src/reactor/core.py"]},
+	{"id":14,"title":"Normalize FOM and ensure gate checks","refs":["src/reactor/metrics.py","scripts/metrics_gate.py"]},
+	{"id":15,"title":"Update progress timeline event budget & semantics","refs":["src/reactor/core.py","tests/test_followups.py"]},
+	{"id":16,"title":"Seeded scenarios for edge and high-load cases","refs":["examples/scenario_edge.json","examples/scenario_high_load.json"]},
+	{"id":17,"title":"Time sweep and dynamic ripple tests","refs":["tests/test_followups.py"]},
+	{"id":18,"title":"Hardware integration smoke tests","refs":["tests/test_followups.py"]},
+	{"id":19,"title":"Production metrics and failure logging","refs":["scripts/demo_runner.py","src/reactor/metrics.py"]},
+	{"id":20,"title":"Document Phase 3 tasks in roadmap & logs","refs":["docs/roadmap.ndjson","docs/progress_log.ndjson"]}
+]}
