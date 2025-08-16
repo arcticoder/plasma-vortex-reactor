@@ -48,3 +48,13 @@ no_implicit_optional = true
 allow_redefinition = true
 show_error_codes = true
 strict_optional = true
+
+[tool.mypy.overrides]
+module = [
+	"reactor.analysis_stat",
+	"reactor.metrics",
+]
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true

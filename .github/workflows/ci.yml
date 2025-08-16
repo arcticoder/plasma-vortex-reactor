@@ -19,6 +19,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest ruff jsonschema
+          pip install -e .
       - name: Run tests (fast)
         run: |
           . .venv/bin/activate
@@ -63,6 +64,10 @@ jobs:
           python scripts/snr_propagation.py --snr 25
           python scripts/performance_budget.py --bench bench_step_loop.json --max-elapsed-s 2.0 --trend-out bench_trend.jsonl
           python scripts/validate_schemas.py > validation_report.json || true
+          # Build via console entry for one-shot artifacts (best-effort)
+          pv-build-artifacts || true
+          # Plot trend from budget JSONL if present
+          python scripts/plot_bench_trend.py --in bench_trend.jsonl --out bench_trend.png || true
       - name: Run energy reduction demo
         run: |
           . .venv/bin/activate
@@ -99,6 +104,7 @@ jobs:
             sensor_noise.png
             bench_step_loop.json
             bench_trend.jsonl
+            bench_trend.png
             progress_dashboard.json
             cost_sweep.json
             cost_sweep.csv
