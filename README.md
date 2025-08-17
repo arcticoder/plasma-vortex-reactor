@@ -75,7 +75,7 @@ python scripts/calibrate_ripple_alpha.py --from-csv full_sweep_with_dynamic_ripp
 python scripts/time_to_stability_yield.py --sweep-time data/full_sweep_with_time.csv --out-json artifacts/time_to_metrics.json --out-png artifacts/time_to_metrics.png
 python scripts/plot_kpi_trend.py --out kpi_trend.png
 python scripts/timeline_analysis.py --timeline docs/timeline_anomalies.ndjson --out timeline_stats.json
-python scripts/envelope_sweep.py --n-points 12 --out-json operating_envelope.json --out-csv operating_envelope.csv --out-png operating_envelope.png
+python scripts/envelope_sweep.py --n-points 12 --out-json artifacts/operating_envelope.json --out-csv data/operating_envelope.csv --out-png artifacts/operating_envelope.png
 python scripts/ablation_ripple.py --n 5000 --out ablation_ripple.json
 ```
 
@@ -100,11 +100,21 @@ Note: Plotting scripts require `matplotlib`. Specifically, `plot_hardware_metric
 
 By default, plotting and analysis scripts now write outputs under `artifacts/` (images/json) and place generated CSV inputs under `data/` to avoid cluttering the repo root.
 
-Order of operations (to produce integrated_report.json):
+Dynamic ripple vs time plot:
+- The helper will auto-generate `data/full_sweep_with_dynamic_ripple.csv` if missing by invoking the sweep script.
+- Usage:
+  - `python scripts/plot_dynamic_ripple_time.py --from-csv data/full_sweep_with_dynamic_ripple.csv --out artifacts/dynamic_ripple_time.png`
+  - If no data or matplotlib is available, a small placeholder PNG is written so downstream steps never fail.
+
+Why do some stability plots show only three points from many CSV rows?
+- `scripts/plot_dynamic_stability_ripple.py` samples ripple values at approximate 10th/50th/90th percentiles to keep the figure readable. To plot all points, pass `--all-points`.
+  - Example: `python scripts/plot_dynamic_stability_ripple.py --from-sweep data/full_sweep_with_dynamic_ripple.csv --all-points --out artifacts/dynamic_stability_ripple.png`
+
+Order of operations (to produce artifacts/integrated_report.json):
 - Run the demo to produce `timeline.ndjson` and `metrics.json`.
 - Generate `feasibility_gates_report.json` (e.g., with datasets or scenario outputs).
 - Optionally run `uq_optimize.py` (writes `uq_optimized.json`) and `param_sweep_confinement.py --full-sweep-with-time/--full-sweep-with-dynamic-ripple` (writes `data/full_sweep_with_*.csv`).
-- Run `run_report.py --integrated-out integrated_report.json` (defaults will look in `data/` for sweeps).
+- Run `run_report.py --integrated-out artifacts/integrated_report.json` (defaults will look in `data/` for sweeps).
 
 ### Additional CLI entry points
 
@@ -127,13 +137,13 @@ The CI workflow uploads a bundle of artifacts on each push/PR, including:
 - integrated_report.json, production_kpi.json, feasibility_gates_report.json
 - time_to_metrics.{json,png}, calibration.json
 - key plots: production_fom_yield.png, stability.png, dynamic_stability_ripple.png
-- KPI trend: kpi_trend.png
+- KPI trend: artifacts/kpi_trend.png
 - anomalies summary: anomalies_summary.json
 - envelope: operating_envelope.{json,csv,png}; ablation: ablation_ripple.json
 - utility outputs: sensor_noise.png, bench_step_loop.json, bench_trend.jsonl
 - analysis outputs: cost_sweep.{json,csv,png}, snr_propagation.{json,png}
 
-Materials for reviewers: see `dist/repro-bundle.tgz` for a one-command reproduction runner and open key plots (operating_envelope.png, dynamic_stability_ripple.png, envelope_dual_panel.png) directly from the Artifacts list.
+Materials for reviewers: see `dist/repro-bundle.tgz` for a one-command reproduction runner and open key plots (artifacts/operating_envelope.png, artifacts/dynamic_stability_ripple.png, artifacts/envelope_dual_panel.png) directly from the Artifacts list.
 
 ## What's novel
 
@@ -151,6 +161,8 @@ Materials for reviewers: see `dist/repro-bundle.tgz` for a one-command reproduct
   - `python scripts/demo_runner.py --scenario examples/scenario_edge.json --steps 100 --dt 1e-3`
 - Production:
   - `python scripts/demo_runner.py --scenario examples/scenario_production.json --steps 1000 --dt 1e-3`
+
+Note on the CI badge: The badge reflects the latest default-branch workflow run. If it appears failing on the GitHub page but local runs pass, check the last Actions run for details; intermittent flaky network steps can be retried.
 
 ## Documentation
 

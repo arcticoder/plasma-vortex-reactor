@@ -44,11 +44,11 @@ def bench_step_loop() -> None:
 
 
 def build_artifacts() -> None:
-    # One-shot builder: demo + report + KPI + plots used by the dashboard
+    # One-shot builder: demo + report + KPI + key plots (dashboard removed)
     import os, sys, json
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), ".."))
     from scripts import demo_runner, generate_feasibility_report, run_report as rr, production_kpi as kpi
-    from scripts import plot_production_fom as pf, plot_stability as ps, generate_progress_dashboard as dash
+    from scripts import plot_production_fom as pf, plot_stability as ps
 
     # Demo run (minimal)
     demo_runner.main()
@@ -61,12 +61,16 @@ def build_artifacts() -> None:
     # Plots
     pf.main()
     ps.main()
-    # Dashboard
-    dash.main()
-    print(json.dumps({"ok": True, "built": [
-        "feasibility_gates_report.json","integrated_report.json","production_kpi.json",
-        "production_fom_yield.png","stability.png","progress_dashboard.html"
-    ]}))
+    print(json.dumps({
+        "ok": True,
+        "built": [
+            "feasibility_gates_report.json",
+            "artifacts/integrated_report.json",
+            "production_kpi.json",
+            "artifacts/production_fom_yield.png",
+            "artifacts/stability.png"
+        ]
+    }))
 
 
 def generate_timeline_anomalies() -> None:

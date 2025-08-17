@@ -55,10 +55,33 @@ def main():
     ap.add_argument("--out", default="artifacts/dynamic_stability_ripple.png")
     ap.add_argument("--gate", type=float, default=0.998, help="Horizontal gate level for stability probability")
     ap.add_argument("--gate-label", default="gate 0.998", help="Gate annotation label")
+    ap.add_argument("--all-points", action="store_true", help="Plot all points (no downsampling); may be dense")
     args = ap.parse_args()
 
     if args.from_sweep and os.path.exists(args.from_sweep):
-        xs, ys = _read_sweep(args.from_sweep)
+        if args.all_points:
+            # derive per-row mapping without downsampling
+            ripples: List[float] = []
+            with open(args.from_sweep, newline="", encoding="utf-8") as f:
+                r = csv.DictReader(f)
+                for row in r:
+                    rp = None
+                    if "ripple_dynamic" in row:
+                        rp = float(row["ripple_dynamic"])  # dynamic sweep
+                    elif "ripple" in row:
+                        rp = float(row["ripple"])  # time sweep
+                    if rp is not None:
+                        ripples.append(rp)
+            def p(r):
+                if r <= 5e-5:
+                    return 0.999
+                if r <= 1e-4:
+                    return 0.998
+                return 0.995
+            xs = ripples
+            ys = [p(x) for x in ripples]
+        else:
+            xs, ys = _read_sweep(args.from_sweep)
     else:
         xs, ys = [5e-5, 1e-4, 2e-4], [0.999, 0.998, 0.995]
 

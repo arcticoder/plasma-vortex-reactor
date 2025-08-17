@@ -9,11 +9,23 @@ from typing import List
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Plot KPI trend from production_kpi*.json files")
-    ap.add_argument("--glob", default="docs/production_kpi*.json")
+    ap.add_argument("--glob", default="{docs,artifacts,./}/production_kpi*.json")
     ap.add_argument("--out", default="artifacts/kpi_trend.png")
     args = ap.parse_args()
 
-    files: List[Path] = sorted(Path().glob(args.glob))
+    # Support brace-like expansion for common folders
+    patterns: List[str] = []
+    if "{" in args.glob and "}" in args.glob:
+        brace = args.glob
+        prefix, rest = brace.split("{", 1)
+        alts, suffix = rest.split("}", 1)
+        for alt in alts.split(","):
+            patterns.append(prefix + alt + suffix)
+    else:
+        patterns.append(args.glob)
+    files: List[Path] = []
+    for pat in patterns:
+        files.extend(sorted(Path().glob(pat)))
     if not files:
         # also include root production_kpi.json if present
         rp = Path("production_kpi.json")

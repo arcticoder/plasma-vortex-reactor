@@ -25,7 +25,7 @@ def main():
     ap.add_argument("--uq-production", default="uq_production.json")
     ap.add_argument("--sweep-time", default="data/full_sweep_with_time.csv")
     ap.add_argument("--sweep-dyn", default="data/full_sweep_with_dynamic_ripple.csv")
-    ap.add_argument("--integrated-out", default="integrated_report.json")
+    ap.add_argument("--integrated-out", default="artifacts/integrated_report.json")
     args = ap.parse_args()
     data = {}
     try:

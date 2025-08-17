@@ -26,3 +26,18 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# Generated data and artifacts
+artifacts/
+data/
+production_kpi.json
+integrated_report.json
+operating_envelope.json
+operating_envelope.csv
+operating_envelope.png
+operating_envelope_frontier.json
+dynamic_stability_ripple.png
+dynamic_ripple_time.png
+kpi_trend.png
+snr_propagation.png
+timeline_debug.ndjson

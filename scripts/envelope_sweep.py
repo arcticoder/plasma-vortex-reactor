@@ -39,12 +39,12 @@ def main() -> None:
     ap.add_argument("--n-max", type=float, default=1e21)
     ap.add_argument("--t-min", type=float, default=5.0)
     ap.add_argument("--t-max", type=float, default=50.0)
-    ap.add_argument("--out-json", default="operating_envelope.json")
-    ap.add_argument("--out-csv", default="operating_envelope.csv")
-    ap.add_argument("--out-png", default="operating_envelope.png")
+    ap.add_argument("--out-json", default="artifacts/operating_envelope.json")
+    ap.add_argument("--out-csv", default="data/operating_envelope.csv")
+    ap.add_argument("--out-png", default="artifacts/operating_envelope.png")
     ap.add_argument("--seed", type=int, default=42, help="Seed for any stochastic models")
     ap.add_argument("--top-k", type=int, default=20, help="Emit top-k frontier JSON")
-    ap.add_argument("--frontier-json", default="operating_envelope_frontier.json")
+    ap.add_argument("--frontier-json", default="artifacts/operating_envelope_frontier.json")
     args = ap.parse_args()
 
     import numpy as np
@@ -58,6 +58,9 @@ def main() -> None:
             grid.append({"n_cm3": float(n), "Te_eV": float(T), "fom": float(f)})
 
     # Save JSON and CSV
+    Path(Path(args.out_json).parent).mkdir(parents=True, exist_ok=True)
+    Path(Path(args.out_csv).parent).mkdir(parents=True, exist_ok=True)
+    Path(Path(args.frontier_json).parent).mkdir(parents=True, exist_ok=True)
     Path(args.out_json).write_text(json.dumps({"grid": grid, "n_points": int(args.n_points)}))
     frontier = _frontier_topk(grid, int(args.top_k))
     Path(args.frontier_json).write_text(json.dumps({"frontier": frontier, "k": int(args.top_k)}))
@@ -99,6 +102,7 @@ def main() -> None:
         ax.set_ylabel("Temperature T (eV)")
         ax.set_title("Operating Envelope: FOM vs n,T")
         fig.tight_layout()
+        Path(Path(args.out_png).parent).mkdir(parents=True, exist_ok=True)
         fig.savefig(args.out_png, dpi=150)
         plt.close(fig)
     except Exception:
