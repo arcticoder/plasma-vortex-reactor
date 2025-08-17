@@ -33,6 +33,9 @@ pv-snr-prop = "scripts.snr_propagation:main"
 pv-perf-budget = "scripts.performance_budget:main"
 pv-envelope = "scripts.envelope_sweep:main"
 pv-ablation-ripple = "scripts.ablation_ripple:main"
+pv-kpi-diff = "scripts.kpi_diff:main"
+pv-ndjson-csv = "scripts.ndjson_to_csv:main"
+pv-dual-panel = "scripts.plot_envelope_dual_panel:main"
 [tool.ruff]
 line-length = 100
 extend-exclude = ["notebooks/**/*.ipynb", "**/*.ipynb"]
@@ -50,19 +53,5 @@ no_implicit_optional = true
 allow_redefinition = true
 show_error_codes = true
 strict_optional = true
+explicit_package_bases = true
 
-[tool.mypy.overrides]
-module = [
-	"reactor.analysis_stat",
-	"reactor.metrics",
-	"reactor.core",
-	"reactor.analysis_fields",
-]
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-no_implicit_optional = true
-check_untyped_defs = true
-disallow_any_generics = true
-warn_return_any = true

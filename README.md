@@ -129,6 +129,8 @@ The CI workflow uploads a bundle of artifacts on each push/PR, including:
 - utility outputs: sensor_noise.png, bench_step_loop.json, bench_trend.jsonl
 - analysis outputs: cost_sweep.{json,csv,png}, snr_propagation.{json,png}
 
+Materials for reviewers: see `dist/repro-bundle.tgz` for a one-command reproduction runner and open key plots (operating_envelope.png, dynamic_stability_ripple.png, envelope_dual_panel.png) directly from the Artifacts list.
+
 ## What's novel
 
 - CI-enforced KPI gates and performance budgets with trend plotting and PR badges.

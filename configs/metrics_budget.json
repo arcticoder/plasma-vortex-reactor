@@ -1,0 +1,9 @@
+{
+  "bench": {
+    "max_elapsed_s": 2.0
+  },
+  "kpi": {
+    "min_fom": 0.10,
+    "require_stable": true
+  }
+}

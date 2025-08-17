@@ -165,13 +165,14 @@ def build_html(docs_dir: Path) -> str:
         "</style>"
         "</head><body>\n<h1>Plasma Vortex Reactor — Progress Dashboard</h1>\n"
         + navbar
-        + "<div class='filters'>\n"
+    + "<div class='filters'>\n"
         + "<label><input type='checkbox' id='toggle-ok' checked> ok</label>"
         + "<label><input type='checkbox' id='toggle-warn' checked> warn</label>"
         + "<label><input type='checkbox' id='toggle-fail' checked> fail</label>"
+    + "<label style='margin-left:16px'>Scenario: <input id='scenario-filter' placeholder='contains...'></label>"
         + "</div>\n"
         + "\n".join(sections)
-        + f"\n<script>const toggles={{ok:true,warn:true,fail:true}};function apply(){{['ok','warn','fail'].forEach(s=>document.querySelectorAll('.status-'+s).forEach(el=>el.style.display=(toggles[s]?'':'none')));}}document.getElementById('toggle-ok').addEventListener('change',e=>{{toggles.ok=e.target.checked;apply();}});document.getElementById('toggle-warn').addEventListener('change',e=>{{toggles.warn=e.target.checked;apply();}});document.getElementById('toggle-fail').addEventListener('change',e=>{{toggles.fail=e.target.checked;apply();}});apply();</script>"
+    + "\n<script>const toggles={ok:true,warn:true,fail:true};let scenario='';function apply(){['ok','warn','fail'].forEach(s=>document.querySelectorAll('.status-'+s).forEach(el=>{const txt=(el.textContent||'').toLowerCase();const show=(toggles[s] && (!scenario || txt.includes(scenario)));el.style.display=(show?'':'none');}));}document.getElementById('toggle-ok').addEventListener('change',e=>{toggles.ok=e.target.checked;apply();});document.getElementById('toggle-warn').addEventListener('change',e=>{toggles.warn=e.target.checked;apply();});document.getElementById('toggle-fail').addEventListener('change',e=>{toggles.fail=e.target.checked;apply();});document.getElementById('scenario-filter').addEventListener('input',e=>{scenario=(e.target.value||'').toLowerCase().trim();apply();});apply();</script>"
         + "\n</body></html>\n"
     )
     # Optionally persist anomalies summary for validation and PR consumption

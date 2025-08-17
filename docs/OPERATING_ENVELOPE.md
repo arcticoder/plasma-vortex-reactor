@@ -1,4 +1,13 @@
-# Operating Envelope
+# Operating Envelope Frontier
+
+The operating envelope is computed via `scripts/envelope_sweep.py` and saved to:
+
+- `operating_envelope.json` (grid of n, T, FOM)
+- `operating_envelope.csv`
+- `operating_envelope_frontier.json` (top-k frontier)
+- `operating_envelope.png` (contour or scatter-colored plot)
+
+Use the frontier to select scenarios for further validation.# Operating Envelope
 
 This figure summarizes the feasible operating space as a function of density n (cm^-3) and temperature T (eV), colored by the production Figure of Merit (FOM).
 

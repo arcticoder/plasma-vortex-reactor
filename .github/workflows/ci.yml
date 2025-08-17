@@ -63,6 +63,8 @@ jobs:
           python scripts/cost_model_sweep.py --n 8
           python scripts/snr_propagation.py --snr 25
           python scripts/performance_budget.py --bench bench_step_loop.json --max-elapsed-s 2.0 --trend-out bench_trend.jsonl
+          # Perf summary badge
+          test -f perf_budget_summary.md && echo "Perf budget summary generated" || true
           # Baseline KPI snapshot if not present
           if [ ! -f baseline_kpi.json ]; then echo '{"stable": true, "fom": 0.12}' > baseline_kpi.json; fi
           python scripts/validate_schemas.py > validation_report.json || true
@@ -72,11 +74,19 @@ jobs:
           python scripts/plot_bench_trend.py --in bench_trend.jsonl --out bench_trend.png || true
           # Envelope sweep and ablation study
           pv-envelope --n-points 12 --out-png operating_envelope.png || true
+          # Dual-panel plot
+          python scripts/plot_envelope_dual_panel.py --envelope operating_envelope.json --time-metrics time_to_metrics.json --out envelope_dual_panel.png || true
           pv-ablation-ripple --n 5000 --out ablation_ripple.json || true
           # Generate anomalies summary via dashboard builder
           python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --json-out progress_dashboard.json
           # Create repro bundle
-          mkdir -p dist/bundle && cp -f examples/scenario_min.json scripts/demo_runner.py scripts/run_report.py scripts/production_kpi.py scripts/performance_budget.py scripts/plot_bench_trend.py requirements.txt dist/bundle/ && (cd dist && tar czf repro-bundle.tgz bundle && rm -rf bundle)
+          mkdir -p dist/bundle && cp -f examples/scenario_min.json scripts/demo_runner.py scripts/run_report.py scripts/production_kpi.py scripts/performance_budget.py scripts/plot_bench_trend.py scripts/repro_bundle_runner.sh scripts/repro_bundle_runner.py requirements.txt dist/bundle/ && (cd dist && tar czf repro-bundle.tgz bundle && rm -rf bundle)
+          # KPI diff
+          python scripts/kpi_diff.py --baseline baseline_kpi.json --current production_kpi.json --out kpi_diff.json || true
+          # Envelope frontier JSON
+          test -f operating_envelope_frontier.json || true
+          # NDJSON export
+          python scripts/ndjson_to_csv.py --in timeline.ndjson --out timeline.csv || true
       - name: Run energy reduction demo
         run: |
           . .venv/bin/activate
@@ -114,8 +124,10 @@ jobs:
             bench_step_loop.json
             bench_trend.jsonl
             bench_trend.png
+            perf_budget_summary.md
             progress_dashboard.json
             anomalies_summary.json
+            kpi_diff.json
             cost_sweep.json
             cost_sweep.csv
             cost_sweep.png
@@ -125,9 +137,19 @@ jobs:
             operating_envelope.json
             operating_envelope.csv
             operating_envelope.png
+            operating_envelope_frontier.json
+            envelope_dual_panel.png
             ablation_ripple.json
             dist/repro-bundle.tgz
             baseline_kpi.json
+
+      - name: Job summary (plots inline)
+        if: ${{ always() }}
+        run: |
+          echo "# Key Plots" >> $GITHUB_STEP_SUMMARY
+          for f in operating_envelope.png dynamic_stability_ripple.png bench_trend.png envelope_dual_panel.png; do
+            if [ -f "$f" ]; then echo "\n## $f\n\n![]($f)" >> $GITHUB_STEP_SUMMARY; fi
+          done
 
       - name: PR summary comment (KPI delta + badge)
         if: ${{ github.event_name == 'pull_request' }}
@@ -138,17 +160,21 @@ jobs:
             const read = p => { try { return JSON.parse(fs.readFileSync(p,'utf8')); } catch { return {}; } };
             const kpi = read('production_kpi.json');
             const base = read('baseline_kpi.json');
+            const diff = read('kpi_diff.json');
             const deltaF = (kpi.fom ?? 0) - (base.fom ?? 0);
-            const trendBadge = `Perf budget: ${(kpi.stable===true)?'OK':'n/a'} | Bench trend available`;
+            const budgetSummary = fs.existsSync('perf_budget_summary.md') ? fs.readFileSync('perf_budget_summary.md','utf8') : '';
+            const perfBadge = '![perf](https://img.shields.io/badge/perf-budget-' + ((kpi.stable===true)?'ok-brightgreen':'n_a-lightgrey') + ')';
             const links = [
               ['Dashboard','progress_dashboard.html'],
               ['KPI','production_kpi.json'],
               ['Integrated','integrated_report.json'],
               ['Trend','bench_trend.png'],
               ['Envelope','operating_envelope.png'],
+              ['Dual','envelope_dual_panel.png'],
               ['Ablation','ablation_ripple.json']
             ].map(([n,p])=>`[${n}](${p})`).join(' · ');
-            const body = `KPI FOM: ${kpi.fom ?? 'n/a'} (Δ vs baseline ${deltaF.toFixed(3)})\n${trendBadge}\n\nArtifacts: ${links}`;
+            const deltaTable = `| Metric | Baseline | Current | Δ |\n|---|---:|---:|---:|\n| Stable | ${base.stable} | ${kpi.stable} | - |\n| FOM | ${base.fom ?? 'n/a'} | ${kpi.fom ?? 'n/a'} | ${(diff.fom && diff.fom.delta!=null)?diff.fom.delta.toFixed(3):'n/a'} |`;
+            const body = `${perfBadge}\n\n${deltaTable}\n\nArtifacts: ${links}\n\n${budgetSummary}`;
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
       - name: Repo metadata (gh)
         if: ${{ github.ref == 'refs/heads/main' && env.GH_TOKEN != '' }}
@@ -210,9 +236,9 @@ jobs:
           python-version: '3.12'
       - name: Install mypy and deps
         run: |
-          pip install mypy
-      - name: Run mypy
-        run: mypy src/reactor scripts tests
+          pip install mypy types-requests
+      - name: Run mypy (strict)
+        run: mypy --config-file pyproject.toml src/reactor scripts tests
 
   hardware-tests:
     runs-on: ubuntu-latest
@@ -259,3 +285,20 @@ jobs:
         run: |
           which pdflatex || true
           [ -f docs/paper.tex ] && pdflatex -interaction=nonstopmode -output-directory=docs docs/paper.tex || true
+
+  pages:
+    if: ${{ github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: |
+          pip install mkdocs mkdocs-material
+          mkdocs build --strict || mkdocs build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deploy
+        uses: actions/deploy-pages@v4

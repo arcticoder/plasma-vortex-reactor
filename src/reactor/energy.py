@@ -7,7 +7,7 @@ class EnergyLedger:
     def __init__(self) -> None:
         self._energy_j = 0.0
         self._n_pbar = 0.0
-        self._channels = {}
+        self._channels: dict[str, float] = {}
         # Enhancement factor (>1 means achieved total is reduced relative to raw)
         self._enhancement = 1.0
 

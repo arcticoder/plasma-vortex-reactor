@@ -70,3 +70,26 @@
 	{"idx":19, "title":"Progress dashboard minor UX improvements","refs":["scripts/generate_progress_dashboard.py"]},
 	{"idx":20, "title":"Plan: packaging entry points and repo metadata updates","refs":["pyproject.toml","gh CLI (follow-up)"]}
 ]}
+{"section":"Readiness","as_of":"2025-08-17","percent":72,"scope":"CI/docs/typing/artifacts toward publication","notes":["Perf badge + KPI delta in PR","Envelope frontier + dual-panel","Repro bundle runner","MkDocs site build","Selective strict mypy; widen next"]}
+{"section":"Phase 3: Scaling/Production - Next 20 Tasks (Batch 3)","status":"planned","as_of":"2025-08-17","tasks":[
+	{"idx":1, "title":"Expand mypy --strict to reactor.analysis, reactor.metrics, and key scripts; fix types repo-wide","refs":["pyproject.toml",".pre-commit-config.yaml","src/reactor/*","scripts/*"]},
+	{"idx":2, "title":"Propagate deterministic seeding to all CLIs (demo_runner, run_report, gates, sweeps)","refs":["scripts/demo_runner.py","scripts/run_report.py","scripts/*.py"]},
+	{"idx":3, "title":"MkDocs API auto-generation via mkdocstrings or pdoc; publish to Pages","refs":["mkdocs.yml","docs/api.md",".github/workflows/ci.yml"]},
+	{"idx":4, "title":"Host progress_dashboard.html on GitHub Pages and link in README","refs":[".github/workflows/ci.yml","README.md"]},
+	{"idx":5, "title":"Add README section: KPI delta badge and materials-for-reviewers links","refs":["README.md","scripts/kpi_diff.py","perf_budget_summary.md"]},
+	{"idx":6, "title":"Unit tests for envelope frontier extraction and dual-panel plotting stubs","refs":["tests/test_pv_envelope_golden.py","scripts/plot_envelope_dual_panel.py"]},
+	{"idx":7, "title":"JSON Schemas for kpi_diff.json and operating_envelope_frontier.json + validation","refs":["docs/schemas/kpi_diff.schema.json","docs/schemas/operating_envelope_frontier.schema.json","tests/"]},
+	{"idx":8, "title":"Dashboard UX: persist scenario filter via URL hash; add artifact hyperlinks","refs":["scripts/generate_progress_dashboard.py"]},
+	{"idx":9, "title":"Bench trend gating driven by configs/metrics_budget.json thresholds","refs":["scripts/performance_budget.py","configs/metrics_budget.json"]},
+	{"idx":10, "title":"Cost model documentation and figures (docs/METRICS_GUIDE.md updates)","refs":["docs/METRICS_GUIDE.md","configs/cost_model.json"]},
+	{"idx":11, "title":"CLI help polish for pv-* entrypoints and --help examples","refs":["pyproject.toml","src/reactor/cli_entry.py"]},
+	{"idx":12, "title":"Add GH Pages link in PR comment and job summary","refs":[".github/workflows/ci.yml"]},
+	{"idx":13, "title":"Materials for reviewers page in docs with artifact walkthrough","refs":["docs/reviewers.md","README.md"]},
+	{"idx":14, "title":"Tests for ndjson_to_csv and dashboard generator (malformed rows)","refs":["scripts/ndjson_to_csv.py","scripts/generate_progress_dashboard.py","tests/"]},
+	{"idx":15, "title":"Document and enforce error/perf budgets (configs/metrics_budget.json) in docs site","refs":["docs/METRICS_GUIDE.md","configs/metrics_budget.json"]},
+	{"idx":16, "title":"EnergyLedger channel report schema and artifact (channel_report.json)","refs":["src/reactor/energy.py","scripts/run_report.py","docs/ARTIFACT_SCHEMA.md"]},
+	{"idx":17, "title":"Strengthen RNG determinism across platforms (NumPy/py stdlib controls)","refs":["scripts/*","tests/*"]},
+	{"idx":18, "title":"Add CITATION.cff and prep DOI (Zenodo) for releases","refs":["CITATION.cff",".github/workflows/release.yml"]},
+	{"idx":19, "title":"Release notes automation from CHANGELOG with gh CLI","refs":["CHANGELOG.md",".github/workflows/release.yml"]},
+	{"idx":20, "title":"Draft Methods and Discussion sections in paper.tex and cross-ref artifacts","refs":["docs/paper.tex"]}
+]}

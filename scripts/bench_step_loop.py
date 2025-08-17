@@ -26,6 +26,11 @@ def main():
     ap.add_argument("--grid", default="32,32")
     ap.add_argument("--out", default="bench_step_loop.json")
     args = ap.parse_args()
+    try:
+        import numpy as _np
+        _np.random.seed(0)
+    except Exception:
+        pass
     gx, gy = [int(x) for x in str(args.grid).split(",")]
     if Reactor is None:
         Path(args.out).write_text(json.dumps({"ok": False, "reason": "reactor not importable"}))

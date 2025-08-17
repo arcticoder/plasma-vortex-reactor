@@ -69,6 +69,43 @@ PNG time series of hardware metric under high-load conditions (synthetic or inge
   Each section includes a count and up to 10 most recent entries with titles/status.
 - progress_dashboard.json: JSON export (counts and recent items per NDJSON file) for machine use.
 
+## operating_envelope.json
+```
+{
+  "n_points": int,
+  "grid": [ { "n_cm3": number, "Te_eV": number, "fom": number }, ... ]
+}
+```
+
+## operating_envelope_frontier.json
+```
+{
+  "k": int,
+  "frontier": [ { "n_cm3": number, "Te_eV": number, "fom": number }, ... ]
+}
+```
+
+## kpi_diff.json
+```
+{
+  "stable": { "baseline": bool, "current": bool },
+  "fom": { "baseline": number|null, "current": number|null, "delta": number|null },
+  "energy_budget_J": { "baseline": number|null, "current": number|null }
+}
+```
+
+## perf_budget_summary.md
+Markdown job summary badge and line with elapsed vs budget.
+
+## timeline.csv
+CSV export of timeline.ndjson (flattened one level).
+
+## Data dictionary
+- FOM: Figure of Merit (unitless proxy), higher is better.
+- gamma: stability proxy (dimensionless); threshold varies by study.
+- n_cm3: electron density in cm^-3.
+- Te_eV: electron temperature in eV.
+
 
 ## fom_report.json
 ```

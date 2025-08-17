@@ -34,6 +34,14 @@
 {"event":"Phase 3: UQ production mode CLI test added","status":"completed","refs":["tests/test_followups.py","scripts/uq_optimize.py"],"details":{"artifact":"uq_production.json"}}
 {"event":"Phase 3: Schema sanity tests for integrated/KPI","status":"completed","refs":["tests/test_followups.py","scripts/run_report.py","scripts/production_kpi.py"],"details":{"guard":"jsonschema optional"}}
 {"event":"Phase 3: Progress dashboard generator + artifact","status":"completed","refs":["scripts/generate_progress_dashboard.py",".github/workflows/ci.yml","docs/ARTIFACT_SCHEMA.md"],"details":{"artifact":"progress_dashboard.html"}}
+{"event":"Perf budget badge and summary in PR","status":"completed","refs":["scripts/performance_budget.py",".github/workflows/ci.yml"],"details":{"job_summary":"perf_budget_summary.md"},"date":"2025-08-17"}
+{"event":"KPI delta JSON + PR table","status":"completed","refs":["scripts/kpi_diff.py",".github/workflows/ci.yml"],"details":{"artifact":"kpi_diff.json"},"date":"2025-08-17"}
+{"event":"Operating envelope frontier extraction","status":"completed","refs":["scripts/envelope_sweep.py"],"details":{"artifact":"operating_envelope_frontier.json","top_k":20},"date":"2025-08-17"}
+{"event":"Dual-panel envelope/time-to figure","status":"completed","refs":["scripts/plot_envelope_dual_panel.py"],"details":{"artifact":"envelope_dual_panel.png"},"date":"2025-08-17"}
+{"event":"Seed pinning added for sweeps/bench","status":"in_progress","refs":["scripts/envelope_sweep.py","scripts/bench_step_loop.py"],"details":{"next":"propagate to all CLIs"},"date":"2025-08-17"}
+{"event":"Selective mypy --strict via pre-commit","status":"completed","refs":[".pre-commit-config.yaml","pyproject.toml"],"details":{"scope":"reactor.energy + changed scripts"},"date":"2025-08-17"}
+{"event":"MkDocs Pages build wired","status":"completed","refs":[".github/workflows/ci.yml","mkdocs.yml"],"details":{"site":"upload-pages-artifact"},"date":"2025-08-17"}
+{"event":"Docs updated: API stub, Operating Envelope frontier, Artifact schema","status":"completed","refs":["docs/api.md","docs/OPERATING_ENVELOPE.md","docs/ARTIFACT_SCHEMA.md"],"date":"2025-08-17"}
 {"event":"Phase 3: KPI cost model wiring","status":"completed","refs":["scripts/production_kpi.py","configs/cost_model.json"],"details":{"flag":"--cost-model","fields_added":["cost_model_used"]}}
 {"event":"Phase 3: Added local JSON schemas for validation","status":"completed","refs":["docs/schemas/integrated_report.schema.json","docs/schemas/production_kpi.schema.json"],"details":{"draft":"07"}}
 {"event":"Phase 3: Sensor SNR model utility","status":"completed","refs":["scripts/sensor_noise_model.py"],"details":{"artifact":"sensor_noise.png"}}

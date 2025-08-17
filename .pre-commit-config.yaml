@@ -14,4 +14,6 @@ repos:
     rev: v1.10.0
     hooks:
       - id: mypy
-        additional_dependencies: []
+  args: ["--config-file=pyproject.toml", "--strict"]
+  files: ^(src/reactor/(analysis\.py|energy\.py|metrics\.py)|scripts/(envelope_sweep|performance_budget|kpi_diff|generate_progress_dashboard|ndjson_to_csv|plot_envelope_dual_panel|generate_timeline_anomalies|bench_step_loop)\.py)$
+  additional_dependencies: []

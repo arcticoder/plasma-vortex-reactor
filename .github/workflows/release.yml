@@ -22,6 +22,8 @@ jobs:
           python scripts/run_report.py --feasibility feasibility_gates_report.json --integrated-out integrated_report.json
           python scripts/production_kpi.py --feasibility feasibility_gates_report.json --out production_kpi.json
           python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --json-out progress_dashboard.json
+          # Update baseline KPI for tagged release
+          if [ -f production_kpi.json ]; then cp -f production_kpi.json baseline_kpi.json; fi
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -29,6 +31,7 @@ jobs:
           files: |
             integrated_report.json
             production_kpi.json
+            baseline_kpi.json
             feasibility_gates_report.json
             progress_dashboard.html
             progress_dashboard.json

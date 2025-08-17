@@ -10,7 +10,7 @@ Functions will no-op or raise a clear error if matplotlib is not available.
 
 def _mpl():
     try:
-        import matplotlib.pyplot as plt  # type: ignore
+        import matplotlib.pyplot as plt
         return plt
     except Exception as e:  # pragma: no cover - environment-dependent
         raise RuntimeError("matplotlib is required for plotting but is not installed") from e

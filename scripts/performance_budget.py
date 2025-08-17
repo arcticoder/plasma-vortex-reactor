@@ -5,6 +5,26 @@ import argparse
 import json
 from pathlib import Path
 import datetime as _dt
+from typing import Any, Dict
+
+
+def _load_budget_config(path: str | None) -> Dict[str, Any]:
+    if not path:
+        return {}
+    try:
+        p = Path(path)
+        if p.exists():
+            return json.loads(p.read_text())
+    except Exception:
+        return {}
+    return {}
+
+
+def _shield(label: str, status: str, color: str) -> str:
+    # Simple Markdown shield using shields.io (no external call, just link)
+    import urllib.parse as _u
+    url = f"https://img.shields.io/badge/{_u.quote(label)}-{_u.quote(status)}-{_u.quote(color)}"
+    return f"![{label}]({url})"
 
 
 def main() -> None:
@@ -12,19 +32,32 @@ def main() -> None:
     ap.add_argument("--bench", default="bench_step_loop.json")
     ap.add_argument("--max-elapsed-s", type=float, default=1.0, help="Maximum allowed elapsed seconds")
     ap.add_argument("--trend-out", default="bench_trend.jsonl", help="Append-only trend file")
+    ap.add_argument("--budget-config", default="configs/metrics_budget.json")
+    ap.add_argument("--job-summary", default="perf_budget_summary.md")
     args = ap.parse_args()
     p = Path(args.bench)
     if not p.exists():
         raise SystemExit(f"Missing benchmark file: {p}")
     data = json.loads(p.read_text())
     elapsed = float(data.get("elapsed_s", 0.0))
-    ok = elapsed <= float(args.max_elapsed_s)
+    # Allow override from config
+    budget_cfg = _load_budget_config(args.budget_config)
+    max_elapsed = float(budget_cfg.get("bench", {}).get("max_elapsed_s", args.max_elapsed_s))
+    ok = elapsed <= max_elapsed
     # append to trend
     with open(args.trend_out, "a", encoding="utf-8") as f:
         f.write(json.dumps({"ts": _dt.datetime.utcnow().isoformat()+"Z", "elapsed_s": elapsed})+"\n")
-    print(json.dumps({"ok": ok, "elapsed_s": elapsed, "budget_s": args.max_elapsed_s}))
+    result = {"ok": ok, "elapsed_s": elapsed, "budget_s": max_elapsed}
+    print(json.dumps(result))
     if not ok:
         raise SystemExit(1)
+    # Write a small job summary markdown with a badge
+    try:
+        badge = _shield("perf", "ok" if ok else "fail", "brightgreen" if ok else "red")
+        summary = f"# Performance Budget\n\n{badge}  Elapsed: {elapsed:.3f}s / Budget: {max_elapsed:.3f}s\n"
+        Path(args.job_summary).write_text(summary)
+    except Exception:
+        pass
 
 
 if __name__ == "__main__":
