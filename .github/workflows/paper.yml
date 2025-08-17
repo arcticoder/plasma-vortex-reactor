@@ -14,35 +14,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Install TeX Live packages
+      - name: Use stable LaTeX action to build PDF
+        uses: xu-cheng/latex-action@v2
+        with:
+          root_file: papers/phase3_stability.tex
+          build_args: -interaction=nonstopmode
+          # cache TeX Live packages between runs for speed
+          extra_packages: |
+            latexmk
+            etoolbox
+            lmodern
+            xetex
+        env:
+          # ensure non-interactive
+          LATEXMK: "latexmk"
+      - name: Save action-provided build log (if any)
+        if: always()
         run: |
-          sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends \
-            texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended \
-            texlive-science latexmk latex-plain-dev || true
-        shell: bash
-      - name: Compile LaTeX (phase3_stability.tex)
-        run: |
-          set -euo pipefail
-          cd papers
-          # capture output to build.log for debugging and always produce that artifact
-          echo "Building LaTeX: $(pwd)/phase3_stability.tex"
-          if command -v latexmk >/dev/null 2>&1; then
-            latexmk -pdf -interaction=nonstopmode -halt-on-error phase3_stability.tex 2>&1 | tee build.log
-          else
-            pdflatex -interaction=nonstopmode phase3_stability.tex 2>&1 | tee build.log || true
-          fi
-          # show summary
-          ls -l
+          # the action writes to ./latex.log in its workspace; copy to papers/build.log if present
+          if [ -f latex.log ]; then mkdir -p papers; cp latex.log papers/build.log; fi
+          # also list produced PDFs
+          ls -l papers || true
         shell: bash
       - name: Upload PDF artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: phase3_stability-pdf
           path: papers/phase3_stability.pdf
       - name: Upload LaTeX build log
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: phase3_stability-build-log
           path: papers/build.log
