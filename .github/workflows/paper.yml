@@ -30,6 +30,14 @@ jobs:
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
           if [ -f requirements-plot.txt ]; then pip install -r requirements-plot.txt || true; fi
         shell: bash
+      - name: Install minimal TeX packages (Ubuntu runners)
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          # These apt packages provide a reasonable LaTeX baseline including etoolbox
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
+        shell: bash
       - name: Generate paper figures (best-effort)
         run: |
           set -euo pipefail
