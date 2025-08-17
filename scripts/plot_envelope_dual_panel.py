@@ -25,6 +25,13 @@ def main() -> None:
         tm = {}
     # Build simple scatter coloring by FOM and overlay lines from time metrics
     try:
+        # Ensure local package is importable when running from scripts/
+        import sys, os
+        _here = os.path.dirname(os.path.abspath(__file__))
+        _root = os.path.dirname(_here)
+        _src = os.path.join(_root, 'src')
+        if _src not in sys.path:
+            sys.path.insert(0, _src)
         from reactor.plotting import _mpl
         import numpy as np
         plt = _mpl()
