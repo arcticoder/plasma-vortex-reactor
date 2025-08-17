@@ -15,7 +15,7 @@
 		\IfFileExists{../artifacts/#2}{\includegraphics[#1]{../artifacts/#2}}{%
 			\IfFileExists{artifacts/#2}{\includegraphics[#1]{artifacts/#2}}{%
 				\IfFileExists{./#2}{\includegraphics[#1]{./#2}}{%
-					\begin{center}\fbox{\parbox{0.9\linewidth}{\centering Missing image: \texttt{#2}}}\end{center}%
+					\begin{center}\fbox{\parbox{0.9\linewidth}{\centering Missing image: \texttt{\detokenize{#2}}}}\end{center}%
 				}%
 			}%
 		}%
