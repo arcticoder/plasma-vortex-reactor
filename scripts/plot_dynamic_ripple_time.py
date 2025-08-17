@@ -4,7 +4,17 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
+import subprocess
+import sys
 from pathlib import Path
+
+# Ensure repository sources are importable when running from scripts/ directly
+_here = os.path.dirname(os.path.abspath(__file__))
+_root = os.path.dirname(_here)
+_src = os.path.join(_root, "src")
+if _src not in sys.path:
+    sys.path.insert(0, _src)
 
 from reactor.plotting import _mpl
 
@@ -16,15 +26,37 @@ def main() -> None:
     args = ap.parse_args()
 
     rows = []
-    try:
-        with open(args.from_csv, "r", encoding="utf-8") as f:
+    # Helper to try reading the CSV
+    def _read_rows(fp: str) -> list[dict]:
+        data: list[dict] = []
+        with open(fp, "r", encoding="utf-8") as f:
             for r in csv.DictReader(f):
-                rows.append(r)
+                data.append(r)
+        return data
+
+    # Attempt to read; if missing, try to auto-generate via param_sweep_confinement.py
+    try:
+        if Path(args.from_csv).exists():
+            rows = _read_rows(args.from_csv)
+        else:
+            # Best-effort generation
+            gen_cmd = [sys.executable, str(Path(_here) / "param_sweep_confinement.py"), "--full-sweep-with-dynamic-ripple"]
+            try:
+                subprocess.run(gen_cmd, check=True, cwd=_root)
+                if Path(args.from_csv).exists():
+                    rows = _read_rows(args.from_csv)
+            except Exception:
+                # ignore, will fall back to placeholder below
+                rows = []
     except Exception:
-        print(json.dumps({"skipped": True}))
-        return
+        rows = []
     if not rows:
-        print(json.dumps({"skipped": True}))
+        # write placeholder so downstream steps have a file to link to
+        try:
+            Path(args.out).write_bytes(b"PNG placeholder - dynamic ripple plot skipped: no data\n")
+        except Exception:
+            pass
+        print(json.dumps({"skipped": True, "reason": "no rows", "out": args.out}))
         return
     try:
         import numpy as np
@@ -38,7 +70,12 @@ def main() -> None:
         fig.tight_layout(); fig.savefig(args.out, dpi=150); plt.close(fig)
         print(json.dumps({"wrote": args.out}))
     except Exception as e:
-        print(json.dumps({"skipped": True, "reason": str(e)}))
+        # Write a best-effort placeholder if plotting failed (e.g., no matplotlib)
+        try:
+            Path(args.out).write_bytes(b"PNG placeholder - matplotlib not available\n")
+        except Exception:
+            pass
+        print(json.dumps({"skipped": True, "reason": str(e), "out": args.out}))
 
 
 if __name__ == "__main__":

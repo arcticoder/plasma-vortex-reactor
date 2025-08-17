@@ -1,0 +1,108 @@
+<!doctype html>
+<html><head><meta charset='utf-8'><title>Progress Dashboard</title><style>body{font-family:sans-serif;margin:24px}code{background:#f4f4f4;padding:1px 4px;border-radius:3px}.navbar{position:sticky;top:0;background:#fff8;border-bottom:1px solid #ddd;padding:8px 0;margin-bottom:16px}.navbar a{margin-right:8px;text-decoration:none;color:#06c}.navbar a:hover{text-decoration:underline}.badge{padding:1px 6px;border-radius:10px;font-size:12px;margin-left:6px}.status-ok .badge{background:#e6ffed;color:#22863a;border:1px solid #34d058}.status-warn .badge{background:#fff5e6;color:#b08800;border:1px solid #ffd33d}.status-fail .badge{background:#ffeef0;color:#cb2431;border:1px solid #d73a49}.filters{margin:8px 0} .filters label{margin-right:12px}.item{margin:2px 0} .hidden{display:none}</style></head><body>
+<h1>Plasma Vortex Reactor — Progress Dashboard</h1>
+<nav class='navbar'><a href='#sec-roadmap'>roadmap.ndjson</a> | <a href='#sec-roadmap-completed'>roadmap-completed.ndjson</a> | <a href='#sec-progress-log'>progress_log.ndjson</a> | <a href='#sec-progress-log-completed'>progress_log-completed.ndjson</a> | <a href='#sec-uq-todo'>UQ-TODO.ndjson</a> | <a href='#sec-uq-todo-resolved'>UQ-TODO-RESOLVED.ndjson</a> | <a href='#sec-vnv-todo'>VnV-TODO.ndjson</a> | <a href='#sec-vnv-todo-resolved'>VnV-TODO-RESOLVED.ndjson</a> | <a href='#sec-timeline-anomalies'>timeline_anomalies.ndjson</a></nav><div class='filters'>
+<label><input type='checkbox' id='toggle-ok' checked> ok</label><label><input type='checkbox' id='toggle-warn' checked> warn</label><label><input type='checkbox' id='toggle-fail' checked> fail</label><label style='margin-left:16px'>Scenario: <input id='scenario-filter' placeholder='contains...'></label></div>
+<p>Generated: 2025-08-17T02:33:55.732213Z</p>
+<h2>Artifacts</h2><ul><li><a href='integrated_report.json'>integrated_report.json</a></li></ul>
+<h2 id='sec-roadmap'>roadmap.ndjson (27)</h2>
+<ul>
+<li class='item '><strong>{&#x27;metric&#x27;: &#x27;Energy per Antiproton&#x27;, &#x27;category&#x27;: &#x27;Energy Efficiency&#x27;, &#x27;threshold&#x27;: &#x27;≤1e12 J/antiproton (Phase 1), ≤1e11 J</strong> <span class='badge '>Energy Efficiency</span></li>
+<li class='item '><strong>{&#x27;metric&#x27;: &#x27;Total Energy Efficiency&#x27;, &#x27;category&#x27;: &#x27;Energy Efficiency&#x27;, &#x27;threshold&#x27;: &#x27;≥242× total energy reduction (e.g.,</strong> <span class='badge '>Energy Efficiency</span></li>
+<li class='item '><strong>{&#x27;metric&#x27;: &#x27;Plasma Density&#x27;, &#x27;category&#x27;: &#x27;Supporting&#x27;, &#x27;threshold&#x27;: &#x27;ne ≥ 1e20 cm^-3; ρ signals consistent with high-yie</strong> <span class='badge '>Supporting</span></li>
+<li class='item '><strong>{&#x27;metric&#x27;: &#x27;Magnetic Field Strength&#x27;, &#x27;category&#x27;: &#x27;Supporting&#x27;, &#x27;threshold&#x27;: &#x27;B ≥ 5 T with &lt;1% fluctuation&#x27;, &#x27;measuremen</strong> <span class='badge '>Supporting</span></li>
+<li class='item '><strong>{&#x27;metric&#x27;: &#x27;Economic Viability (FOM)&#x27;, &#x27;category&#x27;: &#x27;Supporting&#x27;, &#x27;threshold&#x27;: &#x27;FOM ≥ 0.1; cost/antiproton ≤ $1e6 for nic</strong> <span class='badge '>Supporting</span></li>
+<li class='item '><strong>Document Phase 3 tasks in roadmap &amp; logs</strong> </li>
+<li class='item '><strong>Progress dashboard generator (HTML) + CI artifact</strong> </li>
+<li class='item '><strong>Plan: packaging entry points and repo metadata updates</strong> </li>
+<li class='item '><strong>{&#x27;section&#x27;: &#x27;Readiness&#x27;, &#x27;as_of&#x27;: &#x27;2025-08-17&#x27;, &#x27;percent&#x27;: 72, &#x27;scope&#x27;: &#x27;CI/docs/typing/artifacts toward publication&#x27;, &#x27;</strong> </li>
+<li class='item '><strong>Draft Methods and Discussion sections in paper.tex and cross-ref artifacts</strong> </li>
+</ul>
+<h2 id='sec-roadmap-completed'>roadmap-completed.ndjson (26)</h2>
+<ul>
+<li class='item '><strong>Phase 3 task: KPI cost model wiring and fallback FOM</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: Local JSON Schemas (integrated/KPI)</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: Sensor SNR utility and artifact</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: Micro-benchmark step loop</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: Plot thresholds overlays (FOM, Γ)</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: Hardware runner CLI and smoke test</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: Hardware tests CI job</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: Dashboard artifact links</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: README badges + CLI catalog + Try-it</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3 task: Headless-safe time-to-metrics PNG</strong> <span class='badge '>completed</span></li>
+</ul>
+<h2 id='sec-progress-log'>progress_log.ndjson (54)</h2>
+<ul>
+<li class='item '><strong>Phase 3: KPI cost model wiring</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Added local JSON schemas for validation</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Sensor SNR model utility</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Micro-benchmark step loop</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Plot thresholds overlays (FOM, Γ)</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Hardware runner CLI and test</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: CI hardware-tests job</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Dashboard artifact links</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: README polish and CLI catalog</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Headless-safe time_to_metrics.png</strong> <span class='badge '>completed</span></li>
+</ul>
+<h2 id='sec-progress-log-completed'>progress_log-completed.ndjson (19)</h2>
+<ul>
+<li class='item '><strong>Phase 3: KPI cost model wiring</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Local JSON Schemas added</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Sensor noise model utility</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Bench step loop micro-benchmark</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Plot overlays enabled</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Hardware runner CLI and test</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: CI hardware job</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Dashboard artifact links</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: README badges and CLI catalog</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Phase 3: Time-to-metrics headless fallback</strong> <span class='badge '>completed</span></li>
+</ul>
+<h2 id='sec-uq-todo'>UQ-TODO.ndjson (34)</h2>
+<ul>
+<li class='item '><strong>UQ: total energy reduction reproducibility</strong> <span class='badge '>energy</span></li>
+<li class='item '><strong>UQ: plasma density attainment probability</strong> <span class='badge '>plasma_regime</span></li>
+<li class='item '><strong>UQ: magnetic field stability</strong> <span class='badge '>em_fields</span></li>
+<li class='item '><strong>UQ: economic FOM sensitivity</strong> <span class='badge '>economics</span></li>
+<li class='item '><strong>UQ: High-load stability under dynamic ripple</strong> <span class='badge '>stability</span></li>
+<li class='item '><strong>UQ: Hardware timeout reliability at 60s</strong> <span class='badge '>hardware</span></li>
+<li class='item '><strong>UQ: Time-sweep sensitivity of FOM and yield</strong> <span class='badge '>performance</span></li>
+<li class='item '><strong>UQ: Economic FOM sensitivity with cost model</strong> <span class='badge '>economics</span></li>
+<li class='item '><strong>UQ: Envelope frontier stability across seeds</strong> <span class='badge '>envelope</span></li>
+<li class='item '><strong>UQ: KPI delta robustness under anomaly injection</strong> <span class='badge '>kpi</span></li>
+</ul>
+<h2 id='sec-uq-todo-resolved'>UQ-TODO-RESOLVED.ndjson (5)</h2>
+<ul>
+<li class='item '><strong>Baseline anomaly injection tooling</strong> <span class='badge '>resolved</span></li>
+<li class='item '><strong>Unit coverage for EnergyLedger enhancement and reduction</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>UQ: High-load stability under dynamic ripple</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>UQ: Economic FOM sensitivity (baseline setup)</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>UQ: Hardware timeout reliability at 60s</strong> <span class='badge '>completed</span></li>
+</ul>
+<h2 id='sec-vnv-todo'>VnV-TODO.ndjson (24)</h2>
+<ul>
+<li class='item '><strong>Confinement ≥94% under Bennett profile and μ scaling</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>Energy_ledger computes E_pbar and matches budget within 5%</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>B-field ≥5 T stability check</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>Plot stability vs ripple from sweep CSV</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>High-load hardware metrics plot variant</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>Time and dynamic ripple sweeps produce CSVs</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>Dual-panel figure generated in CI</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>Frontier JSON schema validity</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>NDJSON to CSV exporter handles missing details</strong> <span class='badge '>V&amp;V</span></li>
+<li class='item '><strong>Seed determinism smoke tests for sweeps and bench</strong> <span class='badge '>V&amp;V</span></li>
+</ul>
+<h2 id='sec-vnv-todo-resolved'>VnV-TODO-RESOLVED.ndjson (8)</h2>
+<ul>
+<li class='item '><strong>Dashboard tolerance to malformed NDJSON</strong> <span class='badge '>resolved</span></li>
+<li class='item '><strong>Gate supports optional yield check</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Yield gate  1e8 cm^-3 s^-1 with physics-based estimator</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Plot stability vs ripple from sweep CSV</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Schema sanity test using local JSON Schemas when present</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Hardware runner smoke test</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>High-load hardware metrics plot variant</strong> <span class='badge '>completed</span></li>
+<li class='item '><strong>Time and dynamic ripple sweeps produce CSVs</strong> <span class='badge '>completed</span></li>
+</ul>
+<h2 id='sec-timeline-anomalies'>timeline_anomalies.ndjson (0)</h2>
+<p><em>No entries</em></p>
+<script>const toggles={ok:true,warn:true,fail:true};let scenario='';function apply(){['ok','warn','fail'].forEach(s=>document.querySelectorAll('.status-'+s).forEach(el=>{const txt=(el.textContent||'').toLowerCase();const show=(toggles[s] && (!scenario || txt.includes(scenario)));el.style.display=(show?'':'none');}));}document.getElementById('toggle-ok').addEventListener('change',e=>{toggles.ok=e.target.checked;apply();});document.getElementById('toggle-warn').addEventListener('change',e=>{toggles.warn=e.target.checked;apply();});document.getElementById('toggle-fail').addEventListener('change',e=>{toggles.fail=e.target.checked;apply();});document.getElementById('scenario-filter').addEventListener('input',e=>{scenario=(e.target.value||'').toLowerCase().trim();apply();});apply();</script>
+</body></html>

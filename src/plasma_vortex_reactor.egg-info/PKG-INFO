@@ -1,8 +1,19 @@
+Metadata-Version: 2.4
+Name: plasma-vortex-reactor
+Version: 0.0.0
+Summary: Plasma Vortex Reactor modeling and production scaling tools
+Author: arcticoder
+License: MIT
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Provides-Extra: plot
+Requires-Dist: matplotlib>=3.6; extra == "plot"
+
 Plasma Vortex Reactor
 =====================
 
 ![CI](https://github.com/arcticoder/plasma-vortex-reactor/actions/workflows/ci.yml/badge.svg)
-![License](https://img.shields.io/badge/license-Unlicense-blue.svg)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Phase](https://img.shields.io/badge/phase-3%20production-brightgreen)
 
 A research and prototyping repository for a plasma vortex reactor targeting high-energy applications (e.g., antiproton production) via pair creation in controlled plasma vortices. This repo integrates vortex dynamics, kinetic modeling, confinement equilibria, and EM/laser-plasma coupling. It links to the broader arcticoder ecosystem for simulation, energy sourcing, and control.
@@ -62,8 +73,6 @@ Artifacts produced by this repo:
 - generate_progress_dashboard.py: Build progress_dashboard.html aggregating docs/*.ndjson.
 - envelope_sweep.py: Density–Temperature operating envelope with FOM contours.
 - ablation_ripple.py: Ablation of ripple control ON vs OFF.
-- plot_kpi_trend.py: Plot KPI FOM trend across revisions (writes `kpi_trend.png`).
-- timeline_analysis.py: Analyze timeline anomalies/events to `timeline_stats.json`.
 
 Examples:
 
@@ -75,8 +84,6 @@ python scripts/production_kpi.py --feasibility feasibility_gates_report.json --m
 python scripts/calibrate_ripple_alpha.py --from-csv full_sweep_with_dynamic_ripple.csv --out calibration.json
 python scripts/time_to_stability_yield.py --sweep-time full_sweep_with_time.csv --out-json time_to_metrics.json --out-png time_to_metrics.png
 python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html
-python scripts/plot_kpi_trend.py --out kpi_trend.png
-python scripts/timeline_analysis.py --timeline docs/timeline_anomalies.ndjson --out timeline_stats.json
 ```
 
 
@@ -105,8 +112,6 @@ python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_das
 ```
 Open progress_dashboard.html in a browser.
 
-Note: Plotting scripts require `matplotlib`. In headless or minimal environments, scripts will emit small PNG placeholders and print a JSON summary to stdout instead of failing hard.
-
 ### Additional CLI entry points
 
 Console scripts installed with the package:
@@ -130,7 +135,6 @@ The CI workflow uploads a bundle of artifacts on each push/PR, including:
 - time_to_metrics.{json,png}, calibration.json
 - key plots: production_fom_yield.png, stability.png, dynamic_stability_ripple.png
 - dashboard: progress_dashboard.html (+ progress_dashboard.json)
-- KPI trend: kpi_trend.png; dashboard FOM trend: progress_dashboard_fom_trend.png
 - anomalies summary: anomalies_summary.json
 - envelope: operating_envelope.{json,csv,png}; ablation: ablation_ripple.json
 - utility outputs: sensor_noise.png, bench_step_loop.json, bench_trend.jsonl
@@ -144,7 +148,6 @@ Materials for reviewers: see `dist/repro-bundle.tgz` for a one-command reproduct
 - Dynamic ripple adjustment pipeline with ablation study and stability probability gates.
 - Operating envelope characterization (n,T → FOM) feeding into scenario selection.
 - Reproducible artifacts and a minimal repro bundle tarball for reviewers.
-- KPI trend transparency (`kpi_trend.png`) and dashboard FOM trend (`progress_dashboard_fom_trend.png`).
 
 ## Try it: Three Scenarios
 
@@ -154,11 +157,3 @@ Materials for reviewers: see `dist/repro-bundle.tgz` for a one-command reproduct
   - `python scripts/demo_runner.py --scenario examples/scenario_edge.json --steps 100 --dt 1e-3`
 - Production:
   - `python scripts/demo_runner.py --scenario examples/scenario_production.json --steps 1000 --dt 1e-3`
-
-## Documentation
-
-See `docs/` for detailed documentation, including:
-
-- `docs/ARTIFACT_SCHEMA.md`: Schema and structure of artifacts produced by the repository.
-- `docs/usage.md`: Detailed usage instructions and examples for all scripts and tools.
-- `docs/development.md`: Guidelines for development, testing, and contributing to the repository.

@@ -190,6 +190,7 @@ jobs:
         run: |
           gh repo edit ${{ github.repository }} --description "Plasma Vortex Reactor: CI-validated modeling, stability KPI gates, dynamic ripple control, and reproducible artifacts" --homepage "https://github.com/${{ github.repository }}"
           gh repo edit ${{ github.repository }} --add-topic plasma,vortex,reactor,stability,uq,ci,python,ripple,benchmark
+        shell: bash
 
   gated-matrix:
     runs-on: ubuntu-latest
@@ -307,7 +308,7 @@ jobs:
       - name: Try build minimal paper PDF
         run: |
           which pdflatex || true
-          [ -f docs/paper.tex ] && pdflatex -interaction=nonstopmode -output-directory=docs docs/paper.tex || true
+          [ -f papers/phase3_stability.tex ] && pdflatex -interaction=nonstopmode -output-directory=papers papers/phase3_stability.tex || true
 
   pages:
     if: ${{ github.event_name == 'push' }}

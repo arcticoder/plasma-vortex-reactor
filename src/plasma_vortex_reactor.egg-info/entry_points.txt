@@ -1,0 +1,22 @@
+[console_scripts]
+pv-ablation-ripple = scripts.ablation_ripple:main
+pv-anomalies = reactor.cli_entry:generate_timeline_anomalies
+pv-bench = reactor.cli_entry:bench_step_loop
+pv-build-artifacts = reactor.cli_entry:build_artifacts
+pv-cost-sweep = scripts.cost_model_sweep:main
+pv-dashboard = reactor.cli_entry:generate_dashboard
+pv-dual-panel = scripts.plot_envelope_dual_panel:main
+pv-envelope = scripts.envelope_sweep:main
+pv-hw-runner = reactor.cli_entry:hardware_runner
+pv-kpi = reactor.cli_entry:production_kpi
+pv-kpi-diff = scripts.kpi_diff:main
+pv-ndjson-csv = scripts.ndjson_to_csv:main
+pv-perf-budget = scripts.performance_budget:main
+pv-plot-fom = reactor.cli_entry:plot_production_fom
+pv-plot-stability = reactor.cli_entry:plot_stability
+pv-run-report = reactor.cli_entry:run_report
+pv-snr = reactor.cli_entry:sensor_noise
+pv-snr-prop = scripts.snr_propagation:main
+pv-sweep-dyn = reactor.cli_entry:sweep_dynamic_ripple
+pv-sweep-time = reactor.cli_entry:sweep_time
+pv-validate-schemas = reactor.cli_entry:validate_schemas

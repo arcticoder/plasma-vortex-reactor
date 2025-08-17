@@ -4,7 +4,7 @@ version = "0.0.0"
 description = "Plasma Vortex Reactor modeling and production scaling tools"
 requires-python = ">=3.10"
 readme = "README.md"
-license = { text = "MIT" }
+license = { text = "Unlicense" }
 authors = [
 	{ name = "arcticoder" }
 ]

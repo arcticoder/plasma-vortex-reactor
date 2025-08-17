@@ -25,8 +25,8 @@ nox-types:
 	nox -s types || true
 
 paper:
-	@echo "Building docs/paper.tex -> paper.pdf (requires pdflatex)"
-	@pdflatex -interaction=nonstopmode -output-directory=docs docs/paper.tex || true
+	@echo "Building papers/phase3_stability.tex -> PDF (requires pdflatex)"
+	@pdflatex -interaction=nonstopmode -output-directory=papers papers/phase3_stability.tex || true
 
 bundle:
 	@echo "Creating repro bundle tarball..."
