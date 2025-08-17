@@ -14,6 +14,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Set up Python and plotting dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements-plot.txt ]; then pip install -r requirements-plot.txt || true; fi
+        shell: bash
+      - name: Generate paper figures (best-effort)
+        run: |
+          set -euo pipefail
+          mkdir -p artifacts data
+          # Operating envelope: outputs JSON/CSV and PNG
+          python scripts/envelope_sweep.py --n-points 12 --out-json artifacts/operating_envelope.json --out-csv data/operating_envelope.csv --out-png artifacts/operating_envelope.png || true
+          # Dynamic stability ripple (may read a sweep CSV if present)
+          python scripts/plot_dynamic_stability_ripple.py --from-sweep data/full_sweep_with_dynamic_ripple.csv --out artifacts/dynamic_stability_ripple.png || true
+          # KPI trend (tries to find production_kpi*.json; writes a tiny PNG if none exist)
+          python scripts/plot_kpi_trend.py --out artifacts/kpi_trend.png || true
+          # Dual-panel envelope/time-to figure (reads envelope JSON and time metrics if present)
+          python scripts/plot_envelope_dual_panel.py --envelope artifacts/operating_envelope.json --time-metrics artifacts/time_to_metrics.json --out artifacts/envelope_dual_panel.png || true
+        shell: bash
       - name: Use stable LaTeX action to build PDF
         uses: xu-cheng/latex-action@v2
         with:
