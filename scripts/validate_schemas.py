@@ -48,6 +48,33 @@ def main() -> None:
         except Exception as e:
             errors.append(f"anomalies_summary.json: {e}")
 
+    # Optional time_to_metrics validation
+    tms = sdir / "time_to_metrics.schema.json"
+    if tms.exists() and Path("time_to_metrics.json").exists():
+        try:
+            js = json.loads(Path("time_to_metrics.json").read_text())
+            schema = json.loads(tms.read_text())
+            jsonschema.validate(instance=js, schema=schema)
+        except Exception as e:
+            errors.append(f"time_to_metrics.json: {e}")
+    # Optional calibration and cost_sweep validations
+    cal = sdir / "calibration.schema.json"
+    if cal.exists() and Path("calibration.json").exists():
+        try:
+            js = json.loads(Path("calibration.json").read_text())
+            schema = json.loads(cal.read_text())
+            jsonschema.validate(instance=js, schema=schema)
+        except Exception as e:
+            errors.append(f"calibration.json: {e}")
+    cs = sdir / "cost_sweep.schema.json"
+    if cs.exists() and Path("cost_sweep.json").exists():
+        try:
+            js = json.loads(Path("cost_sweep.json").read_text())
+            schema = json.loads(cs.read_text())
+            jsonschema.validate(instance=js, schema=schema)
+        except Exception as e:
+            errors.append(f"cost_sweep.json: {e}")
+
     ok = not errors
     print(json.dumps({"ok": ok, "errors": errors}))
     if errors:

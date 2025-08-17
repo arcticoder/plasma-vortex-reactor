@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "time_to_metrics",
+  "type": "object",
+  "properties": {
+    "time_to_stability_ms": {"type": ["number","null"]},
+    "time_to_yield_ms": {"type": ["number","null"]},
+    "time_ms_series": {"type":"array", "items": {"type":"number"}},
+    "energy_J_series": {"type":"array", "items": {"type":"number"}}
+  },
+  "additionalProperties": true
+}

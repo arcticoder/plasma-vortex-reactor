@@ -13,20 +13,29 @@ def main():
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--seed", type=int, default=123)
     ap.add_argument("--scenario-id", default="ci-demo")
+    ap.add_argument("--severity", choices=["ok","warn","fail","mixed"], default="mixed")
     args = ap.parse_args()
     rnd = random.Random(args.seed)
-    kinds = [
+    all_kinds = [
         ("hardware_timeout", "fail"),
         ("stability_drop", "warn"),
         ("cooldown", "ok"),
         ("overrun", "fail"),
         ("density_dip", "warn"),
     ]
+    if args.severity == "ok":
+        kinds = [(e,s) for (e,s) in all_kinds if s == "ok"] or [("cooldown","ok")]
+    elif args.severity == "warn":
+        kinds = [(e,s) for (e,s) in all_kinds if s == "warn"] or [("stability_drop","warn")]
+    elif args.severity == "fail":
+        kinds = [(e,s) for (e,s) in all_kinds if s == "fail"] or [("hardware_timeout","fail")]
+    else:
+        kinds = all_kinds
     lines = []
     for i in range(args.n):
         ev, status = rnd.choice(kinds)
-    details = {"i": i, "seed": args.seed, "severity": status, "scenario_id": args.scenario_id}
-    lines.append(json.dumps({"event": ev, "status": status, "scenario_id": args.scenario_id, "details": details}))
+        details = {"i": i, "seed": args.seed, "severity": status, "scenario_id": args.scenario_id}
+        lines.append(json.dumps({"event": ev, "status": status, "scenario_id": args.scenario_id, "details": details}))
     outp = Path(args.out)
     outp.parent.mkdir(parents=True, exist_ok=True)
     outp.write_text("\n".join(lines) + "\n")

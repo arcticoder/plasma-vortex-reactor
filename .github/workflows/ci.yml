@@ -87,6 +87,8 @@ jobs:
           test -f operating_envelope_frontier.json || true
           # NDJSON export
           python scripts/ndjson_to_csv.py --in timeline.ndjson --out timeline.csv || true
+          # Dynamic ripple vs time plot from sweep CSV (if present)
+          python scripts/plot_dynamic_ripple_time.py --from-csv full_sweep_with_dynamic_ripple.csv --out dynamic_ripple_time.png || true
       - name: Run energy reduction demo
         run: |
           . .venv/bin/activate
@@ -139,6 +141,7 @@ jobs:
             operating_envelope.png
             operating_envelope_frontier.json
             envelope_dual_panel.png
+            dynamic_ripple_time.png
             ablation_ripple.json
             dist/repro-bundle.tgz
             baseline_kpi.json
@@ -171,6 +174,7 @@ jobs:
               ['Trend','bench_trend.png'],
               ['Envelope','operating_envelope.png'],
               ['Dual','envelope_dual_panel.png'],
+              ['Anomalies','anomalies_summary.json'],
               ['Ablation','ablation_ripple.json']
             ].map(([n,p])=>`[${n}](${p})`).join(' · ');
             const deltaTable = `| Metric | Baseline | Current | Δ |\n|---|---:|---:|---:|\n| Stable | ${base.stable} | ${kpi.stable} | - |\n| FOM | ${base.fom ?? 'n/a'} | ${kpi.fom ?? 'n/a'} | ${(diff.fom && diff.fom.delta!=null)?diff.fom.delta.toFixed(3):'n/a'} |`;
@@ -193,6 +197,7 @@ jobs:
           - examples/scenario_high_density.json
           - examples/scenario_low_temp.json
           - examples/scenario_edge.json
+          - examples/scenario_edge_case.json
           - examples/scenario_high_load.json
           - examples/scenario_production.json
     steps:

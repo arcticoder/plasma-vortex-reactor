@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "cost_sweep",
+  "type": "object",
+  "properties": {
+    "n": {"type": "number"},
+    "rows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "energy_cost_J": {"type": "number"},
+          "price_scale": {"type": "number"},
+          "fom": {"type": "number"}
+        },
+        "required": ["energy_cost_J", "price_scale", "fom"],
+        "additionalProperties": true
+      }
+    }
+  },
+  "required": ["rows"],
+  "additionalProperties": true
+}

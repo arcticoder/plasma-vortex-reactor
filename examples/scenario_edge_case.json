@@ -1,0 +1,9 @@
+{
+  "timeline_log_path": "progress.ndjson",
+  "xi": 0.5,
+  "b_field_ripple_pct": 0.02,
+  "grid": [16, 16],
+  "nu": 1e-3,
+  "b_series": [5.0, 5.0001, 4.9999, 5.0, 5.0002, 4.9998, 5.0],
+  "scenario_id": "edge_case_low_n_high_ripple"
+}

@@ -213,6 +213,20 @@ class Reactor:
         except Exception:
             pass
 
+    def log_hardware_specific_error(self, error: Exception, path: str = "progress.ndjson") -> None:
+        """Log a hardware-specific error event for diagnostics."""
+        try:
+            append_event(path, event="hardware_specific_error", status="fail", details={"error": str(error)})
+        except Exception:
+            pass
+
+    def log_hardware_timeout_60s(self, path: str = "progress.ndjson") -> None:
+        """Log a specific 60s timeout marker for long-running hardware steps."""
+        try:
+            append_event(path, event="hardware_timeout_60s", status="fail")
+        except Exception:
+            pass
+
     # Real hardware integration with timeout and error/timeout logging
     def step_with_real_hardware(self, dt: float, timeout: float = 60.0) -> None:
         try:
@@ -234,6 +248,9 @@ class Reactor:
                     # high-load specific timeout marker
                     if isinstance(getattr(self, "hw_state", {}).get("load", None), str):
                         self.log_high_load_timeout(self.timeline_log_path or "progress.ndjson")
+                    # explicit 60s timeout marker if threshold exceeded
+                    if float(timeout) >= 60.0:
+                        self.log_hardware_timeout_60s(self.timeline_log_path or "progress.ndjson")
                 except Exception:
                     pass
                 raise TimeoutError("Hardware timeout")
@@ -256,6 +273,8 @@ class Reactor:
                     status="fail",
                     details={"error": str(e)},
                 )
+                # always write a specific hardware error marker too
+                self.log_hardware_specific_error(e, self.timeline_log_path or "progress.ndjson")
                 if evt == "production_hardware_error":
                     self.log_high_load_hardware_error(e, self.timeline_log_path or "progress.ndjson")
             except Exception:

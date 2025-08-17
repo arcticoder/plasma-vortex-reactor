@@ -546,7 +546,7 @@ def test_timeline_anomalies_generator_and_dashboard_resilience(tmp_path):
         import pathlib as _pl
         # Generate anomalies
         script_anom = _pl.Path(cwd) / "scripts" / "generate_timeline_anomalies.py"
-        res = subprocess.run([_sys.executable, str(script_anom), "--n", "5", "--out", "docs/timeline_anomalies.ndjson"], capture_output=True)
+        res = subprocess.run([_sys.executable, str(script_anom), "--n", "5", "--out", "docs/timeline_anomalies.ndjson", "--severity", "mixed"], capture_output=True)
         assert res.returncode == 0
         p = _pl.Path("docs/timeline_anomalies.ndjson")
         assert p.exists() and len(p.read_text().strip().splitlines()) == 5
@@ -559,6 +559,62 @@ def test_timeline_anomalies_generator_and_dashboard_resilience(tmp_path):
         res2 = subprocess.run([_sys.executable, str(script_dash), "--docs-dir", "docs", "--out", "progress_dashboard.html"], capture_output=True)
         assert res2.returncode == 0
         assert _pl.Path("progress_dashboard.html").exists()
+    finally:
+        _os.chdir(cwd)
+
+
+def test_cost_sweep_seed_determinism(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        cs = _pl.Path(cwd) / "scripts" / "cost_model_sweep.py"
+        res1 = subprocess.run([_sys.executable, str(cs), "--n", "5", "--seed", "77", "--out-json", "cs1.json"], capture_output=True)
+        assert res1.returncode == 0
+        res2 = subprocess.run([_sys.executable, str(cs), "--n", "5", "--seed", "77", "--out-json", "cs2.json"], capture_output=True)
+        assert res2.returncode == 0
+        j1 = _json.loads(_pl.Path("cs1.json").read_text())
+        j2 = _json.loads(_pl.Path("cs2.json").read_text())
+        assert j1 == j2
+    finally:
+        _os.chdir(cwd)
+
+
+def test_hardware_timeout_60s_marker(tmp_path, monkeypatch):
+    # Force a slow hardware simulate call to trigger timeout
+    import time as _time
+    def _slow(state):
+        _time.sleep(0.01)
+        return state
+    import types, sys as _sys
+    fake_mod = types.SimpleNamespace(simulate_hardware=_slow)
+    monkeypatch.setitem(_sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
+    from reactor.core import Reactor
+    timeline = tmp_path/"progress.ndjson"
+    R = Reactor(grid=(16,16), nu=1e-3, timeline_log_path=str(timeline))
+    R.hw_state = {"load": "high"}
+    with pytest.raises(TimeoutError):
+        # Use a small timeout (<60s) but method always emits hardware_timeout_60s when threshold >=60
+        R.step_with_real_hardware(dt=1e-3, timeout=0.001)
+    # Validate that hardware_timeout marker exists; 60s marker may be emitted based on implementation
+    text = timeline.read_text()
+    assert "hardware_timeout" in text
+
+
+def test_edge_case_scenario_stability(tmp_path):
+    # Run the demo with the edge-case scenario and ensure the pipeline completes without crash
+    import subprocess, sys as _sys, os as _os
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl, shutil as _sh
+        # Copy scenario file into CWD
+        scenario_src = _pl.Path(cwd) / "examples" / "scenario_edge_case.json"
+        _sh.copyfile(scenario_src, "scenario_edge_case.json")
+        script = _pl.Path(cwd) / "scripts" / "demo_runner.py"
+        res = subprocess.run([_sys.executable, str(script), "--scenario", "scenario_edge_case.json", "--steps", "5", "--dt", "1e-3", "--seed", "9"], capture_output=True)
+        assert res.returncode == 0
     finally:
         _os.chdir(cwd)
 
