@@ -8,6 +8,12 @@
 \usepackage{amssymb}
 % Look for figures in common artifact locations
 \graphicspath{{../artifacts/}{artifacts/}{./}}
+% Helper: include graphics safely (don't fail build if file is missing)
+\newcommand{\safeincludegraphics}[2][]{%
+	\IfFileExists{#2}{\includegraphics[#1]{#2}}{%
+		\begin{center}\fbox{\parbox{0.9\linewidth}{\centering Missing image: \texttt{#2}}}\end{center}%
+	}%
+}
 \title{Plasma Vortex Reactor: CI-validated Modeling with Stability KPI Gates and Dynamic Ripple Control}
 % Author populated from author_config.tex
 \author{\authorname\\\texttt{\authoremail}}
@@ -46,22 +52,22 @@ Deterministic seeding is enforced across CLIs. Artifacts are written to \texttt{
 We consider this phase ready for milestone-based review focused on KPI readiness rather than academic polish. Next steps include expanding strict typing coverage, strengthening RNG determinism across platforms, and refining cost-model coupling in KPI trend analyses.
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.7\linewidth]{operating_envelope.png}
+\safeincludegraphics[width=0.7\linewidth]{operating_envelope.png}
 \caption{Operating envelope (FOM vs $n$, $T$).}\label{fig:envelope}
 \end{figure}
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.6\linewidth]{dynamic_stability_ripple.png}
+\safeincludegraphics[width=0.6\linewidth]{dynamic_stability_ripple.png}
 \caption{Stability vs ripple with gate.}\label{fig:ripple}
 \end{figure}
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.6\linewidth]{kpi_trend.png}
+\safeincludegraphics[width=0.6\linewidth]{kpi_trend.png}
 \caption{KPI trend (FOM across revisions).}\label{fig:kpi-trend}
 \end{figure}
 \begin{figure}[h]
 \centering
-\includegraphics[width=0.8\linewidth]{envelope_dual_panel.png}
+\safeincludegraphics[width=0.8\linewidth]{envelope_dual_panel.png}
 \caption{Dual-panel: envelope (left) with FOM heat and time-to-stability/yield overlays (right).}
 \end{figure}
 \end{document}
