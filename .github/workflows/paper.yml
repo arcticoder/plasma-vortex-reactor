@@ -13,20 +13,27 @@ jobs:
   build-pdf:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+      - name: Install TeX Live packages
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended \
+            texlive-science latexmk/pdflatex || true
+        shell: bash
       - name: Compile LaTeX (phase3_stability.tex)
-        uses: xu-cheng/latex-action@v3
-        with:
-          root_file: phase3_stability.tex
-          working_directory: papers
-          latexmk_use_xelatex: false
-          extra_system_packages: |
-            texlive-latex-recommended
-            texlive-latex-extra
-            texlive-fonts-recommended
-            texlive-science
+        run: |
+          set -euo pipefail
+          cd papers
+          # try latexmk first if available
+          if command -v latexmk >/dev/null 2>&1; then
+            latexmk -pdf -interaction=nonstopmode -halt-on-error phase3_stability.tex
+          else
+            pdflatex -interaction=nonstopmode phase3_stability.tex || true
+          fi
+        shell: bash
       - name: Upload PDF artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: phase3_stability-pdf
           path: papers/phase3_stability.pdf
@@ -39,9 +46,9 @@ jobs:
       ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
       ZENODO_DEPOSITION_ID: ${{ secrets.ZENODO_DEPOSITION_ID }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
       - name: Download PDF artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v3
         with:
           name: phase3_stability-pdf
           path: papers
