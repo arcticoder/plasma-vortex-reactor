@@ -50,44 +50,32 @@ jobs:
           python scripts/param_sweep_confinement.py --full-sweep-with-ripple
           python scripts/param_sweep_confinement.py --full-sweep-with-time
           python scripts/param_sweep_confinement.py --full-sweep-with-dynamic-ripple
-          # Generate dynamic stability vs ripple plot from sweep (fallbacks to defaults if CSV missing)
           python scripts/plot_dynamic_stability_ripple.py --from-sweep full_sweep_with_dynamic_ripple.csv --out dynamic_stability_ripple.png
           python scripts/uq_optimize.py --samples 10 --seed 123 --out uq_optimized.json --production
           python scripts/run_report.py --feasibility feasibility_gates_report.json --timeline-summary timeline_summary.json --uq uq_optimized.json --integrated-out integrated_report.json
           python scripts/production_kpi.py --feasibility feasibility_gates_report.json --metrics metrics.json --uq uq_optimized.json --out production_kpi.json
           python scripts/calibrate_ripple_alpha.py --from-csv full_sweep_with_dynamic_ripple.csv --out calibration.json
           python scripts/time_to_stability_yield.py --sweep-time full_sweep_with_time.csv --out-json time_to_metrics.json --out-png time_to_metrics.png
-          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html
+          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --fom-trend
           python scripts/sensor_noise_model.py --out sensor_noise.png --snr 20
           python scripts/bench_step_loop.py --steps 200 --dt 1e-4 --out bench_step_loop.json
           python scripts/cost_model_sweep.py --n 8
           python scripts/snr_propagation.py --snr 25
           python scripts/performance_budget.py --bench bench_step_loop.json --max-elapsed-s 2.0 --trend-out bench_trend.jsonl
-          # Perf summary badge
           test -f perf_budget_summary.md && echo "Perf budget summary generated" || true
-          # Baseline KPI snapshot if not present
           if [ ! -f baseline_kpi.json ]; then echo '{"stable": true, "fom": 0.12}' > baseline_kpi.json; fi
           python scripts/validate_schemas.py > validation_report.json || true
-          # Build via console entry for one-shot artifacts (best-effort)
           pv-build-artifacts || true
-          # Plot trend from budget JSONL if present
           python scripts/plot_bench_trend.py --in bench_trend.jsonl --out bench_trend.png || true
-          # Envelope sweep and ablation study
           pv-envelope --n-points 12 --out-png operating_envelope.png || true
-          # Dual-panel plot
           python scripts/plot_envelope_dual_panel.py --envelope operating_envelope.json --time-metrics time_to_metrics.json --out envelope_dual_panel.png || true
           pv-ablation-ripple --n 5000 --out ablation_ripple.json || true
-          # Generate anomalies summary via dashboard builder
-          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --json-out progress_dashboard.json
-          # Create repro bundle
+          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --json-out progress_dashboard.json --fom-trend
+          python scripts/plot_kpi_trend.py --out kpi_trend.png || true
           mkdir -p dist/bundle && cp -f examples/scenario_min.json scripts/demo_runner.py scripts/run_report.py scripts/production_kpi.py scripts/performance_budget.py scripts/plot_bench_trend.py scripts/repro_bundle_runner.sh scripts/repro_bundle_runner.py requirements.txt dist/bundle/ && (cd dist && tar czf repro-bundle.tgz bundle && rm -rf bundle)
-          # KPI diff
           python scripts/kpi_diff.py --baseline baseline_kpi.json --current production_kpi.json --out kpi_diff.json || true
-          # Envelope frontier JSON
           test -f operating_envelope_frontier.json || true
-          # NDJSON export
           python scripts/ndjson_to_csv.py --in timeline.ndjson --out timeline.csv || true
-          # Dynamic ripple vs time plot from sweep CSV (if present)
           python scripts/plot_dynamic_ripple_time.py --from-csv full_sweep_with_dynamic_ripple.csv --out dynamic_ripple_time.png || true
       - name: Run energy reduction demo
         run: |
@@ -122,6 +110,8 @@ jobs:
             time_to_metrics.json
             time_to_metrics.png
             progress_dashboard.html
+            progress_dashboard_fom_trend.png
+            kpi_trend.png
             sensor_noise.png
             bench_step_loop.json
             bench_trend.jsonl
@@ -164,7 +154,7 @@ jobs:
             const kpi = read('production_kpi.json');
             const base = read('baseline_kpi.json');
             const diff = read('kpi_diff.json');
-            const deltaF = (kpi.fom ?? 0) - (base.fom ?? 0);
+            const anomalies = read('anomalies_summary.json');
             const budgetSummary = fs.existsSync('perf_budget_summary.md') ? fs.readFileSync('perf_budget_summary.md','utf8') : '';
             const perfBadge = '![perf](https://img.shields.io/badge/perf-budget-' + ((kpi.stable===true)?'ok-brightgreen':'n_a-lightgrey') + ')';
             const links = [
@@ -178,7 +168,20 @@ jobs:
               ['Ablation','ablation_ripple.json']
             ].map(([n,p])=>`[${n}](${p})`).join(' · ');
             const deltaTable = `| Metric | Baseline | Current | Δ |\n|---|---:|---:|---:|\n| Stable | ${base.stable} | ${kpi.stable} | - |\n| FOM | ${base.fom ?? 'n/a'} | ${kpi.fom ?? 'n/a'} | ${(diff.fom && diff.fom.delta!=null)?diff.fom.delta.toFixed(3):'n/a'} |`;
-            const body = `${perfBadge}\n\n${deltaTable}\n\nArtifacts: ${links}\n\n${budgetSummary}`;
+            const counts = (anomalies && anomalies.counts) ? anomalies.counts : {};
+            const anomTable = `| Severity | Count |\n|---|---:|\n| ok | ${counts.ok ?? 0} |\n| warn | ${counts.warn ?? 0} |\n| fail | ${counts.fail ?? 0} |`;
+            // Absolute artifact URLs
+            let artLinks = '';
+            try {
+              const run_id = context.runId;
+              const resp = await github.rest.actions.listWorkflowRunArtifacts({ owner: context.repo.owner, repo: context.repo.repo, run_id });
+              if (resp && resp.data && Array.isArray(resp.data.artifacts)) {
+                artLinks = resp.data.artifacts.map(a => `[${a.name}](${a.archive_download_url})`).join(' · ');
+              }
+            } catch (e) {
+              // ignore
+            }
+            const body = `${perfBadge}\n\n${deltaTable}\n\n**Anomalies**\n\n${anomTable}\n\nArtifacts: ${links}\n\nAbsolute artifacts: ${artLinks || '(see run artifacts)'}\n\n${budgetSummary}`;
             await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
       - name: Repo metadata (gh)
         if: ${{ github.ref == 'refs/heads/main' && env.GH_TOKEN != '' }}
@@ -187,6 +190,7 @@ jobs:
         run: |
           gh repo edit ${{ github.repository }} --description "Plasma Vortex Reactor: CI-validated modeling, stability KPI gates, dynamic ripple control, and reproducible artifacts" --homepage "https://github.com/${{ github.repository }}"
           gh repo edit ${{ github.repository }} --add-topic plasma,vortex,reactor,stability,uq,ci,python,ripple,benchmark
+
   gated-matrix:
     runs-on: ubuntu-latest
     strategy:
@@ -219,8 +223,8 @@ jobs:
           python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
             --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
             --out feasibility_gates_report.json --scenario-id ${{ matrix.scenario }} --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield --require-fom || true
-          # metrics_gate enforces failure for high_ripple scenario demonstrating gated failure
           python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
+
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -232,6 +236,7 @@ jobs:
         run: pip install ruff
       - name: Ruff check
         run: ruff check .
+
   types:
     runs-on: ubuntu-latest
     steps:
@@ -244,6 +249,19 @@ jobs:
           pip install mypy types-requests
       - name: Run mypy (strict)
         run: mypy --config-file pyproject.toml src/reactor scripts tests
+
+  mypy-strict:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install nox and mypy
+        run: |
+          pip install nox mypy
+      - name: Run types (strict)
+        run: nox -s types
 
   hardware-tests:
     runs-on: ubuntu-latest
@@ -300,10 +318,26 @@ jobs:
         with:
           python-version: '3.12'
       - run: |
-          pip install mkdocs mkdocs-material
+          pip install mkdocs mkdocs-material mkdocstrings[python]
           mkdocs build --strict || mkdocs build
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
       - id: deploy
         uses: actions/deploy-pages@v4
+
+  test-tutorial:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run tutorial steps
+        run: |
+          python -m venv .venv
+          . .venv/bin/activate
+          pip install -r requirements.txt
+          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 3 --dt 1e-3 --seed 1
+          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --fom-trend
+          test -f progress_dashboard.html

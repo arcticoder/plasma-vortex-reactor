@@ -4,7 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Tuple
 
 
 def _read(path: str) -> Dict[str, Any]:
@@ -21,6 +21,7 @@ def main():
     ap.add_argument("--metrics", default="metrics.json")
     ap.add_argument("--uq", default="uq_optimized.json")
     ap.add_argument("--cost-model", default="configs/cost_model.json", help="Optional cost model JSON for FOM calculation")
+    ap.add_argument("--anomalies-ndjson", default="docs/timeline_anomalies.ndjson", help="Optional anomalies NDJSON to adjust KPI for fail severities")
     ap.add_argument("--out", default="production_kpi.json")
     args = ap.parse_args()
 
@@ -49,6 +50,30 @@ def main():
         except Exception:
             fom = None
 
+    # Optional anomalies adjustment: count 'fail' severities to degrade stability and FOM
+    def _count_fail(ndjson_path: str) -> Tuple[int, int, int]:
+        ok = warn = fail = 0
+        try:
+            p = Path(ndjson_path)
+            if p.exists():
+                for line in p.read_text().splitlines():
+                    line = line.strip()
+                    if not line:
+                        continue
+                    rec = json.loads(line)
+                    status = str(rec.get("status") or rec.get("details", {}).get("severity") or "").strip()
+                    if status == "fail":
+                        fail += 1
+                    elif status == "warn":
+                        warn += 1
+                    elif status == "ok":
+                        ok += 1
+        except Exception:
+            pass
+        return ok, warn, fail
+
+    ok_c, warn_c, fail_c = _count_fail(args.anomalies_ndjson)
+
     kpi = {
         "stable": bool(feas.get("stable", False)),
         "gamma_ok": bool(feas.get("gamma_ok", False)),
@@ -58,7 +83,17 @@ def main():
         "uq_n_samples": uq.get("n_samples"),
         "uq_means": uq.get("means"),
         "cost_model_used": bool(cost_model),
+        "anomaly_counts": {"ok": ok_c, "warn": warn_c, "fail": fail_c},
     }
+
+    # Apply anomaly impact: if any fail anomalies, mark unstable and reduce FOM slightly
+    if fail_c > 0:
+        try:
+            kpi["stable"] = False
+            if kpi["fom"] is not None:
+                kpi["fom"] = float(kpi["fom"]) * 0.9
+        except Exception:
+            pass
 
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(kpi, f, indent=2)

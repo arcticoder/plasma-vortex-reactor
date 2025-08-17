@@ -490,6 +490,34 @@ def test_kpi_cli_outputs(tmp_path):
     finally:
         _os.chdir(cwd)
 
+def test_kpi_anomaly_severity_impact(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        # Minimal feasibility and metrics
+        _pl.Path("feasibility_gates_report.json").write_text(_json.dumps({"stable": True, "gamma_ok": True, "antiproton_yield_pass": True, "fom": 0.2}))
+        _pl.Path("metrics.json").write_text(_json.dumps({"energy_budget_J": 1.0}))
+        _pl.Path("uq_optimized.json").write_text(_json.dumps({"n_samples": 5, "means": {"fom": 0.2}}))
+        # Case A: OK-only anomalies
+        _pl.Path("docs").mkdir(exist_ok=True)
+        _pl.Path("docs/timeline_anomalies.ndjson").write_text('{"event":"cooldown","status":"ok","details":{"severity":"ok"}}\n')
+        kpi = _pl.Path(cwd) / "scripts" / "production_kpi.py"
+        resA = subprocess.run([_sys.executable, str(kpi), "--out", "kpi_ok.json"], capture_output=True)
+        assert resA.returncode == 0
+        A = _json.loads(_pl.Path("kpi_ok.json").read_text())
+        # Case B: include a fail anomaly
+        _pl.Path("docs/timeline_anomalies.ndjson").write_text('{"event":"hardware_timeout","status":"fail","details":{"severity":"fail"}}\n')
+        resB = subprocess.run([_sys.executable, str(kpi), "--out", "kpi_fail.json"], capture_output=True)
+        assert resB.returncode == 0
+        B = _json.loads(_pl.Path("kpi_fail.json").read_text())
+        # Assert stability flips to False and FOM degrades when failures present
+        assert A.get("stable") is True and B.get("stable") is False
+        assert (A.get("fom") or 0) >= (B.get("fom") or 0)
+    finally:
+        _os.chdir(cwd)
+
 def test_calibration_cli(tmp_path):
     import subprocess, sys as _sys, os as _os
     cwd = _os.getcwd()
@@ -502,6 +530,30 @@ def test_calibration_cli(tmp_path):
         res = subprocess.run([_sys.executable, str(script)], capture_output=True)
         assert res.returncode == 0
         assert _pl.Path("calibration.json").exists()
+    finally:
+        _os.chdir(cwd)
+
+def test_timeline_analysis_stats(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        _pl.Path("docs").mkdir(exist_ok=True)
+        # Create a tiny anomalies timeline
+        _pl.Path("docs/timeline_anomalies.ndjson").write_text("\n".join([
+            '{"event":"cooldown","status":"ok"}',
+            '{"event":"stability_drop","status":"warn"}',
+            '{"event":"hardware_timeout","status":"fail"}',
+        ])+"\n")
+        script = _pl.Path(cwd) / "scripts" / "timeline_analysis.py"
+        res = subprocess.run([_sys.executable, str(script), "--timeline", "docs/timeline_anomalies.ndjson", "--out", "timeline_stats.json"], capture_output=True)
+        assert res.returncode == 0
+        stats = _json.loads(_pl.Path("timeline_stats.json").read_text())
+        assert stats.get("events") == 3
+        assert stats.get("by_status", {}).get("ok") == 1
+        assert stats.get("by_status", {}).get("warn") == 1
+        assert stats.get("by_status", {}).get("fail") == 1
     finally:
         _os.chdir(cwd)
 
@@ -529,11 +581,14 @@ def test_progress_dashboard_generator(tmp_path):
         _os.chdir(str(tmp_path))
         import pathlib as _pl, json as _json
         d = _pl.Path("docs"); d.mkdir()
-        (d/"roadmap.ndjson").write_text(_json.dumps({"milestone":"Test Milestone","status":"planned"})+"\n")
+        (d / "roadmap.ndjson").write_text(_json.dumps({"milestone": "Test Milestone", "status": "planned"}) + "\n")
         script = _pl.Path(cwd) / "scripts" / "generate_progress_dashboard.py"
-        res = subprocess.run([_sys.executable, str(script), "--docs-dir", "docs", "--out", "progress_dashboard.html"], capture_output=True)
+        # Also ask for FOM trend; with no production_kpi.json present, it should still succeed and create a placeholder
+        res = subprocess.run([_sys.executable, str(script), "--docs-dir", "docs", "--out", "progress_dashboard.html", "--fom-trend"], capture_output=True)
         assert res.returncode == 0
         assert _pl.Path("progress_dashboard.html").exists()
+        # If FOM trend was requested, a PNG should be created (real plot or placeholder)
+        assert _pl.Path("progress_dashboard_fom_trend.png").exists()
     finally:
         _os.chdir(cwd)
 
@@ -635,6 +690,30 @@ def test_cost_sweep_and_snr_propagation(tmp_path):
         res2 = subprocess.run([_sys.executable, str(snr), "--snr", "30"], capture_output=True)
         assert res2.returncode == 0
         assert _pl.Path("snr_propagation.json").exists() and _pl.Path("snr_propagation.png").exists()
+    finally:
+        _os.chdir(cwd)
+
+def test_cost_sweep_sensitivity_monotonicity(tmp_path):
+    import subprocess, sys as _sys, os as _os, json as _json
+    cwd = _os.getcwd()
+    try:
+        _os.chdir(str(tmp_path))
+        import pathlib as _pl
+        cs = _pl.Path(cwd) / "scripts" / "cost_model_sweep.py"
+        # sensitivity mode with deterministic seed
+        res = subprocess.run([_sys.executable, str(cs), "--n", "6", "--seed", "77", "--sensitivity", "--out-json", "sens.json"], capture_output=True)
+        assert res.returncode == 0
+        data = _json.loads(_pl.Path("sens.json").read_text())
+        rows = data.get("rows", [])
+        # For a fixed price band, ensure FOM decreases as energy_cost_J increases (monotonic non-increasing along cost)
+        # We'll sort by energy_cost within a narrow price_scale window
+        if rows:
+            # pick smallest price_scale group
+            ps = sorted({r["price_scale"] for r in rows})[0]
+            grp = sorted([r for r in rows if abs(r["price_scale"]-ps) < 1e-12], key=lambda r: r["energy_cost_J"])
+            if len(grp) >= 2:
+                foms = [r["fom"] for r in grp]
+                assert all(foms[i] >= foms[i+1] for i in range(len(foms)-1))
     finally:
         _os.chdir(cwd)
 

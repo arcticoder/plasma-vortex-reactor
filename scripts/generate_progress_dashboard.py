@@ -19,7 +19,7 @@ import html
 import json
 import os
 from pathlib import Path
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any, Tuple, Optional
 
 
 NDJSON_FILES = [
@@ -62,7 +62,48 @@ def _anomalies_counts(items: List[Dict[str, Any]]) -> Dict[str, int]:
     return counts
 
 
-def build_html(docs_dir: Path) -> str:
+def _plot_fom_trend(kpi_paths: List[Path], out_png: Path) -> None:
+    # Try to read FOMs in chronological order and plot a simple trend
+    try:
+        xs: List[int] = []
+        ys: List[float] = []
+        for i, kp in enumerate(kpi_paths):
+            try:
+                data = json.loads(kp.read_text())
+                f = data.get("fom")
+                if isinstance(f, (int, float)):
+                    xs.append(i)
+                    ys.append(float(f))
+            except Exception:
+                continue
+        if not xs:
+            out_png.write_bytes(b"PNG placeholder - no FOM data\n")
+            return
+        try:
+            # Lazy import matplotlib via reactor.plotting helper
+            sys_path_added = False
+            import sys as _sys, os as _os
+            _src = Path(__file__).resolve().parents[1] / 'src'
+            if str(_src) not in _sys.path:
+                _sys.path.insert(0, str(_src)); sys_path_added = True
+            from reactor.plotting import _mpl  # type: ignore
+            plt = _mpl()
+            fig, ax = plt.subplots(figsize=(5,3))
+            ax.plot(xs, ys, marker='o')
+            ax.set_xlabel('Revision')
+            ax.set_ylabel('FOM')
+            ax.set_title('FOM Trend')
+            fig.tight_layout(); fig.savefig(str(out_png), dpi=150); plt.close(fig)
+        except Exception:
+            out_png.write_bytes(b"PNG placeholder - matplotlib not available\n")
+    except Exception:
+        try:
+            out_png.write_bytes(b"PNG placeholder - error\n")
+        except Exception:
+            pass
+
+
+def build_html(docs_dir: Path, fom_trend: bool = False, fom_trend_out: Optional[Path] = None) -> str:
     sections: List[str] = []
     now = _dt.datetime.utcnow().isoformat() + "Z"
     sections.append(f"<p>Generated: {html.escape(now)}</p>")
@@ -142,6 +183,22 @@ def build_html(docs_dir: Path) -> str:
             sections.append(f"<li class='item {cls}'><strong>{html.escape(str(title))}</strong> {badge}</li>")
         sections.append("</ul>")
 
+    # Optionally plot FOM trend from production_kpi.json history at repo root (and docs dir if present)
+    if fom_trend:
+        kp_list: List[Path] = []
+        # Collect a simple set: current production_kpi.json and any found copies under docs
+        root_kp = Path("production_kpi.json")
+        if root_kp.exists():
+            kp_list.append(root_kp)
+        # Look for dated snapshots (optional convention)
+        for p in sorted(docs_dir.glob("production_kpi*.json")):
+            kp_list.append(p)
+        if fom_trend_out is None:
+            fom_trend_out = Path("progress_dashboard_fom_trend.png")
+        _plot_fom_trend(kp_list, fom_trend_out)
+        if fom_trend_out.exists():
+            sections.append(f"<h2>FOM Trend</h2><p><img src='{html.escape(str(fom_trend_out))}' alt='FOM Trend'></p>")
+
     navbar = (
         "<nav class='navbar'>"
         + " | ".join(nav_items)
@@ -200,10 +257,12 @@ def main() -> None:
     ap.add_argument("--docs-dir", default="docs", help="Docs directory containing NDJSON files")
     ap.add_argument("--out", default="progress_dashboard.html", help="Output HTML path")
     ap.add_argument("--json-out", default="progress_dashboard.json", help="Optional JSON summary export")
+    ap.add_argument("--fom-trend", action="store_true", help="Generate a FOM trend plot for the dashboard")
+    ap.add_argument("--fom-trend-out", default="progress_dashboard_fom_trend.png")
     args = ap.parse_args()
     docs_dir = Path(args.docs_dir)
     os.makedirs(docs_dir, exist_ok=True)
-    html_doc = build_html(docs_dir)
+    html_doc = build_html(docs_dir, fom_trend=bool(args.fom_trend), fom_trend_out=Path(args.fom_trend_out))
     Path(args.out).write_text(html_doc)
     if args.json_out:
         export_json(docs_dir, Path(args.json_out))

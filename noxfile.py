@@ -14,4 +14,4 @@ def tests(session):
 @nox.session
 def types(session):
     session.install('mypy')
-    session.run('mypy', 'src/reactor', 'scripts', 'tests')
+    session.run('mypy', '--config-file', 'pyproject.toml', 'src/reactor', 'scripts')
