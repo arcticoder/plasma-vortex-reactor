@@ -20,15 +20,11 @@
 - production_kpi.json: Key production KPIs and summary
 - calibration.json: Ripple alpha calibration from dynamic sweep
 - time_to_metrics.json/png: Time to reach yield/FOM targets
-- progress_dashboard.html: HTML snapshot of roadmap/progress/UQ/VnV
 
 ### Artifact Generation Cheatsheet
 
 - Integrated report: `python scripts/run_report.py --feasibility feasibility_gates_report.json --timeline-summary timeline_summary.json --uq uq_optimized.json --integrated-out integrated_report.json`
-- Dashboard: `python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html`
 
-### Anomaly Handling and Dashboard Usage
+### Anomaly Handling
 
 - Generate synthetic anomalies: `python scripts/generate_timeline_anomalies.py --n 20 --out docs/timeline_anomalies.ndjson` (or `pv-anomalies`).
-- The dashboard tolerates missing files and malformed lines, showing counts and the 10 most recent items.
-- Use the navbar for quick jumps and the ok/warn/fail filters to toggle severities.

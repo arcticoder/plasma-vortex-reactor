@@ -31,10 +31,6 @@ def sweep_dynamic_ripple() -> None:
     _run("scripts.param_sweep_confinement")
 
 
-def generate_dashboard() -> None:
-    _run("scripts.generate_progress_dashboard")
-
-
 def hardware_runner() -> None:
     _run("scripts.hardware_runner")
 

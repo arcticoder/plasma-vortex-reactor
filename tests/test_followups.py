@@ -574,16 +574,6 @@ def test_time_to_metrics_cli(tmp_path):
         _os.chdir(cwd)
 
 
-@pytest.mark.skip(reason="dashboard feature removed")
-def test_progress_dashboard_generator(tmp_path):
-    pass
-
-
-@pytest.mark.skip(reason="dashboard feature removed")
-def test_timeline_anomalies_generator_and_dashboard_resilience(tmp_path):
-    pass
-
-
 def test_cost_sweep_seed_determinism(tmp_path):
     import subprocess, sys as _sys, os as _os, json as _json
     cwd = _os.getcwd()
