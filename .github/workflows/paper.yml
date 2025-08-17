@@ -36,7 +36,22 @@ jobs:
           set -euo pipefail
           # These apt packages provide a reasonable LaTeX baseline including etoolbox
           sudo apt-get update -y
-          sudo apt-get install -y --no-install-recommends texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
+          # include xetex so xelatex is available (latexmk may call xelatex)
+          # also install latexmk so we can run latexmk directly and capture logs
+          sudo apt-get install -y --no-install-recommends texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-xetex latexmk
+        shell: bash
+      - name: Debug: show installed LaTeX binaries
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          echo "Which binaries are available and versions:"
+          which xelatex || echo "xelatex: not found"
+          xelatex --version || true
+          which pdflatex || echo "pdflatex: not found"
+          pdflatex --version || true
+          which latexmk || echo "latexmk: not found"
+          latexmk --version || true
+          echo "List /usr/bin for latex/pdflatex/xetex:" && ls -l /usr/bin/*tex* || true
         shell: bash
       - name: Generate paper figures (best-effort)
         run: |
@@ -113,12 +128,31 @@ jobs:
             artifacts
           key: ${{ runner.os }}-pv-data-${{ hashFiles('scripts/**','src/**','examples/**') }}
         shell: bash
-      - name: Use stable LaTeX action to build PDF
-        uses: xu-cheng/latex-action@v2
-        with:
-          root_file: papers/phase3_stability.tex
-          work_in_root_file_dir: true
-          continue_on_error: false
+      - name: Build PDF with latexmk (choose engine)
+        if: runner.os == 'Linux'
+        run: |
+          set -euo pipefail
+          # Run latexmk directly so we get full stdout/stderr in the job log.
+          # Prefer xelatex if available (some latexmk setups call xelatex by default),
+          # otherwise fall back to pdflatex for a smaller texlive footprint.
+          echo "Building LaTeX PDF for papers/phase3_stability.tex"
+          cd papers
+          if command -v xelatex >/dev/null 2>&1; then
+            echo "Using xelatex via latexmk"
+            latexmk -xelatex -interaction=nonstopmode -halt-on-error phase3_stability.tex || {
+              echo "latexmk (xelatex) failed with exit $?: copying log files for diagnosis";
+              ls -l || true;
+              exit 1;
+            }
+          else
+            echo "xelatex not found, falling back to pdflatex via latexmk"
+            latexmk -pdf -interaction=nonstopmode -halt-on-error phase3_stability.tex || {
+              echo "latexmk (pdflatex) failed with exit $?: copying log files for diagnosis";
+              ls -l || true;
+              exit 1;
+            }
+          fi
+        shell: bash
       - name: Collect generated PDF and consolidate logs
         if: always()
         run: |
