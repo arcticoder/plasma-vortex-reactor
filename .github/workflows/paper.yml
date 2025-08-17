@@ -19,55 +19,33 @@ jobs:
           sudo apt-get update -y
           sudo apt-get install -y --no-install-recommends \
             texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended \
-            texlive-science latexmk/pdflatex || true
+            texlive-science latexmk latex-plain-dev || true
         shell: bash
       - name: Compile LaTeX (phase3_stability.tex)
         run: |
           set -euo pipefail
           cd papers
-          # try latexmk first if available
+          # capture output to build.log for debugging and always produce that artifact
+          echo "Building LaTeX: $(pwd)/phase3_stability.tex"
           if command -v latexmk >/dev/null 2>&1; then
-            latexmk -pdf -interaction=nonstopmode -halt-on-error phase3_stability.tex
+            latexmk -pdf -interaction=nonstopmode -halt-on-error phase3_stability.tex 2>&1 | tee build.log
           else
-            pdflatex -interaction=nonstopmode phase3_stability.tex || true
+            pdflatex -interaction=nonstopmode phase3_stability.tex 2>&1 | tee build.log || true
           fi
+          # show summary
+          ls -l
         shell: bash
       - name: Upload PDF artifact
         uses: actions/upload-artifact@v3
         with:
           name: phase3_stability-pdf
           path: papers/phase3_stability.pdf
-
-  zenodo-publish:
-    if: ${{ secrets.ZENODO_TOKEN != '' }}
-    needs: build-pdf
-    runs-on: ubuntu-latest
-    env:
-      ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
-      ZENODO_DEPOSITION_ID: ${{ secrets.ZENODO_DEPOSITION_ID }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download PDF artifact
-        uses: actions/download-artifact@v3
+      - name: Upload LaTeX build log
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
-          name: phase3_stability-pdf
-          path: papers
-      - name: Upload to Zenodo (deposition id)
-        if: ${{ env.ZENODO_DEPOSITION_ID != '' }}
-        run: |
-          set -euo pipefail
-          FILE="papers/phase3_stability.pdf"
-          if [ ! -f "$FILE" ]; then echo "PDF missing"; exit 1; fi
-          curl -sSf -H "Authorization: Bearer ${ZENODO_TOKEN}" \
-            -F "file=@${FILE}" \
-            "https://zenodo.org/api/deposit/depositions/${ZENODO_DEPOSITION_ID}/files"
-      - name: Create new deposition and upload (fallback)
-        if: ${{ env.ZENODO_DEPOSITION_ID == '' }}
-        run: |
-          set -euo pipefail
-          sudo apt-get update && sudo apt-get install -y jq
-          META='{"metadata": {"title": "Phase 3 Stability Paper", "upload_type": "publication", "publication_type": "article", "description": "Plasma Vortex Reactor: CI-validated Modeling with Stability KPI Gates and Dynamic Ripple Control", "creators": [{"name": "'"${GITHUB_ACTOR}"'"}]}}'
-          DEP=$(curl -sSf -H "Authorization: Bearer ${ZENODO_TOKEN}" -H "Content-Type: application/json" -d "$META" https://zenodo.org/api/deposit/depositions)
-          ID=$(echo "$DEP" | jq -r .id)
-          echo "Created deposition $ID"
-          curl -sSf -H "Authorization: Bearer ${ZENODO_TOKEN}" -F "file=@papers/phase3_stability.pdf" "https://zenodo.org/api/deposit/depositions/${ID}/files"
+          name: phase3_stability-build-log
+          path: papers/build.log
+
+  # zenodo-publish removed: publishing requires secrets and caused workflow validation failures
+  # zenodo-publish removed (use scripts/publish_zenodo.sh locally or in a guarded CI job)
