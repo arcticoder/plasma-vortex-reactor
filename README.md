@@ -96,11 +96,7 @@ Install optional plotting/progress/validation extras:
 pip install -r requirements-plot.txt
 ```
 
-Note: Plotting scripts require `matplotlib`. Specifically, `plot_hardware_metrics.py` depends on the plotting extra; install with:
-
-```
-pip install -r requirements-plot.txt
-```
+Note: Plotting scripts require `matplotlib`. Specifically, `plot_hardware_metrics.py` depends on the plotting extra.
 
 By default, plotting and analysis scripts now write outputs under `artifacts/` (images/json) and place generated CSV inputs under `data/` to avoid cluttering the repo root.
 
