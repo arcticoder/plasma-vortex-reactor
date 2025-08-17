@@ -64,7 +64,11 @@ def main():
     if args.scenario:
         cfg = load_json(args.scenario)
 
-    timeline_path = args.timeline_log or cfg.get("timeline_log_path")
+    # Prefer artifacts/timeline.ndjson by default
+    default_artifacts_dir = os.path.join(_root, "artifacts")
+    os.makedirs(default_artifacts_dir, exist_ok=True)
+    default_timeline = os.path.join(default_artifacts_dir, "timeline.ndjson")
+    timeline_path = args.timeline_log or cfg.get("timeline_log_path") or default_timeline
     xi = cfg.get("xi", 2.0)
     br = cfg.get("b_field_ripple_pct", 0.005)
     grid = tuple(cfg.get("grid", [32, 32]))
@@ -83,11 +87,11 @@ def main():
         timeline_log_path=timeline_path,
         xi=xi,
         b_field_ripple_pct=br,
-    timeline_budget=int(args.timeline_budget)
+        timeline_budget=int(args.timeline_budget)
         if args.timeline_budget is not None
-    else None,
-    enforce_density=bool(args.enforce_density),
-    b_series=b_arr,
+        else None,
+        enforce_density=bool(args.enforce_density),
+        b_series=b_arr,
     )
     # log a run_started event with seed if timeline is enabled
     if timeline_path:
@@ -156,32 +160,32 @@ def main():
     # After run, log FOM based on physics yield and total energy
     try:
         y = antiproton_yield_estimator(1e20, 10.0, {"model": "physics"})
-        log_fom(y, ledger.total_energy(), timeline_path or "progress.ndjson")
+        log_fom(y, ledger.total_energy(), timeline_path or default_timeline)
     except Exception:
         pass
     # Optionally log production metrics summary
     try:
         if hasattr(R, "log_production_metrics"):
-            R.log_production_metrics(timeline_path or "progress.ndjson")
+            R.log_production_metrics(timeline_path or default_timeline)
     except Exception:
         pass
     # Log production failure if thresholds not met
     try:
         if hasattr(R, "log_production_failure"):
-            R.log_production_failure(timeline_path or "progress.ndjson")
+            R.log_production_failure(timeline_path or default_timeline)
     except Exception:
         pass
     # Log edge-case failure for scenarios specifically labeled edge
     try:
         if args.scenario and os.path.basename(args.scenario).startswith("scenario_edge"):
             if hasattr(R, "log_edge_production_failure"):
-                R.log_edge_production_failure(timeline_path or "progress.ndjson")
+                R.log_edge_production_failure(timeline_path or default_timeline)
     except Exception:
         pass
     try:
         # Log edge case too (lower density / higher energy) for diagnostics
         y_low = antiproton_yield_estimator(1e19, 5.0, {"model": "physics"})
-        log_fom_edge(y_low, ledger.total_energy() * 10.0, timeline_path or "progress.ndjson")
+        log_fom_edge(y_low, ledger.total_energy() * 10.0, timeline_path or default_timeline)
     except Exception:
         pass
     # Optional energy plot artifact
@@ -191,7 +195,8 @@ def main():
             t_ms = [0, 1, 2, 3, 4]
             E0 = ledger.total_energy()
             energies = [E0, E0*0.5, E0*0.2, E0*0.1, E0*0.08]
-            plot_energy_reduction(t_ms, energies, "energy_reduction.png")
+            # write artifact under artifacts/
+            plot_energy_reduction(t_ms, energies, os.path.join(default_artifacts_dir, "energy_reduction.png"))
     except Exception:
         pass
     t1 = time.perf_counter()

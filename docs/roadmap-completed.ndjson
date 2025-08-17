@@ -24,3 +24,6 @@
 {"milestone":"Phase 3 task: Dashboard artifact links","status":"completed","refs":["scripts/generate_progress_dashboard.py"],"notes":"Lists common artifacts when present"}
 {"milestone":"Phase 3 task: README badges + CLI catalog + Try-it","status":"completed","refs":["README.md"],"notes":"Adds badges and quick commands"}
 {"milestone":"Phase 3 task: Headless-safe time-to-metrics PNG","status":"completed","refs":["scripts/time_to_stability_yield.py"],"notes":"Writes placeholder image if plotting not available"}
+
+{"summary":"MkDocs Pages build + API stubs available","status":"completed","date":"2025-08-17","refs":["mkdocs.yml","docs/api.md"],"notes":"Docs site builds via CI; added usage guide."}
+{"math":"\\Gamma = \\frac{e^2}{a k_B T}","status":"reference","notes":"Target \\Gamma>140 for 10 ms stability gate."}

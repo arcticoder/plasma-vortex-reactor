@@ -52,3 +52,6 @@
 {"event":"Phase 3: KPI artifact links","status":"completed","refs":["scripts/plot_kpi_trend.py"],"details":{"list":"common artifacts"}}
 {"event":"Phase 3: README polish and CLI catalog","status":"completed","refs":["README.md"],"details":{"badges":true}}
 {"event":"Phase 3: Headless-safe time_to_metrics.png","status":"completed","refs":["scripts/time_to_stability_yield.py"],"details":{"placeholder":true}}
+
+{"event":"Docs: MkDocs usage added","status":"completed","refs":["docs/MKDOCS_USAGE.md","mkdocs.yml"],"date":"2025-08-17","python_snippet":"# serve docs locally\\n# mkdocs serve"}
+{"event":"Paper: phase3_stability updated","status":"completed","refs":["papers/phase3_stability.tex"],"date":"2025-08-17","latex":"n(r)=n_0(1+\\xi^2 r^2)^{-2}"}

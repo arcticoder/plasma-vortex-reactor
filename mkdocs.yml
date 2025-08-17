@@ -4,6 +4,7 @@ nav:
   - Guides:
       - Metrics Guide: docs/METRICS_GUIDE.md
       - Artifact Schema: docs/ARTIFACT_SCHEMA.md
+  - MkDocs Usage: docs/MKDOCS_USAGE.md
   - Operating Envelope: docs/OPERATING_ENVELOPE.md
   - Ablation Study: docs/ABLATION.md
   - API: docs/api.md

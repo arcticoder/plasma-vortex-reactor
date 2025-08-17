@@ -1,0 +1,66 @@
+name: Build Paper PDF
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'papers/**'
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'scripts/**'
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile LaTeX (phase3_stability.tex)
+        uses: xu-cheng/latex-action@v3
+        with:
+          root_file: phase3_stability.tex
+          working_directory: papers
+          latexmk_use_xelatex: false
+          extra_system_packages: |
+            texlive-latex-recommended
+            texlive-latex-extra
+            texlive-fonts-recommended
+            texlive-science
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase3_stability-pdf
+          path: papers/phase3_stability.pdf
+
+  zenodo-publish:
+    if: ${{ secrets.ZENODO_TOKEN != '' }}
+    needs: build-pdf
+    runs-on: ubuntu-latest
+    env:
+      ZENODO_TOKEN: ${{ secrets.ZENODO_TOKEN }}
+      ZENODO_DEPOSITION_ID: ${{ secrets.ZENODO_DEPOSITION_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download PDF artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: phase3_stability-pdf
+          path: papers
+      - name: Upload to Zenodo (deposition id)
+        if: ${{ env.ZENODO_DEPOSITION_ID != '' }}
+        run: |
+          set -euo pipefail
+          FILE="papers/phase3_stability.pdf"
+          if [ ! -f "$FILE" ]; then echo "PDF missing"; exit 1; fi
+          curl -sSf -H "Authorization: Bearer ${ZENODO_TOKEN}" \
+            -F "file=@${FILE}" \
+            "https://zenodo.org/api/deposit/depositions/${ZENODO_DEPOSITION_ID}/files"
+      - name: Create new deposition and upload (fallback)
+        if: ${{ env.ZENODO_DEPOSITION_ID == '' }}
+        run: |
+          set -euo pipefail
+          sudo apt-get update && sudo apt-get install -y jq
+          META='{"metadata": {"title": "Phase 3 Stability Paper", "upload_type": "publication", "publication_type": "article", "description": "Plasma Vortex Reactor: CI-validated Modeling with Stability KPI Gates and Dynamic Ripple Control", "creators": [{"name": "'"${GITHUB_ACTOR}"'"}]}}'
+          DEP=$(curl -sSf -H "Authorization: Bearer ${ZENODO_TOKEN}" -H "Content-Type: application/json" -d "$META" https://zenodo.org/api/deposit/depositions)
+          ID=$(echo "$DEP" | jq -r .id)
+          echo "Created deposition $ID"
+          curl -sSf -H "Authorization: Bearer ${ZENODO_TOKEN}" -F "file=@papers/phase3_stability.pdf" "https://zenodo.org/api/deposit/depositions/${ID}/files"

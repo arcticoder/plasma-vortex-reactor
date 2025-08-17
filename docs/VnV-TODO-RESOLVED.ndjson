@@ -6,3 +6,4 @@
 {"category":"V&V","task":"Hardware runner smoke test","priority":"Medium","status":"completed","refs":["tests/test_followups.py","scripts/hardware_runner.py"]}
 {"category":"V&V","task":"High-load hardware metrics plot variant","priority":"Low","source_file":"scripts/plot_hardware_metrics.py","status":"completed","refs":["scripts/plot_hardware_metrics.py",".github/workflows/ci.yml"],"details":{"artifact":"high_load_hardware_metrics.png"}}
 {"category":"V&V","task":"Time and dynamic ripple sweeps produce CSVs","priority":"Medium","source_file":"scripts/param_sweep_confinement.py","status":"completed","refs":["scripts/param_sweep_confinement.py",".github/workflows/ci.yml"],"details":{"csv":["full_sweep_with_time.csv","full_sweep_with_dynamic_ripple.csv"]}}
+{"category":"V&V","task":"Gamma threshold duration check","status":"completed","refs":["tests/test_followups.py"],"notes":"Duration window logic exercised in synthetic timelines."}

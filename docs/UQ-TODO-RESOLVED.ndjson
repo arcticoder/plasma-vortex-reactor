@@ -3,3 +3,4 @@
 {"title":"UQ: High-load stability under dynamic ripple","status":"completed","refs":["scripts/plot_dynamic_stability_ripple.py","tests/test_followups.py"],"notes":"Stability probability plotted from sweep and helper test ensures artifact creation."}
 {"title":"UQ: Economic FOM sensitivity (baseline setup)","status":"completed","refs":["configs/cost_model.json","scripts/production_kpi.py"],"notes":"KPI now honors cost model; full UQ sweep planned later."}
 {"title":"UQ: Hardware timeout reliability at 60s","status":"completed","refs":["src/reactor/core.py","tests/test_followups.py"],"notes":"Default timeout set to 60s and tests cover high-load timeout and error logging."}
+{"title":"UQ: Bennett ξ sensitivity smoke","status":"completed","refs":["scripts/param_sweep_confinement.py"],"notes":"Confinement estimator is monotone with ξ under low ripple in synthetic tests."}

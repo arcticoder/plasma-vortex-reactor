@@ -17,3 +17,6 @@
 {"event":"Phase 3: Dashboard artifact links","status":"completed","refs":["scripts/generate_progress_dashboard.py"]}
 {"event":"Phase 3: README badges and CLI catalog","status":"completed","refs":["README.md"]}
 {"event":"Phase 3: Time-to-metrics headless fallback","status":"completed","refs":["scripts/time_to_stability_yield.py"]}
+
+{"event":"Docs: MkDocs usage added","status":"completed","refs":["docs/MKDOCS_USAGE.md","mkdocs.yml"],"date":"2025-08-17"}
+{"event":"Paper: phase3_stability updated","status":"completed","refs":["papers/phase3_stability.tex"],"date":"2025-08-17"}

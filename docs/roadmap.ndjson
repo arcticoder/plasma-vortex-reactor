@@ -93,3 +93,6 @@
 	{"idx":19, "title":"Release notes automation from CHANGELOG with gh CLI","refs":["CHANGELOG.md",".github/workflows/release.yml"]},
 	{"idx":20, "title":"Draft Methods and Discussion sections in phase3_stability.tex and cross-ref artifacts","refs":["papers/phase3_stability.tex"]}
 ]}
+
+{"section":"Math Snippets","as_of":"2025-08-17","latex":"n(r)=n_0(1+\\xi^2 r^2)^{-2},\\;\\mu = \\frac{m v_c^2}{2B},\\;FOM=\\frac{Y \\cdot p_{\\bar{p}}}{E_{in}}"}
+{"section":"Python Snippets","as_of":"2025-08-17","python":"from reactor.metrics import antiproton_yield_estimator as Y\\nval = Y(1e20, 10.0, {\\\"model\\\": \\\"physics\\\"})\\nprint(val)"}
