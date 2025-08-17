@@ -1,0 +1,90 @@
+{"event": "run_started", "status": "ok", "ts": "2025-08-17T19:57:47.829417+00:00", "details": {"seed": 123}}
+{"event": "vortex_stabilized", "status": "ok", "ts": "2025-08-17T19:57:47.830468+00:00", "details": {"wmax": 0.999996}}
+{"event": "confinement_achieved", "status": "ok", "ts": "2025-08-17T19:57:47.830609+00:00", "details": {"efficiency": 0.9462005103774477, "xi": 2.0, "b_ripple_pct": 0.005}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:57:47.831077+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "stability_check", "status": "ok", "ts": "2025-08-17T19:57:47.831182+00:00", "details": {"gamma": 150.0}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:57:47.831233+00:00", "details": {"i": 0, "dt": 0.001, "elapsed_s": 0.001591498003108427, "elapsed_ns": 1591684, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:57:47.831613+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:57:47.831711+00:00", "details": {"i": 1, "dt": 0.001, "elapsed_s": 0.000413136000133818, "elapsed_ns": 413156, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:57:47.832080+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:57:47.832175+00:00", "details": {"i": 2, "dt": 0.001, "elapsed_s": 0.00037211000017123297, "elapsed_ns": 372169, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:57:47.832552+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:57:47.832644+00:00", "details": {"i": 3, "dt": 0.001, "elapsed_s": 0.00037504300053115003, "elapsed_ns": 375082, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:57:47.833035+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:57:47.833130+00:00", "details": {"i": 4, "dt": 0.001, "elapsed_s": 0.00038143400161061436, "elapsed_ns": 381454, "seed": 123}}
+{"event": "fom_calculated", "status": "ok", "ts": "2025-08-17T19:57:47.833228+00:00", "details": {"fom": 6000000000.0}}
+{"event": "production_metrics", "status": "ok", "ts": "2025-08-17T19:57:47.833317+00:00", "details": {"yield": 0.0, "fom": 0.0}}
+{"event": "production_failure", "status": "fail", "ts": "2025-08-17T19:57:47.833406+00:00", "details": {"fom": 0.0, "yield": 0.0}}
+{"event": "fom_edge_check", "status": "ok", "ts": "2025-08-17T19:57:47.833506+00:00", "details": {"fom": 6000000.0, "yield": 3e+19, "E_total": 50000.0}}
+{"event": "run_started", "status": "ok", "ts": "2025-08-17T19:58:02.166908+00:00", "details": {"seed": 123}}
+{"event": "vortex_stabilized", "status": "ok", "ts": "2025-08-17T19:58:02.167476+00:00", "details": {"wmax": 0.999996}}
+{"event": "confinement_achieved", "status": "ok", "ts": "2025-08-17T19:58:02.167614+00:00", "details": {"efficiency": 0.9462005103774477, "xi": 2.0, "b_ripple_pct": 0.005}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:02.167808+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "stability_check", "status": "ok", "ts": "2025-08-17T19:58:02.167917+00:00", "details": {"gamma": 150.0}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:02.167991+00:00", "details": {"i": 0, "dt": 0.001, "elapsed_s": 0.0008752850008022506, "elapsed_ns": 875451, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:02.168458+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:02.168556+00:00", "details": {"i": 1, "dt": 0.001, "elapsed_s": 0.00049065599887399, "elapsed_ns": 490548, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:02.168935+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:02.169047+00:00", "details": {"i": 2, "dt": 0.001, "elapsed_s": 0.000398077998397639, "elapsed_ns": 398059, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:02.169465+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:02.169558+00:00", "details": {"i": 3, "dt": 0.001, "elapsed_s": 0.0004294699974707328, "elapsed_ns": 429412, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:02.169930+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:02.170026+00:00", "details": {"i": 4, "dt": 0.001, "elapsed_s": 0.00041932499880203977, "elapsed_ns": 419461, "seed": 123}}
+{"event": "fom_calculated", "status": "ok", "ts": "2025-08-17T19:58:02.170121+00:00", "details": {"fom": 6000000000.0}}
+{"event": "production_metrics", "status": "ok", "ts": "2025-08-17T19:58:02.170211+00:00", "details": {"yield": 0.0, "fom": 0.0}}
+{"event": "production_failure", "status": "fail", "ts": "2025-08-17T19:58:02.170297+00:00", "details": {"fom": 0.0, "yield": 0.0}}
+{"event": "fom_edge_check", "status": "ok", "ts": "2025-08-17T19:58:02.170395+00:00", "details": {"fom": 6000000.0, "yield": 3e+19, "E_total": 50000.0}}
+{"event": "run_started", "status": "ok", "ts": "2025-08-17T19:58:11.427356+00:00", "details": {"seed": 123}}
+{"event": "vortex_stabilized", "status": "ok", "ts": "2025-08-17T19:58:11.427988+00:00", "details": {"wmax": 0.999996}}
+{"event": "confinement_achieved", "status": "ok", "ts": "2025-08-17T19:58:11.428148+00:00", "details": {"efficiency": 0.9462005103774477, "xi": 2.0, "b_ripple_pct": 0.005}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:11.428401+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "stability_check", "status": "ok", "ts": "2025-08-17T19:58:11.428500+00:00", "details": {"gamma": 150.0}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:11.428573+00:00", "details": {"i": 0, "dt": 0.001, "elapsed_s": 0.0010268820005876478, "elapsed_ns": 1027076, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:11.428972+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:11.429070+00:00", "details": {"i": 1, "dt": 0.001, "elapsed_s": 0.0004070609975315165, "elapsed_ns": 407002, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:11.429442+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:11.429550+00:00", "details": {"i": 2, "dt": 0.001, "elapsed_s": 0.00039059999835444614, "elapsed_ns": 390581, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:11.429915+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:11.430007+00:00", "details": {"i": 3, "dt": 0.001, "elapsed_s": 0.00036734999957843684, "elapsed_ns": 367330, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:11.430371+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:11.430464+00:00", "details": {"i": 4, "dt": 0.001, "elapsed_s": 0.00036768099744222127, "elapsed_ns": 367672, "seed": 123}}
+{"event": "fom_calculated", "status": "ok", "ts": "2025-08-17T19:58:11.430559+00:00", "details": {"fom": 6000000000.0}}
+{"event": "production_metrics", "status": "ok", "ts": "2025-08-17T19:58:11.430648+00:00", "details": {"yield": 0.0, "fom": 0.0}}
+{"event": "production_failure", "status": "fail", "ts": "2025-08-17T19:58:11.430737+00:00", "details": {"fom": 0.0, "yield": 0.0}}
+{"event": "fom_edge_check", "status": "ok", "ts": "2025-08-17T19:58:11.430833+00:00", "details": {"fom": 6000000.0, "yield": 3e+19, "E_total": 50000.0}}
+{"event": "run_started", "status": "ok", "ts": "2025-08-17T19:58:36.761924+00:00", "details": {"seed": 123}}
+{"event": "vortex_stabilized", "status": "ok", "ts": "2025-08-17T19:58:36.762639+00:00", "details": {"wmax": 0.999996}}
+{"event": "confinement_achieved", "status": "ok", "ts": "2025-08-17T19:58:36.762786+00:00", "details": {"efficiency": 0.9462005103774477, "xi": 2.0, "b_ripple_pct": 0.005}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:36.763019+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "stability_check", "status": "ok", "ts": "2025-08-17T19:58:36.763119+00:00", "details": {"gamma": 150.0}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:36.763173+00:00", "details": {"i": 0, "dt": 0.001, "elapsed_s": 0.001045671000611037, "elapsed_ns": 1045826, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:36.763743+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:36.763878+00:00", "details": {"i": 1, "dt": 0.001, "elapsed_s": 0.0006294289996731095, "elapsed_ns": 629410, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:36.764346+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:36.764447+00:00", "details": {"i": 2, "dt": 0.001, "elapsed_s": 0.0004164650017628446, "elapsed_ns": 416446, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:36.764848+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:36.764949+00:00", "details": {"i": 3, "dt": 0.001, "elapsed_s": 0.0003752919983526226, "elapsed_ns": 375291, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:36.765350+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:36.765448+00:00", "details": {"i": 4, "dt": 0.001, "elapsed_s": 0.0004033580007671844, "elapsed_ns": 403387, "seed": 123}}
+{"event": "fom_calculated", "status": "ok", "ts": "2025-08-17T19:58:36.765563+00:00", "details": {"fom": 6000000000.0}}
+{"event": "production_metrics", "status": "ok", "ts": "2025-08-17T19:58:36.765645+00:00", "details": {"yield": 0.0, "fom": 0.0}}
+{"event": "production_failure", "status": "fail", "ts": "2025-08-17T19:58:36.765752+00:00", "details": {"fom": 0.0, "yield": 0.0}}
+{"event": "fom_edge_check", "status": "ok", "ts": "2025-08-17T19:58:36.765871+00:00", "details": {"fom": 6000000.0, "yield": 3e+19, "E_total": 50000.0}}
+{"event": "run_started", "status": "ok", "ts": "2025-08-17T19:58:42.053149+00:00", "details": {"seed": 123}}
+{"event": "vortex_stabilized", "status": "ok", "ts": "2025-08-17T19:58:42.053689+00:00", "details": {"wmax": 0.999996}}
+{"event": "confinement_achieved", "status": "ok", "ts": "2025-08-17T19:58:42.053831+00:00", "details": {"efficiency": 0.9462005103774477, "xi": 2.0, "b_ripple_pct": 0.005}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:42.054011+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "stability_check", "status": "ok", "ts": "2025-08-17T19:58:42.054117+00:00", "details": {"gamma": 150.0}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:42.054227+00:00", "details": {"i": 0, "dt": 0.001, "elapsed_s": 0.0009142820017586928, "elapsed_ns": 914428, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:42.054633+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:42.054738+00:00", "details": {"i": 1, "dt": 0.001, "elapsed_s": 0.00041225699897040613, "elapsed_ns": 412169, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:42.055121+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:42.055233+00:00", "details": {"i": 2, "dt": 0.001, "elapsed_s": 0.0003968479977629613, "elapsed_ns": 396829, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:42.055604+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:42.055698+00:00", "details": {"i": 3, "dt": 0.001, "elapsed_s": 0.00037305200021364726, "elapsed_ns": 373023, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T19:58:42.056334+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T19:58:42.056536+00:00", "details": {"i": 4, "dt": 0.001, "elapsed_s": 0.0007421980008075479, "elapsed_ns": 742442, "seed": 123}}
+{"event": "fom_calculated", "status": "ok", "ts": "2025-08-17T19:58:42.056638+00:00", "details": {"fom": 6000000000.0}}
+{"event": "production_metrics", "status": "ok", "ts": "2025-08-17T19:58:42.056728+00:00", "details": {"yield": 0.0, "fom": 0.0}}
+{"event": "production_failure", "status": "fail", "ts": "2025-08-17T19:58:42.056815+00:00", "details": {"fom": 0.0, "yield": 0.0}}
+{"event": "fom_edge_check", "status": "ok", "ts": "2025-08-17T19:58:42.056920+00:00", "details": {"fom": 6000000.0, "yield": 3e+19, "E_total": 50000.0}}

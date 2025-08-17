@@ -14,6 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Restore cached data/artifacts (fast-path)
+        uses: actions/cache@v3
+        with:
+          path: |
+            data
+            artifacts
+          key: ${{ runner.os }}-pv-data-${{ hashFiles('scripts/**','src/**','examples/**') }}
+          restore-keys: |
+            ${{ runner.os }}-pv-data-
       - name: Set up Python and plotting dependencies
         run: |
           set -euo pipefail
@@ -25,14 +34,76 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p artifacts data
-          # Operating envelope: outputs JSON/CSV and PNG
-          python scripts/envelope_sweep.py --n-points 12 --out-json artifacts/operating_envelope.json --out-csv data/operating_envelope.csv --out-png artifacts/operating_envelope.png || true
-          # Dynamic stability ripple (may read a sweep CSV if present)
-          python scripts/plot_dynamic_stability_ripple.py --from-sweep data/full_sweep_with_dynamic_ripple.csv --out artifacts/dynamic_stability_ripple.png || true
-          # KPI trend (tries to find production_kpi*.json; writes a tiny PNG if none exist)
-          python scripts/plot_kpi_trend.py --out artifacts/kpi_trend.png || true
-          # Dual-panel envelope/time-to figure (reads envelope JSON and time metrics if present)
-          python scripts/plot_envelope_dual_panel.py --envelope artifacts/operating_envelope.json --time-metrics artifacts/time_to_metrics.json --out artifacts/envelope_dual_panel.png || true
+          # Install any optional plotting extras (already done earlier, but safe)
+          if [ -f requirements-plot.txt ]; then pip install -r requirements-plot.txt || true; fi
+
+          # 1) Fast deterministic demo to generate timeline/feasibility artifacts used by run_report/production_kpi
+          # Use a small number of steps so CI stays quick.
+          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 5 --dt 1e-3 --seed 123 --timeline-budget 50
+
+          # 2) Produce sweep CSVs (dynamic ripple / time sweeps). May be slow depending on script defaults.
+          # We run in best-effort mode; if this is too slow in CI you can add a --samples/--n-points arg to the script.
+          if [ -f scripts/param_sweep_confinement.py ]; then
+            # Request both dynamic ripple and time-containing CSV outputs (script writes to data/ by default)
+            python scripts/param_sweep_confinement.py --full-sweep-with-dynamic-ripple --full-sweep-with-time
+          fi
+
+          # 3) Compute time-to-stability metrics (reads data/full_sweep_with_time.csv if present)
+          if [ -f scripts/time_to_stability_yield.py ]; then
+            python scripts/time_to_stability_yield.py --sweep-time data/full_sweep_with_time.csv --out-json artifacts/time_to_metrics.json --out-png artifacts/time_to_metrics.png
+          fi
+
+          # 4) Produce operating envelope JSON/CSV (envelope sweep script or param sweep may provide this)
+          if [ -f scripts/envelope_sweep.py ]; then
+            python scripts/envelope_sweep.py --n-points 12 --out-json artifacts/operating_envelope.json --out-csv data/operating_envelope.csv --out-png artifacts/operating_envelope.png
+          fi
+
+          # 5) Run the integrator and KPI summary (best-effort). Inputs may be missing; non-fatal.
+          if [ -f scripts/run_report.py ]; then
+            python scripts/run_report.py --feasibility feasibility_gates_report.json --timeline-summary timeline_summary.json --uq uq_optimized.json --integrated-out artifacts/integrated_report.json
+          fi
+          if [ -f scripts/production_kpi.py ]; then
+            python scripts/production_kpi.py --feasibility feasibility_gates_report.json --metrics metrics.json --uq uq_optimized.json --out production_kpi.json
+          fi
+
+          # 6) Finally run the plotters (they will create small placeholders if inputs are absent)
+          python scripts/plot_dynamic_stability_ripple.py --from-sweep data/full_sweep_with_dynamic_ripple.csv --out artifacts/dynamic_stability_ripple.png
+          python scripts/plot_kpi_trend.py --out artifacts/kpi_trend.png
+          python scripts/plot_envelope_dual_panel.py --envelope artifacts/operating_envelope.json --time-metrics artifacts/time_to_metrics.json --out artifacts/envelope_dual_panel.png
+
+          # 7) Detect known tiny-placeholder PNGs. Fail only if a required PNG is missing, empty, or exactly matches the canonical 1x1 placeholder.
+          PLACEHOLDER_HEX="89504E470D0A1A0A0000000D49484452000000010000000108060000001F15C4890000000A49444154789C6360000002000100FFFF03000006000557BF0000000049454E44AE426082"
+          echo "Checking generated figures for placeholders (will fail if exact tiny-placeholder is detected)"
+          for f in artifacts/dynamic_stability_ripple.png artifacts/envelope_dual_panel.png artifacts/kpi_trend.png artifacts/operating_envelope.png artifacts/time_to_metrics.png; do
+            if [ ! -f "$f" ]; then
+              echo "Required figure missing: $f" >&2
+              exit 2
+            fi
+            sz=$(stat -c%s "$f" || echo 0)
+            echo "Found $f ($sz bytes)"
+            if [ "$sz" -eq 0 ]; then
+              echo "Figure $f is empty (0 bytes) — failing build" >&2
+              exit 3
+            fi
+            # compute hex of file and check if it equals canonical placeholder
+            fh=$(xxd -p -c 999999 "$f" | tr -d '\n' || true)
+            if [ "$fh" = "$PLACEHOLDER_HEX" ]; then
+              echo "Figure $f matches known tiny placeholder PNG — failing build" >&2
+              echo "First 64 bytes of $f:" >&2
+              xxd -l 64 "$f" >&2 || true
+              exit 4
+            fi
+            # print a short hex preview for diagnostics (first 32 bytes)
+            echo "Preview (first 32 bytes hex) of $f: $(xxd -l 32 -p "$f" | tr -d '\n')"
+          done
+
+      - name: Save generated data/artifacts to cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            data
+            artifacts
+          key: ${{ runner.os }}-pv-data-${{ hashFiles('scripts/**','src/**','examples/**') }}
         shell: bash
       - name: Use stable LaTeX action to build PDF
         uses: xu-cheng/latex-action@v2
