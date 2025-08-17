@@ -21,8 +21,8 @@ from reactor.plotting import _mpl
 
 def main() -> None:
     ap = argparse.ArgumentParser(description="Plot dynamic ripple vs time from full_sweep_with_dynamic_ripple.csv")
-    ap.add_argument("--from-csv", default="full_sweep_with_dynamic_ripple.csv")
-    ap.add_argument("--out", default="dynamic_ripple_time.png")
+    ap.add_argument("--from-csv", default="data/full_sweep_with_dynamic_ripple.csv")
+    ap.add_argument("--out", default="artifacts/dynamic_ripple_time.png")
     args = ap.parse_args()
 
     rows = []
@@ -67,6 +67,9 @@ def main() -> None:
         ax.scatter(t, rd, s=8, alpha=0.6)
         ax.set_xlabel("t (s)"); ax.set_ylabel("ripple_dynamic")
         ax.set_title("Dynamic Ripple vs Time")
+        from os import makedirs
+        from os.path import dirname, abspath
+        makedirs(dirname(abspath(args.out)) or ".", exist_ok=True)
         fig.tight_layout(); fig.savefig(args.out, dpi=150); plt.close(fig)
         print(json.dumps({"wrote": args.out}))
     except Exception as e:

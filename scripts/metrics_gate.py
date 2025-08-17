@@ -25,10 +25,19 @@ def main():
         help="Optional scenario path or name to enable scenario-specific gates (e.g., high-load)",
     )
     args = ap.parse_args()
-    with open(args.metrics, "r", encoding="utf-8") as f:
-        metrics = json.load(f)
-    with open(args.report, "r", encoding="utf-8") as f:
-        rep = json.load(f)
+    try:
+        with open(args.metrics, "r", encoding="utf-8") as f:
+            metrics = json.load(f)
+    except Exception as e:
+        print(json.dumps({"gate": "feasibility", "ok": False, "error": f"metrics load failed: {e}"}))
+        sys.exit(2)
+    try:
+        with open(args.report, "r", encoding="utf-8") as f:
+            txt = f.read().strip()
+            rep = json.loads(txt)
+    except Exception as e:
+        print(json.dumps({"gate": "feasibility", "ok": False, "error": f"report load failed: {e}", "path": args.report}))
+        sys.exit(2)
     # simple gate: require stable true when present
     ok = True
     reasons = []

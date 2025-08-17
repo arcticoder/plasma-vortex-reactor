@@ -41,13 +41,15 @@ def _fit_alpha(xs: List[float], ys: List[float]) -> float:
 
 def main():
     ap = argparse.ArgumentParser(description="Calibrate ripple decay alpha from sweep CSV")
-    ap.add_argument("--from-csv", default="full_sweep_with_dynamic_ripple.csv")
-    ap.add_argument("--out", default="calibration.json")
+    ap.add_argument("--from-csv", default="data/full_sweep_with_dynamic_ripple.csv")
+    ap.add_argument("--out", default="artifacts/calibration.json")
     args = ap.parse_args()
 
     xs, ys = _read_csv(args.from_csv)
     alpha = _fit_alpha(xs, ys)
     out = {"alpha": alpha, "source": args.from_csv}
+    import os
+    os.makedirs(os.path.dirname(os.path.abspath(args.out)) or ".", exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
     print(json.dumps({"wrote": args.out}))

@@ -123,16 +123,16 @@ def main():
     b_ok = False
     b_stats = {}
     if b_series is not None and b_series.size > 0:
-        rms = b_field_rms_fluctuation(b_series)
-        b_stats = {"b_mean_T": float(np.mean(b_series)), "b_rms_fraction": rms}
-        b_ok = (rms <= args.b_ripple_max) and (np.mean(b_series) >= thr.b_field_min_T)
+        rms = float(b_field_rms_fluctuation(b_series))
+        b_stats = {"b_mean_T": float(np.mean(b_series)), "b_rms_fraction": float(rms)}
+        b_ok = bool((rms <= float(args.b_ripple_max)) and (float(np.mean(b_series)) >= float(thr.b_field_min_T)))
 
     dens_ok = False
     dens_stats = {}
     if E_mag is not None and E_mag.size > 0:
         ne = estimate_density_from_em(E_mag, gamma=1.0, Emin=0.0, ne_min=0.0)
         dens_stats = {"ne_max_cm3": float(np.max(ne))}
-        dens_ok = float(np.max(ne)) >= args.density_threshold
+        dens_ok = bool(float(np.max(ne)) >= float(args.density_threshold))
 
     # Optional yield estimation
     antiproton_yield_pass = None
@@ -162,23 +162,23 @@ def main():
             )
         )
 
-    stable = gamma_ok and b_ok and dens_ok
+    stable = bool(gamma_ok) and bool(b_ok) and bool(dens_ok)
     if args.require_yield and (antiproton_yield_pass is not None):
-        stable = stable and bool(antiproton_yield_pass)
+        stable = bool(stable and bool(antiproton_yield_pass))
     if args.require_fom and (fom_val is not None):
-        stable = stable and bool(fom_val >= 0.1)
+        stable = bool(stable and bool(float(fom_val) >= 0.1))
     payload = {
-        "stable": stable,
-        "gamma_ok": gamma_ok,
-        "b_ok": b_ok,
-        "dens_ok": dens_ok,
+        "stable": bool(stable),
+        "gamma_ok": bool(gamma_ok),
+        "b_ok": bool(b_ok),
+        "dens_ok": bool(dens_ok),
         "gamma_stats": gamma_stats,
         "b_stats": b_stats,
         "density_stats": dens_stats,
         "antiproton_yield_pass": antiproton_yield_pass,
         "antiproton_yield_value": y_val,
-    "bennett_ok": bennett_ok,
-    "fom": fom_val,
+        "bennett_ok": bennett_ok,
+        "fom": float(fom_val) if fom_val is not None else None,
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "scenario_id": args.scenario_id,
     }

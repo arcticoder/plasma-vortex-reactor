@@ -10,7 +10,7 @@ from typing import List
 def main() -> None:
     ap = argparse.ArgumentParser(description="Plot KPI trend from production_kpi*.json files")
     ap.add_argument("--glob", default="docs/production_kpi*.json")
-    ap.add_argument("--out", default="kpi_trend.png")
+    ap.add_argument("--out", default="artifacts/kpi_trend.png")
     args = ap.parse_args()
 
     files: List[Path] = sorted(Path().glob(args.glob))
@@ -31,8 +31,10 @@ def main() -> None:
         except Exception:
             continue
     out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
     if not xs:
-        out.write_bytes(b"PNG placeholder - no KPI data\n")
+        # Write a tiny valid PNG (1x1 transparent) to avoid viewer errors
+        out.write_bytes(bytes.fromhex("89504E470D0A1A0A0000000D49484452000000010000000108060000001F15C4890000000A49444154789C6360000002000100FFFF03000006000557BF0000000049454E44AE426082"))
         print("{}".format(json.dumps({"wrote": str(out), "n": 0})))
         return
     try:
@@ -50,7 +52,7 @@ def main() -> None:
         ax.set_title('KPI Trend')
         fig.tight_layout(); fig.savefig(str(out), dpi=150); plt.close(fig)
     except Exception:
-        out.write_bytes(b"PNG placeholder - matplotlib not available\n")
+        out.write_bytes(bytes.fromhex("89504E470D0A1A0A0000000D49484452000000010000000108060000001F15C4890000000A49444154789C6360000002000100FFFF03000006000557BF0000000049454E44AE426082"))
     print("{}".format(json.dumps({"wrote": str(out), "n": len(xs)})))
 
 

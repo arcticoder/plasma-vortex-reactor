@@ -166,6 +166,7 @@ def main():
     if args.full_sweep_with_ripple:
         # Small demo ranges to keep CI fast
         from itertools import product
+        import os as _os
         n_e_range = [1e19, 1e20, 1e21]
         T_e_range = [5.0, 10.0, 20.0]
         B_range = [4.5, 5.0, 5.5]
@@ -177,7 +178,8 @@ def main():
             y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
             eta_ok = bennett_confinement_check(n_e, xi, B, ripple)
             rows.append({"n_e": n_e, "T_e": T_e, "B": B, "xi": xi, "alpha": alpha, "yield": y, "eta": bool(eta_ok)})
-        with open("full_sweep_with_ripple.csv", "w", newline="", encoding="utf-8") as f:
+        _os.makedirs("data", exist_ok=True)
+        with open("data/full_sweep_with_ripple.csv", "w", newline="", encoding="utf-8") as f:
             w = csv.DictWriter(f, fieldnames=list(rows[0].keys()))
             w.writeheader()
             for r in rows:
@@ -188,6 +190,7 @@ def main():
         from itertools import product
         import csv as _csv
         import math as _math
+        import os as _os
 
         n_e_range = [1e19, 1e20, 1e21]
         T_e_range = [5.0, 10.0, 20.0]
@@ -205,7 +208,8 @@ def main():
             f = _fom(y, E_total)
             eta_ok = bennett_confinement_check(n_e, xi, B, ripple)
             rows.append({"n_e": n_e, "T_e": T_e, "B": B, "xi": xi, "alpha": alpha, "t": t, "ripple": ripple, "yield": y, "E_total": E_total, "fom": f, "eta": bool(eta_ok)})
-        with open("full_sweep_with_time.csv", "w", newline="", encoding="utf-8") as f:
+        _os.makedirs("data", exist_ok=True)
+        with open("data/full_sweep_with_time.csv", "w", newline="", encoding="utf-8") as f:
             w = _csv.DictWriter(f, fieldnames=list(rows[0].keys()))
             w.writeheader()
             for r in rows:
@@ -245,7 +249,9 @@ def main():
             })
         if rows:
             import csv as _csv
-            with open("full_sweep_with_dynamic_ripple.csv", "w", newline="", encoding="utf-8") as f:
+            import os as _os
+            _os.makedirs("data", exist_ok=True)
+            with open("data/full_sweep_with_dynamic_ripple.csv", "w", newline="", encoding="utf-8") as f:
                 w = _csv.DictWriter(f, fieldnames=list(rows[0].keys()))
                 w.writeheader()
                 for r in rows:

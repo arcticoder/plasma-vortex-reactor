@@ -34,9 +34,9 @@ def _first_time_meeting(rows: List[Dict[str, Any]], key: str, threshold: float, 
 
 def main():
     ap = argparse.ArgumentParser(description="Compute time-to-stability and time-to-yield from sweep CSVs")
-    ap.add_argument("--sweep-time", default="full_sweep_with_time.csv")
-    ap.add_argument("--out-json", default="time_to_metrics.json")
-    ap.add_argument("--out-png", default="time_to_metrics.png")
+    ap.add_argument("--sweep-time", default="data/full_sweep_with_time.csv")
+    ap.add_argument("--out-json", default="artifacts/time_to_metrics.json")
+    ap.add_argument("--out-png", default="artifacts/time_to_metrics.png")
     args = ap.parse_args()
 
     rows = _read_csv(args.sweep_time)
@@ -44,6 +44,9 @@ def main():
     t_fom = _first_time_meeting(rows, "fom", 0.1, lambda v, thr: v >= thr)
 
     out = {"time_to_yield": t_yield, "time_to_fom": t_fom, "source": args.sweep_time}
+    from pathlib import Path
+    import os
+    os.makedirs(os.path.dirname(os.path.abspath(args.out_json)) or ".", exist_ok=True)
     with open(args.out_json, "w", encoding="utf-8") as f:
         json.dump(out, f, indent=2)
 
@@ -65,6 +68,7 @@ def main():
         ax.set_ylabel("Time (s)")
         ax.set_title("Time-to-Metrics")
         fig.tight_layout()
+        os.makedirs(os.path.dirname(os.path.abspath(args.out_png)) or ".", exist_ok=True)
         fig.savefig(args.out_png, dpi=150)
         plt.close(fig)
     except Exception:

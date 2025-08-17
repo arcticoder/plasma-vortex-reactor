@@ -37,7 +37,7 @@ PRs that change public behavior should include updates to tests and docs.
 
 After installing the package (editable install is fine), the following are available:
 
-- `pv-dashboard`, `pv-kpi`, `pv-run-report`
+- `pv-kpi`, `pv-run-report`
 - `pv-plot-fom`, `pv-plot-stability`, `pv-sweep-time`, `pv-sweep-dyn`
 - `pv-hw-runner`, `pv-anomalies`, `pv-validate-schemas`
 - `pv-snr`, `pv-bench`, `pv-cost-sweep`, `pv-snr-prop`, `pv-perf-budget`

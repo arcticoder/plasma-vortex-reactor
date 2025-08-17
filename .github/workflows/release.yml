@@ -21,7 +21,7 @@ jobs:
           python scripts/generate_feasibility_report.py --gamma-series "[150,150,150,150]" --dt 0.002 --b-series "[5,5,5,5]" --E-mag "[0,1,2,3]" --out feasibility_gates_report.json --scenario-id release
           python scripts/run_report.py --feasibility feasibility_gates_report.json --integrated-out integrated_report.json
           python scripts/production_kpi.py --feasibility feasibility_gates_report.json --out production_kpi.json
-          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --json-out progress_dashboard.json
+          
           # Update baseline KPI for tagged release
           if [ -f production_kpi.json ]; then cp -f production_kpi.json baseline_kpi.json; fi
       - name: Create Release
@@ -33,5 +33,4 @@ jobs:
             production_kpi.json
             baseline_kpi.json
             feasibility_gates_report.json
-            progress_dashboard.html
-            progress_dashboard.json
+            

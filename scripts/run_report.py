@@ -23,8 +23,8 @@ def main():
     # Optional integrated report inputs
     ap.add_argument("--uq", default="uq_optimized.json")
     ap.add_argument("--uq-production", default="uq_production.json")
-    ap.add_argument("--sweep-time", default="full_sweep_with_time.csv")
-    ap.add_argument("--sweep-dyn", default="full_sweep_with_dynamic_ripple.csv")
+    ap.add_argument("--sweep-time", default="data/full_sweep_with_time.csv")
+    ap.add_argument("--sweep-dyn", default="data/full_sweep_with_dynamic_ripple.csv")
     ap.add_argument("--integrated-out", default="integrated_report.json")
     args = ap.parse_args()
     data = {}
@@ -74,17 +74,28 @@ def main():
             return {"_missing": True, "path": path}
 
     def _read_csv_head(path: str, limit: int = 200) -> Dict[str, Any]:
-        try:
-            rows: List[Dict[str, Any]] = []
-            with open(path, newline="", encoding="utf-8") as f:
-                r = csv.DictReader(f)
-                for i, row in enumerate(r):
-                    if i >= limit:
-                        break
-                    rows.append(row)
-            return {"path": path, "rows": rows, "n_rows": i + 1 if rows else 0}
-        except Exception:
-            return {"_missing": True, "path": path}
+        def _try(p: str) -> Dict[str, Any] | None:
+            try:
+                rows: List[Dict[str, Any]] = []
+                with open(p, newline="", encoding="utf-8") as f:
+                    r = csv.DictReader(f)
+                    for i, row in enumerate(r):
+                        if i >= limit:
+                            break
+                        rows.append(row)
+                return {"path": p, "rows": rows, "n_rows": i + 1 if rows else 0}
+            except Exception:
+                return None
+        got = _try(path)
+        if got is not None:
+            return got
+        # Fallback: if path is data/..., try CWD filename
+        if path.startswith("data/"):
+            alt = path[len("data/") :]
+            got = _try(alt)
+            if got is not None:
+                return got
+        return {"_missing": True, "path": path}
 
     integrated: Dict[str, Any] = {
         "feasibility": data.get("feasibility"),

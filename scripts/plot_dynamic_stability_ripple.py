@@ -51,8 +51,8 @@ def _read_sweep(path: str) -> Tuple[List[float], List[float]]:
 
 def main():
     ap = argparse.ArgumentParser(description="Plot dynamic stability vs ripple")
-    ap.add_argument("--from-sweep", default=None, help="Optional CSV produced by time/dynamic ripple sweeps")
-    ap.add_argument("--out", default="dynamic_stability_ripple.png")
+    ap.add_argument("--from-sweep", default="data/full_sweep_with_dynamic_ripple.csv", help="Optional CSV produced by time/dynamic ripple sweeps")
+    ap.add_argument("--out", default="artifacts/dynamic_stability_ripple.png")
     ap.add_argument("--gate", type=float, default=0.998, help="Horizontal gate level for stability probability")
     ap.add_argument("--gate-label", default="gate 0.998", help="Gate annotation label")
     args = ap.parse_args()
@@ -62,6 +62,8 @@ def main():
     else:
         xs, ys = [5e-5, 1e-4, 2e-4], [0.999, 0.998, 0.995]
 
+    # ensure folder
+    os.makedirs(os.path.dirname(os.path.abspath(args.out)) or ".", exist_ok=True)
     plot_stability_ripple(xs, ys, args.out, gate_y=args.gate, gate_label=args.gate_label)
 
 

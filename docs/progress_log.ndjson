@@ -1,12 +1,12 @@
 {"event":"perf_budget_enforced","status":"ok","details":{"file":"scripts/performance_budget.py","ci":"wired"},"date":"2025-08-16"}
 {"event":"release_workflow_added","status":"ok","details":{"file":".github/workflows/release.yml"},"date":"2025-08-16"}
 {"event":"pr_summary_comment","status":"ok","details":{"ci":"github-script"},"date":"2025-08-16"}
-{"event":"dashboard_filters_export","status":"ok","details":{"html":"progress_dashboard.html","json":"progress_dashboard.json"},"date":"2025-08-16"}
+{"event":"kpi_trend_export","status":"ok","details":{"png":"artifacts/kpi_trend.png"},"date":"2025-08-16"}
 {"event":"cost_and_snr","status":"ok","details":{"scripts":["cost_model_sweep.py","snr_propagation.py"]},"date":"2025-08-16"}
 {"event":"nox_and_make","status":"ok","details":{"noxfile":"present","make":"targets"},"date":"2025-08-16"}
 {"event":"hardware_dry_run","status":"ok","details":{"script":"hardware_runner.py"},"date":"2025-08-16"}
 {"event":"timeline_anomalies_generator","status":"ok","details":{"script":"scripts/generate_timeline_anomalies.py","cli":"pv-anomalies"},"date":"2025-08-16"}
-{"event":"dashboard_navbar","status":"ok","details":{"file":"scripts/generate_progress_dashboard.py","features":["navbar","anchors","anomalies_section"]},"date":"2025-08-16"}
+{"event":"kpi_trend_placeholder","status":"ok","details":{"file":"scripts/plot_kpi_trend.py","features":["placeholder_on_missing_data"]},"date":"2025-08-16"}
 {"event":"cli_exposed","status":"ok","details":{"scripts":["pv-anomalies","pv-validate-schemas"]},"date":"2025-08-16"}
 {"event":"resilience_tests","status":"ok","details":{"tests":["test_timeline_anomalies_generator_and_dashboard_resilience"]},"date":"2025-08-16"}
 {"event":"Roadmap extended with Phase 1-3 milestones and metrics","status":"planned","refs":["docs/roadmap.ndjson"],"details":{"phases":["Phase 1: Core Development","Phase 2: Simulation and Optimization","Phase 3: Production Scaling"],"metrics":["stability","yield","confinement","energy","density","B-field","FOM"]}}
@@ -33,7 +33,7 @@
 {"event":"Phase 3: Test markers and CI filters added","status":"completed","refs":["pytest.ini",".github/workflows/ci.yml","tests/test_followups.py"],"details":{"fast":"not slow and not production","production":"production"}}
 {"event":"Phase 3: UQ production mode CLI test added","status":"completed","refs":["tests/test_followups.py","scripts/uq_optimize.py"],"details":{"artifact":"uq_production.json"}}
 {"event":"Phase 3: Schema sanity tests for integrated/KPI","status":"completed","refs":["tests/test_followups.py","scripts/run_report.py","scripts/production_kpi.py"],"details":{"guard":"jsonschema optional"}}
-{"event":"Phase 3: Progress dashboard generator + artifact","status":"completed","refs":["scripts/generate_progress_dashboard.py",".github/workflows/ci.yml","docs/ARTIFACT_SCHEMA.md"],"details":{"artifact":"progress_dashboard.html"}}
+{"event":"Phase 3: KPI trend plot + artifact","status":"completed","refs":["scripts/plot_kpi_trend.py",".github/workflows/ci.yml","docs/ARTIFACT_SCHEMA.md"],"details":{"artifact":"artifacts/kpi_trend.png"}}
 {"event":"Perf budget badge and summary in PR","status":"completed","refs":["scripts/performance_budget.py",".github/workflows/ci.yml"],"details":{"job_summary":"perf_budget_summary.md"},"date":"2025-08-17"}
 {"event":"KPI delta JSON + PR table","status":"completed","refs":["scripts/kpi_diff.py",".github/workflows/ci.yml"],"details":{"artifact":"kpi_diff.json"},"date":"2025-08-17"}
 {"event":"Operating envelope frontier extraction","status":"completed","refs":["scripts/envelope_sweep.py"],"details":{"artifact":"operating_envelope_frontier.json","top_k":20},"date":"2025-08-17"}
@@ -49,6 +49,6 @@
 {"event":"Phase 3: Plot thresholds overlays (FOM, Γ)","status":"completed","refs":["scripts/plot_production_fom.py","scripts/plot_stability.py"],"details":{"source":"metrics.json"}}
 {"event":"Phase 3: Hardware runner CLI and test","status":"completed","refs":["scripts/hardware_runner.py","tests/test_followups.py"],"details":{"marker":"hardware"}}
 {"event":"Phase 3: CI hardware-tests job","status":"completed","refs":[".github/workflows/ci.yml"],"details":{"selector":"pytest -m hardware"}}
-{"event":"Phase 3: Dashboard artifact links","status":"completed","refs":["scripts/generate_progress_dashboard.py"],"details":{"list":"common artifacts"}}
+{"event":"Phase 3: KPI artifact links","status":"completed","refs":["scripts/plot_kpi_trend.py"],"details":{"list":"common artifacts"}}
 {"event":"Phase 3: README polish and CLI catalog","status":"completed","refs":["README.md"],"details":{"badges":true}}
 {"event":"Phase 3: Headless-safe time_to_metrics.png","status":"completed","refs":["scripts/time_to_stability_yield.py"],"details":{"placeholder":true}}

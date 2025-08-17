@@ -50,13 +50,12 @@ jobs:
           python scripts/param_sweep_confinement.py --full-sweep-with-ripple
           python scripts/param_sweep_confinement.py --full-sweep-with-time
           python scripts/param_sweep_confinement.py --full-sweep-with-dynamic-ripple
-          python scripts/plot_dynamic_stability_ripple.py --from-sweep full_sweep_with_dynamic_ripple.csv --out dynamic_stability_ripple.png
+          python scripts/plot_dynamic_stability_ripple.py --from-sweep data/full_sweep_with_dynamic_ripple.csv --out artifacts/dynamic_stability_ripple.png
           python scripts/uq_optimize.py --samples 10 --seed 123 --out uq_optimized.json --production
           python scripts/run_report.py --feasibility feasibility_gates_report.json --timeline-summary timeline_summary.json --uq uq_optimized.json --integrated-out integrated_report.json
           python scripts/production_kpi.py --feasibility feasibility_gates_report.json --metrics metrics.json --uq uq_optimized.json --out production_kpi.json
-          python scripts/calibrate_ripple_alpha.py --from-csv full_sweep_with_dynamic_ripple.csv --out calibration.json
-          python scripts/time_to_stability_yield.py --sweep-time full_sweep_with_time.csv --out-json time_to_metrics.json --out-png time_to_metrics.png
-          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --fom-trend
+          python scripts/calibrate_ripple_alpha.py --from-csv data/full_sweep_with_dynamic_ripple.csv --out artifacts/calibration.json
+          python scripts/time_to_stability_yield.py --sweep-time data/full_sweep_with_time.csv --out-json artifacts/time_to_metrics.json --out-png artifacts/time_to_metrics.png
           python scripts/sensor_noise_model.py --out sensor_noise.png --snr 20
           python scripts/bench_step_loop.py --steps 200 --dt 1e-4 --out bench_step_loop.json
           python scripts/cost_model_sweep.py --n 8
@@ -70,13 +69,12 @@ jobs:
           pv-envelope --n-points 12 --out-png operating_envelope.png || true
           python scripts/plot_envelope_dual_panel.py --envelope operating_envelope.json --time-metrics time_to_metrics.json --out envelope_dual_panel.png || true
           pv-ablation-ripple --n 5000 --out ablation_ripple.json || true
-          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --json-out progress_dashboard.json --fom-trend
-          python scripts/plot_kpi_trend.py --out kpi_trend.png || true
+          python scripts/plot_kpi_trend.py --out artifacts/kpi_trend.png || true
           mkdir -p dist/bundle && cp -f examples/scenario_min.json scripts/demo_runner.py scripts/run_report.py scripts/production_kpi.py scripts/performance_budget.py scripts/plot_bench_trend.py scripts/repro_bundle_runner.sh scripts/repro_bundle_runner.py requirements.txt dist/bundle/ && (cd dist && tar czf repro-bundle.tgz bundle && rm -rf bundle)
           python scripts/kpi_diff.py --baseline baseline_kpi.json --current production_kpi.json --out kpi_diff.json || true
           test -f operating_envelope_frontier.json || true
-          python scripts/ndjson_to_csv.py --in timeline.ndjson --out timeline.csv || true
-          python scripts/plot_dynamic_ripple_time.py --from-csv full_sweep_with_dynamic_ripple.csv --out dynamic_ripple_time.png || true
+          python scripts/ndjson_to_csv.py --in timeline.ndjson --out artifacts/timeline.csv || true
+          python scripts/plot_dynamic_ripple_time.py --from-csv data/full_sweep_with_dynamic_ripple.csv --out artifacts/dynamic_ripple_time.png || true
       - name: Run energy reduction demo
         run: |
           . .venv/bin/activate
@@ -93,7 +91,7 @@ jobs:
             b_field_ripple.png
             stability.png
             stability_ripple.png
-            dynamic_stability_ripple.png
+            artifacts/dynamic_stability_ripple.png
             fom_yield.png
             production_fom_yield.png
             yield_density.png
@@ -101,23 +99,21 @@ jobs:
             high_load_hardware_metrics.png
             energy_reduction.png
             full_sweep.csv
-            full_sweep_with_ripple.csv
-            full_sweep_with_time.csv
-            full_sweep_with_dynamic_ripple.csv
+            data/full_sweep_with_ripple.csv
+            data/full_sweep_with_time.csv
+            data/full_sweep_with_dynamic_ripple.csv
             integrated_report.json
             production_kpi.json
-            calibration.json
-            time_to_metrics.json
-            time_to_metrics.png
-            progress_dashboard.html
-            progress_dashboard_fom_trend.png
-            kpi_trend.png
+            artifacts/calibration.json
+            artifacts/time_to_metrics.json
+            artifacts/time_to_metrics.png
+            artifacts/kpi_trend.png
             sensor_noise.png
             bench_step_loop.json
             bench_trend.jsonl
             bench_trend.png
             perf_budget_summary.md
-            progress_dashboard.json
+            
             anomalies_summary.json
             kpi_diff.json
             cost_sweep.json
@@ -131,7 +127,7 @@ jobs:
             operating_envelope.png
             operating_envelope_frontier.json
             envelope_dual_panel.png
-            dynamic_ripple_time.png
+            artifacts/dynamic_ripple_time.png
             ablation_ripple.json
             dist/repro-bundle.tgz
             baseline_kpi.json
@@ -140,7 +136,7 @@ jobs:
         if: ${{ always() }}
         run: |
           echo "# Key Plots" >> $GITHUB_STEP_SUMMARY
-          for f in operating_envelope.png dynamic_stability_ripple.png bench_trend.png envelope_dual_panel.png; do
+          for f in operating_envelope.png artifacts/dynamic_stability_ripple.png bench_trend.png envelope_dual_panel.png; do
             if [ -f "$f" ]; then echo "\n## $f\n\n![]($f)" >> $GITHUB_STEP_SUMMARY; fi
           done
 
@@ -158,7 +154,7 @@ jobs:
             const budgetSummary = fs.existsSync('perf_budget_summary.md') ? fs.readFileSync('perf_budget_summary.md','utf8') : '';
             const perfBadge = '![perf](https://img.shields.io/badge/perf-budget-' + ((kpi.stable===true)?'ok-brightgreen':'n_a-lightgrey') + ')';
             const links = [
-              ['Dashboard','progress_dashboard.html'],
+              
               ['KPI','production_kpi.json'],
               ['Integrated','integrated_report.json'],
               ['Trend','bench_trend.png'],
@@ -340,5 +336,4 @@ jobs:
           . .venv/bin/activate
           pip install -r requirements.txt
           python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 3 --dt 1e-3 --seed 1
-          python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html --fom-trend
-          test -f progress_dashboard.html
+          

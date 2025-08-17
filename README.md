@@ -50,7 +50,7 @@ Artifacts produced by this repo:
 - gate_summary.md (scripts/gate_summary_md.py)
 - channel_report.json (scripts/generate_channel_report.py)
 - run_report.json (scripts/run_report.py)
-- progress_dashboard.html (scripts/generate_progress_dashboard.py)
+  
 ## CLI Catalog
 
 - plot_hardware_metrics.py: Plot metrics over time; supports NDJSON/JSON; `--high-load` variant.
@@ -59,7 +59,6 @@ Artifacts produced by this repo:
 - production_kpi.py: Produce production_kpi.json summary; respects optional configs/cost_model.json.
 - calibrate_ripple_alpha.py: Fit decay alpha from dynamic ripple sweep CSV.
 - time_to_stability_yield.py: Compute time to reach yield/FOM thresholds and emit JSON/PNG.
-- generate_progress_dashboard.py: Build progress_dashboard.html aggregating docs/*.ndjson.
 - envelope_sweep.py: Density–Temperature operating envelope with FOM contours.
 - ablation_ripple.py: Ablation of ripple control ON vs OFF.
 - plot_kpi_trend.py: Plot KPI FOM trend across revisions (writes `kpi_trend.png`).
@@ -69,14 +68,15 @@ Examples:
 
 ```
 python scripts/plot_hardware_metrics.py --out hardware_metrics.png
-python scripts/plot_dynamic_stability_ripple.py --from-sweep full_sweep_with_dynamic_ripple.csv --out dynamic_stability_ripple.png
+python scripts/plot_dynamic_stability_ripple.py --from-sweep data/full_sweep_with_dynamic_ripple.csv --out artifacts/dynamic_stability_ripple.png
 python scripts/run_report.py --feasibility feasibility_gates_report.json --timeline-summary timeline_summary.json --uq uq_optimized.json --integrated-out integrated_report.json
 python scripts/production_kpi.py --feasibility feasibility_gates_report.json --metrics metrics.json --uq uq_optimized.json --cost-model configs/cost_model.json --out production_kpi.json
 python scripts/calibrate_ripple_alpha.py --from-csv full_sweep_with_dynamic_ripple.csv --out calibration.json
-python scripts/time_to_stability_yield.py --sweep-time full_sweep_with_time.csv --out-json time_to_metrics.json --out-png time_to_metrics.png
-python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html
+python scripts/time_to_stability_yield.py --sweep-time data/full_sweep_with_time.csv --out-json artifacts/time_to_metrics.json --out-png artifacts/time_to_metrics.png
 python scripts/plot_kpi_trend.py --out kpi_trend.png
 python scripts/timeline_analysis.py --timeline docs/timeline_anomalies.ndjson --out timeline_stats.json
+python scripts/envelope_sweep.py --n-points 12 --out-json operating_envelope.json --out-csv operating_envelope.csv --out-png operating_envelope.png
+python scripts/ablation_ripple.py --n 5000 --out ablation_ripple.json
 ```
 
 
@@ -96,16 +96,19 @@ Install optional plotting/progress/validation extras:
 pip install -r requirements-plot.txt
 ```
 
-### Progress Dashboard (HTML)
-
-Generate a quick snapshot of roadmap/progress/UQ/VnV NDJSON:
+Note: Plotting scripts require `matplotlib`. Specifically, `plot_hardware_metrics.py` depends on the plotting extra; install with:
 
 ```
-python scripts/generate_progress_dashboard.py --docs-dir docs --out progress_dashboard.html
+pip install -r requirements-plot.txt
 ```
-Open progress_dashboard.html in a browser.
 
-Note: Plotting scripts require `matplotlib`. In headless or minimal environments, scripts will emit small PNG placeholders and print a JSON summary to stdout instead of failing hard.
+By default, plotting and analysis scripts now write outputs under `artifacts/` (images/json) and place generated CSV inputs under `data/` to avoid cluttering the repo root.
+
+Order of operations (to produce integrated_report.json):
+- Run the demo to produce `timeline.ndjson` and `metrics.json`.
+- Generate `feasibility_gates_report.json` (e.g., with datasets or scenario outputs).
+- Optionally run `uq_optimize.py` (writes `uq_optimized.json`) and `param_sweep_confinement.py --full-sweep-with-time/--full-sweep-with-dynamic-ripple` (writes `data/full_sweep_with_*.csv`).
+- Run `run_report.py --integrated-out integrated_report.json` (defaults will look in `data/` for sweeps).
 
 ### Additional CLI entry points
 
@@ -114,7 +117,6 @@ Console scripts installed with the package:
 - pv-plot-fom, pv-plot-stability
 - pv-run-report, pv-kpi
 - pv-sweep-time, pv-sweep-dyn
-- pv-dashboard
 - pv-hw-runner
 - pv-snr, pv-bench
 - pv-build-artifacts
@@ -129,8 +131,7 @@ The CI workflow uploads a bundle of artifacts on each push/PR, including:
 - integrated_report.json, production_kpi.json, feasibility_gates_report.json
 - time_to_metrics.{json,png}, calibration.json
 - key plots: production_fom_yield.png, stability.png, dynamic_stability_ripple.png
-- dashboard: progress_dashboard.html (+ progress_dashboard.json)
-- KPI trend: kpi_trend.png; dashboard FOM trend: progress_dashboard_fom_trend.png
+- KPI trend: kpi_trend.png
 - anomalies summary: anomalies_summary.json
 - envelope: operating_envelope.{json,csv,png}; ablation: ablation_ripple.json
 - utility outputs: sensor_noise.png, bench_step_loop.json, bench_trend.jsonl
@@ -144,7 +145,7 @@ Materials for reviewers: see `dist/repro-bundle.tgz` for a one-command reproduct
 - Dynamic ripple adjustment pipeline with ablation study and stability probability gates.
 - Operating envelope characterization (n,T → FOM) feeding into scenario selection.
 - Reproducible artifacts and a minimal repro bundle tarball for reviewers.
-- KPI trend transparency (`kpi_trend.png`) and dashboard FOM trend (`progress_dashboard_fom_trend.png`).
+- KPI trend transparency (`artifacts/kpi_trend.png`).
 
 ## Try it: Three Scenarios
 

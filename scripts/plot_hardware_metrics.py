@@ -17,7 +17,7 @@ from reactor.plotting import _mpl
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--in-json", default=None, help="Path to hardware metrics JSON (list of {t_ms, i}) or timeline NDJSON extract")
-    ap.add_argument("--out", default="hardware_metrics.png")
+    ap.add_argument("--out", default="artifacts/hardware_metrics.png")
     ap.add_argument("--high-load", action="store_true", help="Render a high-load variant (synthetic if no JSON)")
     ap.add_argument("--anomaly-threshold", type=float, default=1.3, help="Flag metric values above this threshold as anomalies")
     args = ap.parse_args()
@@ -63,6 +63,8 @@ def main():
     ax.set_ylabel("Hardware Metric (i)")
     ax.set_title("Hardware State vs Time" + (" (High Load)" if args.high_load else ""))
     fig.tight_layout()
+    out_dir = os.path.dirname(os.path.abspath(args.out)) or "."
+    os.makedirs(out_dir, exist_ok=True)
     fig.savefig(args.out, dpi=150)
     plt.close(fig)
     print(json.dumps({"wrote": args.out, "anomalies": len(anomalies)}))

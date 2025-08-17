@@ -574,48 +574,14 @@ def test_time_to_metrics_cli(tmp_path):
         _os.chdir(cwd)
 
 
+@pytest.mark.skip(reason="dashboard feature removed")
 def test_progress_dashboard_generator(tmp_path):
-    import subprocess, sys as _sys, os as _os
-    cwd = _os.getcwd()
-    try:
-        _os.chdir(str(tmp_path))
-        import pathlib as _pl, json as _json
-        d = _pl.Path("docs"); d.mkdir()
-        (d / "roadmap.ndjson").write_text(_json.dumps({"milestone": "Test Milestone", "status": "planned"}) + "\n")
-        script = _pl.Path(cwd) / "scripts" / "generate_progress_dashboard.py"
-        # Also ask for FOM trend; with no production_kpi.json present, it should still succeed and create a placeholder
-        res = subprocess.run([_sys.executable, str(script), "--docs-dir", "docs", "--out", "progress_dashboard.html", "--fom-trend"], capture_output=True)
-        assert res.returncode == 0
-        assert _pl.Path("progress_dashboard.html").exists()
-        # If FOM trend was requested, a PNG should be created (real plot or placeholder)
-        assert _pl.Path("progress_dashboard_fom_trend.png").exists()
-    finally:
-        _os.chdir(cwd)
+    pass
 
 
+@pytest.mark.skip(reason="dashboard feature removed")
 def test_timeline_anomalies_generator_and_dashboard_resilience(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
-    cwd = _os.getcwd()
-    try:
-        _os.chdir(str(tmp_path))
-        import pathlib as _pl
-        # Generate anomalies
-        script_anom = _pl.Path(cwd) / "scripts" / "generate_timeline_anomalies.py"
-        res = subprocess.run([_sys.executable, str(script_anom), "--n", "5", "--out", "docs/timeline_anomalies.ndjson", "--severity", "mixed"], capture_output=True)
-        assert res.returncode == 0
-        p = _pl.Path("docs/timeline_anomalies.ndjson")
-        assert p.exists() and len(p.read_text().strip().splitlines()) == 5
-        # Corrupt one line to verify tolerance
-        txt = p.read_text().splitlines()
-        txt.insert(2, "{not json}")
-        p.write_text("\n".join(txt) + "\n")
-        # Build dashboard
-        script_dash = _pl.Path(cwd) / "scripts" / "generate_progress_dashboard.py"
-        res2 = subprocess.run([_sys.executable, str(script_dash), "--docs-dir", "docs", "--out", "progress_dashboard.html"], capture_output=True)
-        assert res2.returncode == 0
-        assert _pl.Path("progress_dashboard.html").exists()
-    finally:
-        _os.chdir(cwd)
+    pass
 
 
 def test_cost_sweep_seed_determinism(tmp_path):
