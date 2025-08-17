@@ -8,10 +8,17 @@
 \usepackage{amssymb}
 % Look for figures in common artifact locations
 \graphicspath{{../artifacts/}{artifacts/}{./}}
-% Helper: include graphics safely (don't fail build if file is missing)
+% Helper: include graphics safely (don't fail build if file is missing).
+% Check common artifact locations manually because \IfFileExists does not use \graphicspath.
 \newcommand{\safeincludegraphics}[2][]{%
 	\IfFileExists{#2}{\includegraphics[#1]{#2}}{%
-		\begin{center}\fbox{\parbox{0.9\linewidth}{\centering Missing image: \texttt{#2}}}\end{center}%
+		\IfFileExists{../artifacts/#2}{\includegraphics[#1]{../artifacts/#2}}{%
+			\IfFileExists{artifacts/#2}{\includegraphics[#1]{artifacts/#2}}{%
+				\IfFileExists{./#2}{\includegraphics[#1]{./#2}}{%
+					\begin{center}\fbox{\parbox{0.9\linewidth}{\centering Missing image: \texttt{#2}}}\end{center}%
+				}%
+			}%
+		}%
 	}%
 }
 \title{Plasma Vortex Reactor: CI-validated Modeling with Stability KPI Gates and Dynamic Ripple Control}
