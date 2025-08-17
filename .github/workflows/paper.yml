@@ -18,22 +18,22 @@ jobs:
         uses: xu-cheng/latex-action@v2
         with:
           root_file: papers/phase3_stability.tex
-          build_args: -interaction=nonstopmode
-          # cache TeX Live packages between runs for speed
-          extra_packages: |
-            latexmk
-            etoolbox
-            lmodern
-            xetex
-        env:
-          # ensure non-interactive
-          LATEXMK: "latexmk"
-      - name: Save action-provided build log (if any)
+          work_in_root_file_dir: true
+          continue_on_error: false
+      - name: Collect generated PDF and consolidate logs
         if: always()
         run: |
-          # the action writes to ./latex.log in its workspace; copy to papers/build.log if present
-          if [ -f latex.log ]; then mkdir -p papers; cp latex.log papers/build.log; fi
-          # also list produced PDFs
+          set -euo pipefail
+          mkdir -p papers
+          # find and copy the PDF(s) to papers/
+          find . -type f -iname 'phase3_stability.pdf' -print -exec cp -f {} papers/ \; || true
+          # collect any .log files produced by LaTeX runs into a single build.log
+          find . -type f -name '*.log' -print -exec cp -f {} papers/ \; || true
+          if ls papers/*.log 1> /dev/null 2>&1; then
+            cat papers/*.log > papers/build.log || true
+          else
+            echo "No .log files found" > papers/build.log
+          fi
           ls -l papers || true
         shell: bash
       - name: Upload PDF artifact
