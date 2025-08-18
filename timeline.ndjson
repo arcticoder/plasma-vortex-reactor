@@ -88,3 +88,24 @@
 {"event": "production_metrics", "status": "ok", "ts": "2025-08-17T19:58:42.056728+00:00", "details": {"yield": 0.0, "fom": 0.0}}
 {"event": "production_failure", "status": "fail", "ts": "2025-08-17T19:58:42.056815+00:00", "details": {"fom": 0.0, "yield": 0.0}}
 {"event": "fom_edge_check", "status": "ok", "ts": "2025-08-17T19:58:42.056920+00:00", "details": {"fom": 6000000.0, "yield": 3e+19, "E_total": 50000.0}}
+{"event": "run_started", "status": "ok", "ts": "2025-08-17T20:44:45.925421+00:00", "details": {"seed": 123}}
+{"event": "vortex_stabilized", "status": "ok", "ts": "2025-08-17T20:44:45.926544+00:00", "details": {"wmax": 0.999996}}
+{"event": "confinement_achieved", "status": "ok", "ts": "2025-08-17T20:44:45.926686+00:00", "details": {"efficiency": 0.9462005103774477, "xi": 2.0, "b_ripple_pct": 0.005}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T20:44:45.927206+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "stability_check", "status": "ok", "ts": "2025-08-17T20:44:45.927310+00:00", "details": {"gamma": 150.0}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.927429+00:00", "details": {"i": 0, "dt": 0.001, "elapsed_s": 0.0017960619989025872, "elapsed_ns": 1796197, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T20:44:45.927866+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.927967+00:00", "details": {"i": 1, "dt": 0.001, "elapsed_s": 0.00044126300053903833, "elapsed_ns": 441224, "seed": 123}}
+{"event": "b_field_check", "status": "ok", "ts": "2025-08-17T20:44:45.928330+00:00", "details": {"B_mean_T": 5.000069999999999, "ripple": 2.835449679458967e-05}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.928427+00:00", "details": {"i": 2, "dt": 0.001, "elapsed_s": 0.0004072150004503783, "elapsed_ns": 407284, "seed": 123}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.928897+00:00", "details": {"i": 3, "dt": 0.001, "elapsed_s": 0.00027475400202092715, "elapsed_ns": 274705, "seed": 123}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.929240+00:00", "details": {"i": 4, "dt": 0.001, "elapsed_s": 0.00024494600074831396, "elapsed_ns": 244888, "seed": 123}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.929575+00:00", "details": {"i": 5, "dt": 0.001, "elapsed_s": 0.00023838700144551694, "elapsed_ns": 238291, "seed": 123}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.929938+00:00", "details": {"i": 6, "dt": 0.001, "elapsed_s": 0.00026769900068757124, "elapsed_ns": 267660, "seed": 123}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.930265+00:00", "details": {"i": 7, "dt": 0.001, "elapsed_s": 0.0002326339999854099, "elapsed_ns": 232566, "seed": 123}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.930598+00:00", "details": {"i": 8, "dt": 0.001, "elapsed_s": 0.00023838700144551694, "elapsed_ns": 238300, "seed": 123}}
+{"event": "step", "status": "ok", "ts": "2025-08-17T20:44:45.930966+00:00", "details": {"i": 9, "dt": 0.001, "elapsed_s": 0.0002643430016178172, "elapsed_ns": 264294, "seed": 123}}
+{"event": "fom_calculated", "status": "ok", "ts": "2025-08-17T20:44:45.931063+00:00", "details": {"fom": 3000000000.0}}
+{"event": "production_metrics", "status": "ok", "ts": "2025-08-17T20:44:45.931151+00:00", "details": {"yield": 0.0, "fom": 0.0}}
+{"event": "production_failure", "status": "fail", "ts": "2025-08-17T20:44:45.931242+00:00", "details": {"fom": 0.0, "yield": 0.0}}
+{"event": "fom_edge_check", "status": "ok", "ts": "2025-08-17T20:44:45.931343+00:00", "details": {"fom": 3000000.0, "yield": 3e+19, "E_total": 100000.0}}

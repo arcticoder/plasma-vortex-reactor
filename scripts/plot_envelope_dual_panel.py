@@ -47,16 +47,48 @@ def main() -> None:
             ax1.set_ylabel('Temperature T (eV)')
             ax1.set_title('Operating Envelope')
         # Right panel: time to metrics (if present)
+        # Accept multiple keys and units (s vs ms)
         t_series = tm.get("time_ms_series") or tm.get("time_ms") or []
+        if (not t_series) and ("time_s_series" in tm):
+            try:
+                t_series = [float(x) * 1000.0 for x in (tm.get("time_s_series") or [])]
+            except Exception:
+                t_series = []
         e_series = tm.get("energy_J_series") or tm.get("energy_J") or []
+
+        # Markers: stability/yield
         stab_ms = tm.get("time_to_stability_ms")
         yield_ms = tm.get("time_to_yield_ms")
+        # Fallback: seconds-only keys from time_to_stability_yield.py
+        if stab_ms is None:
+            v = tm.get("time_to_fom") or tm.get("time_to_stability")
+            if isinstance(v, (int, float)):
+                stab_ms = float(v) * 1000.0
+        if yield_ms is None:
+            v = tm.get("time_to_yield") or tm.get("time_to_yield_s")
+            if isinstance(v, (int, float)):
+                yield_ms = float(v) * 1000.0
+
+        # Plot series if both time and energy available
         if t_series and e_series:
-            ax2.plot(t_series, e_series, color='teal', label='Energy')
+            try:
+                ax2.plot(t_series, e_series, color='teal', label='Energy')
+            except Exception:
+                pass
+        # Always plot markers if present
+        x_vals = []
         if stab_ms is not None:
             ax2.axvline(stab_ms, color='green', linestyle='--', label='Stability')
+            x_vals.append(float(stab_ms))
         if yield_ms is not None:
             ax2.axvline(yield_ms, color='orange', linestyle='--', label='Yield')
+            x_vals.append(float(yield_ms))
+        # If no series was provided, set some sensible limits so markers are visible
+        if not (t_series and e_series):
+            if x_vals:
+                xmax = max(x_vals) * 1.1 if max(x_vals) > 0 else 1.0
+                ax2.set_xlim(left=0.0, right=xmax)
+            ax2.set_ylim(bottom=0.0, top=1.0)
         ax2.set_xlabel('Time (ms)')
         ax2.set_ylabel('Energy (J)')
         ax2.set_title('Time-to-Stability/Yield')

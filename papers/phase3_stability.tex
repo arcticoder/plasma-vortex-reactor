@@ -6,9 +6,9 @@
 \usepackage{amsmath}
 % AMS symbol package (provides \gtrsim, \lesssim, etc.)
 \usepackage{amssymb}
-% Provide etoolbox explicitly so builds on minimal TeX installs (or CI runners
-% configured via tlmgr) have the macro extensions hyperref expects.
-\usepackage{etoolbox}
+% Provide etoolbox if available; guard against minimal TeX installs so local
+% builds don't fail. If the package is missing, continue without it.
+\IfFileExists{etoolbox.sty}{\usepackage{etoolbox}}{}
 % Look for figures in common artifact locations
 \graphicspath{{../artifacts/}{artifacts/}{./}}
 % Helper: include graphics safely (don't fail build if file is missing).
