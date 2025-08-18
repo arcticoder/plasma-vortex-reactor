@@ -75,14 +75,51 @@ def main() -> None:
                 ax2.plot(t_series, e_series, color='teal', label='Energy')
             except Exception:
                 pass
-        # Always plot markers if present
+        # Always plot markers if present; if they coincide, draw one combined line
         x_vals = []
-        if stab_ms is not None:
-            ax2.axvline(stab_ms, color='green', linestyle='--', label='Stability')
-            x_vals.append(float(stab_ms))
-        if yield_ms is not None:
-            ax2.axvline(yield_ms, color='orange', linestyle='--', label='Yield')
-            x_vals.append(float(yield_ms))
+        if (stab_ms is not None) and (yield_ms is not None):
+            try:
+                s_val = float(stab_ms)
+                y_val = float(yield_ms)
+                tol = max(1e-6, 0.001 * max(abs(s_val), abs(y_val)))
+                if abs(s_val - y_val) <= tol:
+                    ax2.axvline(s_val, color='purple', linestyle='--', label='Yield & Stability')
+                    x_vals.append(s_val)
+                else:
+                    ax2.axvline(s_val, color='green', linestyle='--', label='Stability')
+                    ax2.axvline(y_val, color='orange', linestyle='--', label='Yield')
+                    x_vals.extend([s_val, y_val])
+            except Exception:
+                # Fallback to plotting whichever parses
+                if stab_ms is not None:
+                    try:
+                        sv = float(stab_ms)
+                        ax2.axvline(sv, color='green', linestyle='--', label='Stability')
+                        x_vals.append(sv)
+                    except Exception:
+                        pass
+                if yield_ms is not None:
+                    try:
+                        yv = float(yield_ms)
+                        ax2.axvline(yv, color='orange', linestyle='--', label='Yield')
+                        x_vals.append(yv)
+                    except Exception:
+                        pass
+        else:
+            if stab_ms is not None:
+                try:
+                    sv = float(stab_ms)
+                    ax2.axvline(sv, color='green', linestyle='--', label='Stability')
+                    x_vals.append(sv)
+                except Exception:
+                    pass
+            if yield_ms is not None:
+                try:
+                    yv = float(yield_ms)
+                    ax2.axvline(yv, color='orange', linestyle='--', label='Yield')
+                    x_vals.append(yv)
+                except Exception:
+                    pass
         # If no series was provided, set some sensible limits so markers are visible
         if not (t_series and e_series):
             if x_vals:
