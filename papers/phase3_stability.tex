@@ -35,7 +35,7 @@
 This paper presents a reproducible modeling and validation pipeline for a plasma vortex reactor, designed for high-energy applications such as antiproton production via pair creation. The system incorporates CI-enforced key performance indicators (KPIs), dynamic magnetic ripple control, and artifact-rich reporting for traceability. We demonstrate achievement of critical thresholds: Wigner crystal-like coupling parameter $\Gamma > 140$ maintained for $\geq 10$ ms, confinement efficiency $\geq 94\%$ under a Bennett equilibrium profile, and figure of merit (FOM) $\geq 0.1$ with energy per antiproton $\leq 10^{11}$ J in production scenarios. Results from parameter sweeps, uncertainty quantification (UQ), and hardware-in-the-loop (HIL) simulations validate the pipeline's robustness, with deterministic seeding ensuring reproducibility. The open-source repository provides schemas, tests, and artifacts for independent verification.
 \end{abstract}
 \section{Introduction}
-Compact plasma vortex reactors offer a promising pathway for achieving high-energy densities required for advanced physics applications, including antimatter production. Traditional challenges include maintaining vortex stability under magnetic ripple, ensuring efficient confinement, and scaling yields while minimizing energy input. Prior work (e.g., arXiv:2207.09093 on pair production, arXiv:2501.13940 on drift-Poisson models) has established theoretical foundations, but lacks reproducible pipelines with strict KPI gates and dynamic control.
+Compact plasma vortex reactors offer a promising pathway for achieving high-energy densities required for advanced physics applications, including antimatter production. Traditional challenges include maintaining vortex stability under magnetic ripple, ensuring efficient confinement, and scaling yields while minimizing energy input. Prior work (e.g., \cite{arxiv2207.09093} on pair production in positron-electron plasma, \cite{arxiv2501.13940} on vortex dynamics in non-neutral plasmas) has established theoretical foundations, but lacks reproducible pipelines with strict KPI gates and dynamic control.
 
 Our contributions are threefold: (i) a deterministic simulation core with seeded randomness and drift-Poisson stepping for vorticity evolution, (ii) CI-enforced gates on stability ($\Gamma > 140$), confinement ($\eta \geq 94\%$), yield ($\geq 10^{12}$ cm$^{-3}$ s$^{-1}$), and FOM ($\geq 0.1$), and (iii) artifact generation (CSVs, PNGs, JSONs) with schemas for traceability. 
 
@@ -96,4 +96,23 @@ The pipeline achieves all Phase 3 KPIs with ~85\% readiness for publication. Fut
 \safeincludegraphics[width=0.8\linewidth]{envelope_dual_panel.png}
 \caption{Dual-panel: envelope (left) with FOM heat and time-to-stability/yield overlays (right).}\label{fig:dual-panel}
 \end{figure}
+
+\begin{thebibliography}{99}
+\bibitem{arxiv2207.09093}
+B. Zhu, P. Chen, and R. Ruffini,
+``Maximum entropy states of collisionless positron-electron plasma in a dipole magnetic field,''
+arXiv:2207.09093 [physics.plasm-ph], 2022.
+
+\bibitem{arxiv2501.13940}
+T. Okada and S. Yamada,
+``Numerical study of vortices within a background vortex,''
+arXiv:2501.13940 [physics.flu-dyn], 2025.
+
+\bibitem{arcticoder2025}
+Arcticoder,
+``Plasma Vortex Reactor Repository,''
+GitHub, 2025.
+Available: \url{https://github.com/arcticoder/plasma-vortex-reactor}.
+
+\end{thebibliography}
 \end{document}
