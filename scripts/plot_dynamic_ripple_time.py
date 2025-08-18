@@ -51,9 +51,13 @@ def main() -> None:
     except Exception:
         rows = []
     if not rows:
-        # write placeholder so downstream steps have a file to link to
+        # write a tiny valid PNG so downstream steps never fail on image open
         try:
-            Path(args.out).write_bytes(b"PNG placeholder - dynamic ripple plot skipped: no data\n")
+            out = Path(args.out)
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_bytes(bytes.fromhex(
+                "89504E470D0A1A0A0000000D49484452000000010000000108060000001F15C4890000000A49444154789C6360000002000100FFFF03000006000557BF0000000049454E44AE426082"
+            ))
         except Exception:
             pass
         print(json.dumps({"skipped": True, "reason": "no rows", "out": args.out}))
@@ -73,9 +77,13 @@ def main() -> None:
         fig.tight_layout(); fig.savefig(args.out, dpi=150); plt.close(fig)
         print(json.dumps({"wrote": args.out}))
     except Exception as e:
-        # Write a best-effort placeholder if plotting failed (e.g., no matplotlib)
+        # Write a tiny valid PNG placeholder if plotting failed (e.g., no matplotlib)
         try:
-            Path(args.out).write_bytes(b"PNG placeholder - matplotlib not available\n")
+            out = Path(args.out)
+            out.parent.mkdir(parents=True, exist_ok=True)
+            out.write_bytes(bytes.fromhex(
+                "89504E470D0A1A0A0000000D49484452000000010000000108060000001F15C4890000000A49444154789C6360000002000100FFFF03000006000557BF0000000049454E44AE426082"
+            ))
         except Exception:
             pass
         print(json.dumps({"skipped": True, "reason": str(e), "out": args.out}))
