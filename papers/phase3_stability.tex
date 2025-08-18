@@ -35,9 +35,9 @@
 This paper presents a reproducible modeling and validation pipeline for a plasma vortex reactor, designed for high-energy applications such as antiproton production via pair creation. The system incorporates CI-enforced key performance indicators (KPIs), dynamic magnetic ripple control, and artifact-rich reporting for traceability. We demonstrate achievement of critical thresholds: Wigner crystal-like coupling parameter $\Gamma > 140$ maintained for $\geq 10$ ms, confinement efficiency $\geq 94\%$ under a Bennett equilibrium profile, and figure of merit (FOM) $\geq 0.1$ with energy per antiproton $\leq 10^{11}$ J in production scenarios. Results from parameter sweeps, uncertainty quantification (UQ), and hardware-in-the-loop (HIL) simulations validate the pipeline's robustness, with deterministic seeding ensuring reproducibility. The open-source repository provides schemas, tests, and artifacts for independent verification.
 \end{abstract}
 \section{Introduction}
-Compact plasma vortex reactors offer a promising pathway for achieving high-energy densities required for advanced physics applications, including antimatter production and potential integration with warp drive technologies. Traditional challenges include maintaining vortex stability under magnetic ripple, ensuring efficient confinement, and scaling yields while minimizing energy input. Prior work (e.g., arXiv:2207.09093 on pair production, arXiv:2501.13940 on drift-Poisson models) has established theoretical foundations, but lacks reproducible pipelines with strict KPI gates and dynamic control.
+Compact plasma vortex reactors offer a promising pathway for achieving high-energy densities required for advanced physics applications, including antimatter production. Traditional challenges include maintaining vortex stability under magnetic ripple, ensuring efficient confinement, and scaling yields while minimizing energy input. Prior work (e.g., arXiv:2207.09093 on pair production, arXiv:2501.13940 on drift-Poisson models) has established theoretical foundations, but lacks reproducible pipelines with strict KPI gates and dynamic control.
 
-Our contributions are threefold: (i) a deterministic simulation core with seeded randomness and drift-Poisson stepping for vorticity evolution, (ii) CI-enforced gates on stability ($\Gamma > 140$), confinement ($\eta \geq 94\%$), yield ($\geq 10^{12}$ cm$^{-3}$ s$^{-1}$), and FOM ($\geq 0.1$), and (iii) artifact generation (CSVs, PNGs, JSONs) with schemas for traceability. The system targets a prototype by April 5, 2063, building on the arcticoder ecosystem for plasma-EM coupling.
+Our contributions are threefold: (i) a deterministic simulation core with seeded randomness and drift-Poisson stepping for vorticity evolution, (ii) CI-enforced gates on stability ($\Gamma > 140$), confinement ($\eta \geq 94\%$), yield ($\geq 10^{12}$ cm$^{-3}$ s$^{-1}$), and FOM ($\geq 0.1$), and (iii) artifact generation (CSVs, PNGs, JSONs) with schemas for traceability. 
 
 Key thresholds include: maintain $\Gamma > 140$ for $\geq 10$ ms (collective regime), confinement $\geq 94\%$ under Bennett profile $n(r)=n_0\,(1+\xi^2 r^2)^{-2}$, energy reduction $\geq 242\times$ (2.7 GJ $\to$ $\sim$11.15 MJ), and B-field $\geq 5$ T with ripple $\leq 0.01\%$.
 
@@ -58,7 +58,7 @@ where $k_0$ is a scaling factor, $\sigma_{pp}$ pair-production cross-section, an
 
 \paragraph{Dynamic ripple sweeps.} Sweep RMS ripple (0.0001-0.002) to compute stability probability $P(\Gamma > 140)$ over time, visualized in Fig.~\ref{fig:ripple}.
 
-\paragraph{CI and artifacts.} GitHub Actions generates artifacts (e.g., `full_sweep_with_time.csv`, `production_fom_yield.png`) with schemas for validation. Deterministic seeding (e.g., `--seed 123`) ensures reproducibility.
+\paragraph{CI and artifacts.} GitHub Actions generates artifacts (e.g., `full\_sweep\_with\_time.csv`, `production\_fom\_yield.png`) with schemas for validation. Deterministic seeding (e.g., `--seed 123`) ensures reproducibility.
 
 \section{Results}
 \subsection{Operating Envelope}
@@ -71,10 +71,10 @@ Feasibility gates enforce stability (`stable=true` for baseline, fails on ripple
 Time-to-metrics overlays on the envelope (Fig.~\ref{fig:dual-panel}) show stabilization in $\mathcal{O}(10^2)$ ms. KPI trends (Fig.~\ref{fig:kpi-trend}) confirm FOM consistency across revisions.
 
 \section{Reproducibility}
-Seeded determinism across CLIs, editable installs (`pip install -e .`), and schemas (e.g., `integrated_report.schema.json`) ensure traceability. Artifacts are uploaded to CI, with MkDocs for documentation and API references.
+Seeded determinism across CLIs, editable installs (`pip install -e .`), and schemas (e.g., `integrated\_report.schema.json`) ensure traceability. Artifacts are uploaded to CI.
 
 \section{Conclusion}
-The pipeline achieves all Phase 3 KPIs with ~85\% readiness for publication. Future work includes full hardware integration and soliton drive synergies.
+The pipeline achieves all Phase 3 KPIs with ~85\% readiness for publication. Future work includes full hardware integration.
 
 \begin{figure}[h]
 \centering
