@@ -41,6 +41,8 @@ dynamic_ripple_time.png
 kpi_trend.png
 snr_propagation.png
 timeline_debug.ndjson
+timeline_*.ndjson
+feasibility_*.json
 papers/*.pdf
 papers/*.out
 papers/*.log

@@ -1,0 +1,31 @@
+{
+  "path": "timeline.ndjson",
+  "counts": {
+    "run_started": 8,
+    "vortex_stabilized": 8,
+    "confinement_achieved": 8,
+    "b_field_check": 37,
+    "stability_check": 8,
+    "step": 65,
+    "fom_calculated": 8,
+    "production_metrics": 8,
+    "production_failure": 8,
+    "fom_edge_check": 8
+  },
+  "first_ts": "2025-08-17T19:57:47.829417+00:00",
+  "last_ts": "2025-08-19T04:01:07.177484+00:00",
+  "wmax_min": 0.999992,
+  "wmax_max": 0.999996,
+  "perf_percentiles": {
+    "p50": 0.00037504300053115003,
+    "p90": 0.0009142820017586928,
+    "p99": 0.001886884005216416
+  },
+  "perf_count": 65,
+  "perf_ns_percentiles": {
+    "p50": 375082,
+    "p90": 914428,
+    "p99": 1887311
+  },
+  "perf_ns_count": 65
+}
