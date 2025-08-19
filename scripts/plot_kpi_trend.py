@@ -11,6 +11,7 @@ def main() -> None:
     ap = argparse.ArgumentParser(description="Plot KPI trend from production_kpi*.json files")
     ap.add_argument("--glob", default="{docs,artifacts,./}/production_kpi*.json")
     ap.add_argument("--out", default="artifacts/kpi_trend.png")
+    ap.add_argument("--require-passing", action="store_true", help="Only plot entries where stable,gamma_ok,yield_pass are true")
     args = ap.parse_args()
 
     # Support brace-like expansion for common folders
@@ -36,8 +37,13 @@ def main() -> None:
     for i, p in enumerate(files):
         try:
             data = json.loads(p.read_text())
+            # Optional filter: only keep KPI-passing entries
+            if args.require_passing:
+                if not (bool(data.get("stable", False)) and bool(data.get("gamma_ok", False)) and bool(data.get("yield_pass", False))):
+                    continue
             f = data.get("fom")
-            if isinstance(f, (int, float)):
+            # Guard against absurd synthetic magnitudes: ignore if very large
+            if isinstance(f, (int, float)) and abs(float(f)) < 1e6:
                 xs.append(i)
                 ys.append(float(f))
         except Exception:
@@ -56,8 +62,10 @@ def main() -> None:
                     _sp.run([_sys.executable, "scripts/production_kpi.py", "--out", str(pk)], check=False)
             if pk.exists():
                 data = json.loads(pk.read_text())
+                if args.require_passing and not (bool(data.get("stable", False)) and bool(data.get("gamma_ok", False)) and bool(data.get("yield_pass", False))):
+                    data = {}
                 f = data.get("fom")
-                if isinstance(f, (int, float)):
+                if isinstance(f, (int, float)) and abs(float(f)) < 1e6:
                     xs = [0]; ys = [float(f)]
         except Exception:
             pass
@@ -74,9 +82,9 @@ def main() -> None:
                     if mets.exists():
                         md = json.loads(mets.read_text())
                         energy_budget = float(md.get("energy_budget_J", 0.0) or 0.0)
-                    denom = max(e_cost * energy_budget, 1e-12)
-                    f = price / denom if denom > 0 else None
-                    if isinstance(f, (int, float)):
+                    denom = e_cost * energy_budget
+                    f = price / denom if denom and denom > 0 else None
+                    if isinstance(f, (int, float)) and abs(float(f)) < 1e6:
                         xs = [0]; ys = [float(f)]
             except Exception:
                 pass

@@ -45,8 +45,12 @@ def main():
             price_per_antiproton = float(cost_model.get("price_per_antiproton", 0.0) or 0.0)
             energy_cost_per_J = float(cost_model.get("energy_cost_per_J", 0.0) or 0.0)
             energy_budget = float(mets.get("energy_budget_J", 0.0) or 0.0)
-            denom = max(energy_cost_per_J * energy_budget, 1e-12)
-            fom = price_per_antiproton / denom
+            denom = energy_cost_per_J * energy_budget
+            # Only compute fallback FOM if inputs are valid and positive; otherwise leave None
+            if denom and denom > 0.0 and price_per_antiproton > 0.0:
+                fom = price_per_antiproton / denom
+            else:
+                fom = None
         except Exception:
             fom = None
 
