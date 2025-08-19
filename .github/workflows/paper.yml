@@ -40,7 +40,7 @@ jobs:
           # also install latexmk so we can run latexmk directly and capture logs
           sudo apt-get install -y --no-install-recommends texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-xetex latexmk
         shell: bash
-      - name: Debug: show installed LaTeX binaries
+  - name: 'Debug: show installed LaTeX binaries'
         if: runner.os == 'Linux'
         run: |
           set -euo pipefail
@@ -159,7 +159,7 @@ jobs:
           # also install latexmk so we can run latexmk directly and capture logs
           sudo apt-get install -y --no-install-recommends texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended texlive-xetex latexmk
         shell: bash
-      - name: Debug: show installed LaTeX binaries
+  - name: 'Debug: show installed LaTeX binaries'
         if: runner.os == 'Linux'
         run: |
           set -euo pipefail
