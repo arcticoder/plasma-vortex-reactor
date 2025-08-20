@@ -34,6 +34,7 @@ def main() -> None:
             files = [rp]
     xs: List[int] = []
     ys: List[float] = []
+    labels: List[str] = []
     for i, p in enumerate(files):
         try:
             data = json.loads(p.read_text())
@@ -46,6 +47,7 @@ def main() -> None:
             if isinstance(f, (int, float)) and abs(float(f)) < 1e6:
                 xs.append(i)
                 ys.append(float(f))
+                labels.append(p.name)
         except Exception:
             continue
     out = Path(args.out)
@@ -101,10 +103,24 @@ def main() -> None:
             _sys.path.insert(0, str(s))
         from reactor.plotting import _mpl  # type: ignore
         plt = _mpl()
-        fig, ax = plt.subplots(figsize=(5,3))
+        fig, ax = plt.subplots(figsize=(6,3.5))
         ax.plot(xs, ys, marker='o')
-        ax.set_xlabel('Revision')
-        ax.set_ylabel('FOM')
+        # Use log scale if dynamic range is large
+        try:
+            if ys and (max(abs(y) for y in ys) / max(1e-30, min(abs(y) for y in ys))) >= 1e3:
+                ax.set_yscale('log')
+                ax.set_ylabel('abs(FOM) (log)')
+                ys_abs = [abs(y) for y in ys]
+        except Exception:
+            pass
+        if labels and len(labels) == len(xs):
+            ax.set_xticks(xs)
+            ax.set_xticklabels(labels, rotation=45, fontsize=8)
+            ax.set_xlabel('Run (files)')
+        else:
+            ax.set_xlabel('Revision')
+        if ax.get_ylabel() == '':
+            ax.set_ylabel('FOM')
         ax.set_title('KPI Trend')
         fig.tight_layout(); fig.savefig(str(out), dpi=150); plt.close(fig)
     except Exception:
