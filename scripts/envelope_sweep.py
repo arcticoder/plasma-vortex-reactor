@@ -39,9 +39,10 @@ def main() -> None:
     ap.add_argument("--n-max", type=float, default=1e21)
     ap.add_argument("--t-min", type=float, default=5.0)
     ap.add_argument("--t-max", type=float, default=50.0)
-    ap.add_argument("--out-json", default="artifacts/operating_envelope.json")
-    ap.add_argument("--out-csv", default="data/operating_envelope.csv")
-    ap.add_argument("--out-png", default="artifacts/operating_envelope.png")
+    # Tests expect JSON/CSV in CWD by default
+    ap.add_argument("--out-json", default="operating_envelope.json")
+    ap.add_argument("--out-csv", default="operating_envelope.csv")
+    ap.add_argument("--out-png", default="operating_envelope.png")
     ap.add_argument("--seed", type=int, default=42, help="Seed for any stochastic models")
     ap.add_argument("--top-k", type=int, default=20, help="Emit top-k frontier JSON")
     ap.add_argument("--frontier-json", default="artifacts/operating_envelope_frontier.json")
