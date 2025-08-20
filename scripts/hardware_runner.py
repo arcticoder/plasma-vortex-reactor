@@ -41,8 +41,9 @@ def main():
             state["i"] = state.get("i", 0) + 1
             return state
         # Create a proper module object for sys.modules
-        mod = types.ModuleType('enhanced_simulation_hardware_abstraction_framework')
-        mod.simulate_hardware = _fake_sim
+    from typing import Any, cast
+    mod = types.ModuleType('enhanced_simulation_hardware_abstraction_framework')
+    setattr(mod, 'simulate_hardware', cast(Any, _fake_sim))
         _sys.modules['enhanced_simulation_hardware_abstraction_framework'] = mod
 
     R = Reactor(grid=(16, 16), nu=1e-3)
@@ -53,7 +54,9 @@ def main():
         try:
             if args.dry_run:
                 # emulate time passage and a successful step
-                R._time_s += args.dt  # type: ignore[attr-defined]
+                # Advance internal time if attribute exists
+                if hasattr(R, "_time_s"):
+                    R._time_s += float(args.dt)
                 stats["steps"] += 1
                 continue
             R.step_with_real_hardware(dt=args.dt, timeout=args.timeout)

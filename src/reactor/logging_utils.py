@@ -53,7 +53,7 @@ def summarize_timeline(path: str) -> Dict[str, Any]:
                     last_ts = ts
                 det = rec.get("details", {}) or {}
                 if "wmax" in det:
-                    wmax = float(det["wmax"])  # type: ignore[arg-type]
+                    wmax = float(det["wmax"])  
                     wmax_min = min(wmax_min, wmax)
                     wmax_max = max(wmax_max, wmax)
     except FileNotFoundError:

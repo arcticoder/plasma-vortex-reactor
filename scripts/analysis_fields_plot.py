@@ -65,7 +65,7 @@ def main():
         # Expect a flat list of numbers
         if not (isinstance(data, list) and (not data or not isinstance(data[0], dict))):
             raise SystemExit("Invalid --series format for simple ripple array")
-        arr = [float(x) for x in data]  # type: ignore[list-item]
+    arr = [float(x) for x in data]
         t_ms = list(range(len(arr)))
         try:
             plot_b_field_ripple(t_ms, arr, args.out)

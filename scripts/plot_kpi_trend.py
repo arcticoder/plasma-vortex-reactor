@@ -101,7 +101,7 @@ def main() -> None:
         s = Path(__file__).resolve().parents[1] / 'src'
         if str(s) not in _sys.path:
             _sys.path.insert(0, str(s))
-        from reactor.plotting import _mpl  # type: ignore
+        from reactor.plotting import _mpl
         plt = _mpl()
         fig, ax = plt.subplots(figsize=(6,3.5))
         ax.plot(xs, ys, marker='o')

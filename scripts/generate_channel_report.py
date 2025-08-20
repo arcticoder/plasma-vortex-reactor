@@ -54,9 +54,8 @@ def main():
         _json.dump(payload, f, indent=2)
     # Optional validate against schema if jsonschema is available
     try:
-        import json  # type: ignore
-
-        import jsonschema  # type: ignore
+        import json
+        import jsonschema
 
         with open(
             "docs/schemas/channel_report.schema.json", "r", encoding="utf-8"

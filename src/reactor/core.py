@@ -275,7 +275,7 @@ class Reactor:
     # Real hardware integration with timeout and error/timeout logging
     def step_with_real_hardware(self, dt: float, timeout: float = 60.0) -> None:
         try:
-            from enhanced_simulation_hardware_abstraction_framework import simulate_hardware  # type: ignore
+            from enhanced_simulation_hardware_abstraction_framework import simulate_hardware
         except Exception as e:
             # Log error if hardware module unavailable
             try:
@@ -291,7 +291,7 @@ class Reactor:
         import time as _time
         t0 = _time.time()
         try:
-            hw_state = simulate_hardware(getattr(self, "hw_state", {}))  # type: ignore[misc]
+            hw_state = simulate_hardware(getattr(self, "hw_state", {}))
             if (_time.time() - t0) > float(timeout):
                 try:
                     append_event(self.timeline_log_path or "progress.ndjson", event="hardware_timeout", status="fail")
@@ -335,7 +335,7 @@ class Reactor:
 # Optional ecosystem integration with unified_gut_polymerization
 try:
     # pair_production_rate(n_e_cm3, T_e_eV) -> rate [1/(cm^3 s)]
-    from unified_gut_polymerization import pair_production_rate  # type: ignore
+    from unified_gut_polymerization import pair_production_rate
 except Exception:  # pragma: no cover - optional dep
     pair_production_rate = None  # type: ignore
 
@@ -352,7 +352,7 @@ def update_yield_with_gut(state: dict) -> dict:
         n_e = float(state.get("n_e", 0.0))
         T_e = float(state.get("T_e", 0.0))
         dt = float(state.get("dt", 0.0))
-        inc = float(pair_production_rate(n_e, T_e)) * dt  # type: ignore[misc]
+        inc = float(pair_production_rate(n_e, T_e)) * dt
         state["yield"] = float(state.get("yield", 0.0)) + inc
         return state
     except Exception:
@@ -367,11 +367,11 @@ def step_with_hardware(state: dict) -> dict:
     on failure, no-ops and returns state unchanged.
     """
     try:
-        from enhanced_simulation_hardware_abstraction_framework import simulate_hardware  # type: ignore
+        from enhanced_simulation_hardware_abstraction_framework import simulate_hardware
     except Exception:
         return state
     try:
-        hw = simulate_hardware(state)  # type: ignore[misc]
+        hw = simulate_hardware(state)
         state.update(hw)
         return state
     except Exception:

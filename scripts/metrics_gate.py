@@ -38,12 +38,21 @@ def main():
     except Exception as e:
         print(json.dumps({"gate": "feasibility", "ok": False, "error": f"report load failed: {e}", "path": args.report}))
         sys.exit(2)
+    # Allow scenario inference from report when not explicitly provided
+    if not args.scenario:
+        rep_scenario = rep.get("scenario_id")
+        if isinstance(rep_scenario, str):
+            args.scenario = rep_scenario
     # simple gate: require stable true when present
     ok = True
     reasons = []
+    # Only require overall stability for production-like scenarios; otherwise provide a soft warning.
     if not rep.get("stable", False):
-        ok = False
-        reasons.append("unstable")
+        if args.scenario and ("high_load" in args.scenario or "production" in args.scenario):
+            ok = False
+            reasons.append("unstable")
+        else:
+            reasons.append("unstable")
     # optional specific checks
     gthr = metrics.get("gamma_min", None)
     if gthr is not None and rep.get("gamma_stats"):

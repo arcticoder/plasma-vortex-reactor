@@ -24,7 +24,7 @@ def compute_fom(n_cm3: float, Te_eV: float) -> float:
     return float(total_fom(y, E_total))
 
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, TextIO
 
 
 def _frontier_topk(grid: List[Dict[str, Any]], k: int) -> List[Dict[str, Any]]:
@@ -67,7 +67,7 @@ def main() -> None:
     frontier = _frontier_topk(grid, int(args.top_k))
     Path(args.frontier_json).write_text(json.dumps({"frontier": frontier, "k": int(args.top_k)}))
     with open(args.out_csv, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
+        w = csv.writer(f)  # type: ignore[arg-type]
         w.writerow(["n_cm3", "Te_eV", "fom"])
         for row in grid:
             w.writerow([row["n_cm3"], row["Te_eV"], row["fom"]])

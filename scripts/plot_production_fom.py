@@ -47,7 +47,7 @@ def main():
 
             m = _json.loads(open(os.path.join(_root, "metrics.json")).read())
             thr = float(m.get("fom_min", 0.1))
-            import matplotlib.pyplot as _plt  # type: ignore
+            import matplotlib.pyplot as _plt
             _plt.axhline(thr, color="red", linestyle="--", label=f"FOM ≥ {thr}")
             _plt.legend()
         except Exception:

@@ -23,8 +23,8 @@ def _first_time_meeting(rows: List[Dict[str, Any]], key: str, threshold: float, 
             k_raw = row.get(key, None)
             if k_raw is None:
                 continue
-            t = float(t_raw)  # type: ignore[arg-type]
-            val = float(k_raw)  # type: ignore[arg-type]
+            t = float(t_raw)
+            val = float(k_raw)
             if comparator(val, threshold):
                 return t
         except Exception:

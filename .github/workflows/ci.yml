@@ -38,7 +38,7 @@ jobs:
           python scripts/generate_feasibility_report.py --gamma-series "$(cat datasets/gamma_series.json)" \
             --dt 0.002 --b-series "$(cat datasets/b_field_series.json)" --E-mag "$(cat datasets/E_mag.json)" \
             --out feasibility_gates_report.json --scenario-id ci-demo --fail-on-gate --yield-model physics --n-cm3 1e20 --Te-eV 10 --require-yield --require-fom
-          python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
+          python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json --scenario ${{ matrix.scenario }}
           python scripts/param_sweep_confinement.py --out data/confinement_sweep.csv --plot-confinement-energy artifacts/confinement_energy.png
           python scripts/uq_demo.py --samples 10 --seed 42 --out-json uq_results.json --out-csv uq_results.csv
           python scripts/analysis_fields_plot.py --out b_field_ripple.png

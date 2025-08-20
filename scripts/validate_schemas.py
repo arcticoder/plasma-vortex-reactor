@@ -15,7 +15,7 @@ def main() -> None:
     args = ap.parse_args()
     errors: list[str] = []
     try:
-        import jsonschema  # type: ignore
+        import jsonschema
     except Exception:
         print(json.dumps({"ok": False, "reason": "jsonschema not installed"}))
         return

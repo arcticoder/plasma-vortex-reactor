@@ -36,7 +36,7 @@ def main():
             thr = json.loads(open("metrics.json").read())
             gmin = float(thr.get("gamma_min", 140.0))
             _mpl()
-            import matplotlib.pyplot as _plt  # type: ignore
+            import matplotlib.pyplot as _plt
             _plt.axhline(gmin, color="red", linestyle="--", label=f"Γ ≥ {gmin}")
             _plt.legend()
         except Exception:

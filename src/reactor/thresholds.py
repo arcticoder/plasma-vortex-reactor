@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from typing import Any, Dict
 
 
 @dataclass(frozen=True)
@@ -23,8 +24,16 @@ def thresholds_from_json(path: str) -> Thresholds:
     The JSON should map threshold names to values; unknown keys are ignored.
     """
     with open(path, "r", encoding="utf-8") as f:
-        data = json.load(f)
+        data: Dict[str, Any] = json.load(f)
     # filter only known fields
-    fields = {f.name for f in Thresholds.__dataclass_fields__.values()}  # type: ignore[attr-defined]
-    kwargs = {k: v for k, v in data.items() if k in fields}
-    return Thresholds(**kwargs)  # type: ignore[arg-type]
+    fields = set(vars(Thresholds()).keys())
+    # Only accept primitive numeric fields for Thresholds; cast defensively
+    kwargs: Dict[str, Any] = {}
+    for k, v in data.items():
+        if k in fields:
+            try:
+                kwargs[k] = float(v) if isinstance(getattr(Thresholds, k, 0.0), (int, float)) else v
+            except Exception:
+                kwargs[k] = v
+    # Construct via unpacked kwargs; kwargs keys are a subset of Thresholds fields
+    return Thresholds(**kwargs)  

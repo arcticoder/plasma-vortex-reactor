@@ -11,7 +11,7 @@ def main() -> None:
     ap.add_argument("--json", required=True)
     args = ap.parse_args()
     try:
-        import jsonschema  # type: ignore
+        import jsonschema
         with open(args.schema, "r", encoding="utf-8") as f:
             schema = json.load(f)
         with open(args.json, "r", encoding="utf-8") as f:
