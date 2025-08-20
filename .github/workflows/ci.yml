@@ -181,15 +181,7 @@ jobs:
               // ignore
             }
             const body = `${perfBadge}\n\n${deltaTable}\n\n**Anomalies**\n\n${anomTable}\n\nArtifacts: ${links}\n\nAbsolute artifacts: ${artLinks || '(see run artifacts)'}\n\n${budgetSummary}`;
-            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });
-      - name: Repo metadata (gh)
-        if: ${{ github.ref == 'refs/heads/main' && env.GH_TOKEN != '' }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh repo edit ${{ github.repository }} --description "Plasma Vortex Reactor: CI-validated modeling, stability KPI gates, dynamic ripple control, and reproducible artifacts" --homepage "https://github.com/${{ github.repository }}"
-          gh repo edit ${{ github.repository }} --add-topic plasma,vortex,reactor,stability,uq,ci,python,ripple,benchmark
-        shell: bash
+            await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: context.issue.number, body });      
 
   gated-matrix:
     runs-on: ubuntu-latest
