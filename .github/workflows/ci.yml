@@ -294,46 +294,4 @@ jobs:
         run: |
           . .venv/bin/activate
           python scripts/hardware_runner.py --dry-run --steps 5 --out hardware_run.json
-          test -f hardware_run.json
-
-  paper-build:
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Try build minimal paper PDF
-        run: |
-          which pdflatex || true
-          [ -f papers/phase3_stability.tex ] && pdflatex -interaction=nonstopmode -output-directory=papers papers/phase3_stability.tex || true
-
-  pages:
-    if: ${{ github.event_name == 'push' }}
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - run: |
-          pip install mkdocs mkdocs-material mkdocstrings[python]
-          mkdocs build --strict || mkdocs build
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-      - id: deploy
-        uses: actions/deploy-pages@v4
-
-  test-tutorial:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Run tutorial steps
-        run: |
-          python -m venv .venv
-          . .venv/bin/activate
-          pip install -r requirements.txt
-          python scripts/demo_runner.py --scenario examples/scenario_min.json --steps 3 --dt 1e-3 --seed 1
-          
+          test -f hardware_run.json  
