@@ -2,18 +2,16 @@ from __future__ import annotations
 
 import numpy as np
 
+from .analysis_fields import b_field_rms_fluctuation
 from .logging_utils import append_event
 from .metrics import (
     antiproton_yield_estimator,
     confinement_efficiency_estimator,
-    log_yield,
     log_stability,
+    total_fom,
 )
-from .plasma import debye_length
-from .analysis_fields import b_field_rms_fluctuation
-from .analysis_confinement import log_confinement
 from .models import drift_poisson_step, vorticity_evolution
-from .metrics import total_fom
+from .plasma import debye_length
 
 
 class Reactor:
@@ -107,14 +105,22 @@ class Reactor:
                         self.timeline_log_path,
                         event="antiproton_yield",
                         status="ok",
-                        details={"yield_cm3_s": float(y), "ne_cm3": float(self.ne_cm3), "Te_eV": float(self.Te_eV)},
+                        details={
+                            "yield_cm3_s": float(y),
+                            "ne_cm3": float(self.ne_cm3),
+                            "Te_eV": float(self.Te_eV),
+                        },
                     )
                     self._yield_logged = True
             # Optional B-field validation if series provided
-            if self.B_series is not None and self._within_budget():
-                B_mean = float(np.mean(self.B_series)) if self.B_series.size else 0.0
-                ripple = b_field_rms_fluctuation(self.B_series) if self.B_series.size else 0.0
-                if ripple > 1e-4 or B_mean < 5.0:
+            if (self.B_series is not None) and self._within_budget():
+                B_mean = float(np.mean(self.B_series)) if getattr(self.B_series, "size", 0) else 0.0
+                ripple = (
+                    b_field_rms_fluctuation(self.B_series)
+                    if getattr(self.B_series, "size", 0)
+                    else 0.0
+                )
+                if (ripple > 1e-4) or (B_mean < 5.0):
                     # Log a fail event but do not raise hard to avoid breaking demos/tests
                     try:
                         append_event(
@@ -133,12 +139,21 @@ class Reactor:
                         details={"B_mean_T": B_mean, "ripple": ripple},
                     )
             # Log stability (Γ proxy) from wmax as a simple indicator (once per step)
-            if (self._timeline_budget is not None) and self._within_budget() and (not getattr(self, "_stability_logged", False)):
+            if (
+                self._timeline_budget is not None
+                and self._within_budget()
+                and (not getattr(self, "_stability_logged", False))
+            ):
                 gamma_proxy = 150.0 if wmax >= 0.5 else 100.0
                 try:
                     log_stability(gamma_proxy, self.timeline_log_path)
                 except Exception:
-                    append_event(self.timeline_log_path, event="stability_check", status=("ok" if gamma_proxy >= 140.0 else "fail"), details={"gamma": float(gamma_proxy)})
+                    append_event(
+                        self.timeline_log_path,
+                        event="stability_check",
+                        status=("ok" if gamma_proxy >= 140.0 else "fail"),
+                        details={"gamma": float(gamma_proxy)},
+                    )
                 self._stability_logged = True
         return self.state
 
@@ -153,7 +168,6 @@ class Reactor:
         B_mean = float(np.mean(self.B_series))
         if B_mean <= 0:
             return 0.0
-        ripple = b_field_rms_fluctuation(self.B_series)
         scale = float(max(0.0, 1.0 - float(alpha) * self._time_s))
         arr = np.asarray(self.B_series, dtype=float)
         self.B_series = B_mean + (arr - B_mean) * scale
@@ -180,7 +194,12 @@ class Reactor:
             # Approximate energy from steps as proxy (not a full ledger here)
             E_total = max(1e-9, self._time_s) * 1e6
             f = total_fom(y, E_total)
-            append_event(path, event="production_metrics", status="ok", details={"yield": float(y), "fom": float(f)})
+            append_event(
+                path,
+                event="production_metrics",
+                status="ok",
+                details={"yield": float(y), "fom": float(f)},
+            )
         except Exception:
             pass
 
@@ -192,7 +211,12 @@ class Reactor:
             E_total = max(1e-9, self._time_s) * 1e6
             f = total_fom(y, E_total)
             if (f < 0.1) or (y < 1e12):
-                append_event(path, event="production_failure", status="fail", details={"fom": float(f), "yield": float(y)})
+                append_event(
+                    path,
+                    event="production_failure",
+                    status="fail",
+                    details={"fom": float(f), "yield": float(y)},
+                )
         except Exception:
             pass
 
@@ -208,13 +232,23 @@ class Reactor:
             E_total = max(1e-9, self._time_s) * 1e6
             f = total_fom(y, E_total)
             if (f < 0.1) or (y < 1e12):
-                append_event(path, event="edge_production_failure", status="fail", details={"fom": float(f), "yield": float(y)})
+                append_event(
+                    path,
+                    event="edge_production_failure",
+                    status="fail",
+                    details={"fom": float(f), "yield": float(y)},
+                )
         except Exception:
             pass
 
     def log_high_load_hardware_error(self, error: Exception, path: str = "progress.ndjson") -> None:
         try:
-            append_event(path, event="high_load_hardware_error", status="fail", details={"error": str(error)})
+            append_event(
+                path,
+                event="high_load_hardware_error",
+                status="fail",
+                details={"error": str(error)},
+            )
         except Exception:
             pass
 
@@ -245,7 +279,12 @@ class Reactor:
         except Exception as e:
             # Log error if hardware module unavailable
             try:
-                append_event(self.timeline_log_path or "progress.ndjson", event="hardware_error", status="fail", details={"error": str(e)})
+                append_event(
+                    self.timeline_log_path or "progress.ndjson",
+                    event="hardware_error",
+                    status="fail",
+                    details={"error": str(e)},
+                )
             except Exception:
                 pass
             return

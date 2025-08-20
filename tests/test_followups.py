@@ -1,5 +1,6 @@
-import numpy as np
 import sys
+
+import numpy as np
 import pytest
 
 from reactor.analysis import (
@@ -187,7 +188,6 @@ def test_hardware_simulation_logging(tmp_path, monkeypatch):
     def _fake_simulate(state):
         return {"hw": True, "i": state.get("i", 0)}
 
-    import builtins
     import types
     fake_mod = types.SimpleNamespace(simulate_hardware=_fake_simulate)
     modules = {}
@@ -265,7 +265,8 @@ def test_production_timeout(monkeypatch):
     def _slow_sim(state):
         _time.sleep(0.02)
         return state
-    import types, sys as _sys
+    import sys as _sys
+    import types
     fake_mod = types.SimpleNamespace(simulate_hardware=_slow_sim)
     monkeypatch.setitem(_sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
     R = Reactor(grid=(16, 16), nu=1e-3)
@@ -290,7 +291,8 @@ def test_high_load_hardware(monkeypatch):
         d = dict(state)
         d["hw"] = True
         return d
-    import types, sys as _sys
+    import sys as _sys
+    import types
     fake_mod = types.SimpleNamespace(simulate_hardware=_fake_sim)
     monkeypatch.setitem(_sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
     R = Reactor(grid=(16, 16), nu=1e-3)
@@ -317,7 +319,8 @@ def test_high_load_timeout(monkeypatch):
     def _slow_sim(state):
         _time.sleep(0.02)
         return state
-    import types, sys as _sys
+    import sys as _sys
+    import types
     fake_mod = types.SimpleNamespace(simulate_hardware=_slow_sim)
     monkeypatch.setitem(_sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
     R = Reactor(grid=(16, 16), nu=1e-3)
@@ -336,7 +339,8 @@ def test_real_hardware_integration(monkeypatch):
         d["hw"] = True
         d["i"] = d.get("i", 0)
         return d
-    import types, sys as _sys
+    import sys as _sys
+    import types
     fake_mod = types.SimpleNamespace(simulate_hardware=_fake_sim)
     monkeypatch.setitem(_sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
     R = Reactor(grid=(16, 16), nu=1e-3)
@@ -351,7 +355,8 @@ def test_hardware_timeout(monkeypatch):
     def _slow_sim(state):
         _time.sleep(0.02)
         return state
-    import types, sys as _sys
+    import sys as _sys
+    import types
     fake_mod = types.SimpleNamespace(simulate_hardware=_slow_sim)
     monkeypatch.setitem(_sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
     R = Reactor(grid=(16, 16), nu=1e-3)
@@ -366,7 +371,9 @@ def test_hardware_timeout(monkeypatch):
 
 @pytest.mark.slow
 def test_time_sweep(tmp_path, monkeypatch):
-    import subprocess, sys as _sys, os as _os
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -387,7 +394,10 @@ def test_time_sweep(tmp_path, monkeypatch):
 
 @pytest.mark.production
 def test_uq_optimize_production(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -404,7 +414,10 @@ def test_uq_optimize_production(tmp_path):
 
 
 def test_schema_validation_for_integrated_and_kpi(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     jsonschema = pytest.importorskip("jsonschema")
     validate = jsonschema.validate
     cwd = _os.getcwd()
@@ -448,7 +461,9 @@ def test_schema_validation_for_integrated_and_kpi(tmp_path):
 
 @pytest.mark.slow
 def test_dynamic_ripple_time(tmp_path):
-    import subprocess, sys as _sys, os as _os
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -468,14 +483,17 @@ def test_dynamic_ripple_time(tmp_path):
 @pytest.mark.slow
 def test_dynamic_stability_plot(tmp_path):
     # Use built-in plotting function to generate a dynamic stability vs ripple plot
+
     from reactor.analysis_stat import plot_stability_ripple
-    import os as _os
     out = tmp_path / "dynamic_stability_ripple.png"
     plot_stability_ripple([5e-5, 1e-4, 2e-4], [0.999, 0.998, 0.995], str(out))
     assert out.exists() and out.stat().st_size > 0
 
 def test_kpi_cli_outputs(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -491,7 +509,10 @@ def test_kpi_cli_outputs(tmp_path):
         _os.chdir(cwd)
 
 def test_kpi_anomaly_severity_impact(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -519,7 +540,9 @@ def test_kpi_anomaly_severity_impact(tmp_path):
         _os.chdir(cwd)
 
 def test_calibration_cli(tmp_path):
-    import subprocess, sys as _sys, os as _os
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -534,7 +557,10 @@ def test_calibration_cli(tmp_path):
         _os.chdir(cwd)
 
 def test_timeline_analysis_stats(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -558,7 +584,9 @@ def test_timeline_analysis_stats(tmp_path):
         _os.chdir(cwd)
 
 def test_time_to_metrics_cli(tmp_path):
-    import subprocess, sys as _sys, os as _os
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -575,7 +603,10 @@ def test_time_to_metrics_cli(tmp_path):
 
 
 def test_cost_sweep_seed_determinism(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -598,7 +629,8 @@ def test_hardware_timeout_60s_marker(tmp_path, monkeypatch):
     def _slow(state):
         _time.sleep(0.01)
         return state
-    import types, sys as _sys
+    import sys as _sys
+    import types
     fake_mod = types.SimpleNamespace(simulate_hardware=_slow)
     monkeypatch.setitem(_sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
     from reactor.core import Reactor
@@ -615,11 +647,14 @@ def test_hardware_timeout_60s_marker(tmp_path, monkeypatch):
 
 def test_edge_case_scenario_stability(tmp_path):
     # Run the demo with the edge-case scenario and ensure the pipeline completes without crash
-    import subprocess, sys as _sys, os as _os
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
-        import pathlib as _pl, shutil as _sh
+        import pathlib as _pl
+        import shutil as _sh
         # Copy scenario file into CWD
         scenario_src = _pl.Path(cwd) / "examples" / "scenario_edge_case.json"
         _sh.copyfile(scenario_src, "scenario_edge_case.json")
@@ -631,7 +666,9 @@ def test_edge_case_scenario_stability(tmp_path):
 
 
 def test_cost_sweep_and_snr_propagation(tmp_path):
-    import subprocess, sys as _sys, os as _os
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -650,7 +687,10 @@ def test_cost_sweep_and_snr_propagation(tmp_path):
         _os.chdir(cwd)
 
 def test_cost_sweep_sensitivity_monotonicity(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -675,7 +715,10 @@ def test_cost_sweep_sensitivity_monotonicity(tmp_path):
 
 
 def test_hardware_runner_dry_run(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -690,7 +733,9 @@ def test_hardware_runner_dry_run(tmp_path):
 
 
 def test_envelope_and_ablation(tmp_path):
-    import subprocess, sys as _sys, os as _os
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))
@@ -711,7 +756,10 @@ def test_envelope_and_ablation(tmp_path):
 
 @pytest.mark.hardware
 def test_hardware_runner_simulated(tmp_path):
-    import subprocess, sys as _sys, os as _os, json as _json
+    import json as _json
+    import os as _os
+    import subprocess
+    import sys as _sys
     cwd = _os.getcwd()
     try:
         _os.chdir(str(tmp_path))

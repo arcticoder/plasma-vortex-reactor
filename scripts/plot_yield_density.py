@@ -2,9 +2,11 @@
 from __future__ import annotations
 
 import argparse
+import os
+import sys
+
 import numpy as np
 
-import os, sys
 _here = os.path.dirname(os.path.abspath(__file__))
 _root = os.path.dirname(_here)
 _src = os.path.join(_root, "src")
@@ -35,7 +37,7 @@ def main():
     # overlay threshold(s)
     if args.overlay_thresholds:
         try:
-            thr = thresholds_from_json(args.metrics)
+            thresholds_from_json(args.metrics)
             ax.axhline(1e8, color="gray", linestyle=":", linewidth=1, label="Yield min (proxy)")
         except Exception:
             pass

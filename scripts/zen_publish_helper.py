@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-import os, sys, json
-from urllib.request import Request, urlopen
+import json
+import os
+import sys
 from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
+
 
 def eprint(*a, **k):
     print(*a, **k, file=sys.stderr)

@@ -24,7 +24,7 @@ def main():
     args = ap.parse_args()
     if args.series:
         gam = json.loads(args.series)
-        t_ms = [i for i in range(len(gam))]
+        t_ms = list(range(len(gam)))
     else:
         t_ms = [0, 2, 4, 6, 8, 10]
         gam = [150, 149.8, 150.2, 150.1, 149.9, 150.0]
@@ -35,7 +35,7 @@ def main():
         try:
             thr = json.loads(open("metrics.json").read())
             gmin = float(thr.get("gamma_min", 140.0))
-            plt = _mpl()
+            _mpl()
             import matplotlib.pyplot as _plt  # type: ignore
             _plt.axhline(gmin, color="red", linestyle="--", label=f"Γ ≥ {gmin}")
             _plt.legend()

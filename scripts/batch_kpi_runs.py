@@ -8,14 +8,14 @@ from __future__ import annotations
 
 import json
 import subprocess
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PY = str(ROOT / "src")
 
 def run(cmd, env=None, check=True):
-    ev = dict()
+    ev = {}
     if env:
         ev.update(env)
     try:

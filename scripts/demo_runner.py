@@ -3,10 +3,10 @@ from __future__ import annotations
 
 import argparse
 import json
-import random
-import time
 import os
+import random
 import sys
+import time
 
 _here = os.path.dirname(os.path.abspath(__file__))
 _root = os.path.dirname(_here)
@@ -16,8 +16,8 @@ if _src not in sys.path:
 
 from reactor.config import load_json
 from reactor.core import Reactor
-from reactor.metrics import antiproton_yield_estimator, log_fom, log_fom_edge
 from reactor.energy import EnergyLedger, lg_mode_enhancement, plot_energy_reduction
+from reactor.metrics import antiproton_yield_estimator, log_fom, log_fom_edge
 
 
 def main():

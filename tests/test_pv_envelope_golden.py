@@ -39,5 +39,5 @@ def test_pv_envelope_monotonicity(tmp_path: Path) -> None:
     # Extract FOM sequence ordered by T
     rows = sorted(grid, key=lambda r: float(r["Te_eV"]))
     foms = [float(r["fom"]) for r in rows]
-    for a, b in zip(foms, foms[1:]):
+    for a, b in zip(foms, foms[1:], strict=False):
         assert b >= a - 1e-12

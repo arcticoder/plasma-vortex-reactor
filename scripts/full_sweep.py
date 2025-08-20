@@ -11,7 +11,7 @@ _src = os.path.join(_root, "src")
 if _src not in sys.path:
     sys.path.insert(0, _src)
 
-from param_sweep_confinement import full_sweep  # type: ignore
+from param_sweep_confinement import full_sweep
 
 
 def main():

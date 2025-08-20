@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
+import sys
 from pathlib import Path
+
 import numpy as np
-import os, sys
 
 _here = os.path.dirname(os.path.abspath(__file__))
 _root = os.path.dirname(_here)

@@ -58,9 +58,9 @@ def main() -> None:
             # Attempt: run production_kpi.py quickly if present inputs exist
             pk = Path("production_kpi.json")
             if not pk.exists():
-                from shutil import which as _which
                 if Path("scripts/production_kpi.py").exists():
-                    import subprocess as _sp, sys as _sys
+                    import subprocess as _sp
+                    import sys as _sys
                     _sp.run([_sys.executable, "scripts/production_kpi.py", "--out", str(pk)], check=False)
             if pk.exists():
                 data = json.loads(pk.read_text())
@@ -110,7 +110,6 @@ def main() -> None:
             if ys and (max(abs(y) for y in ys) / max(1e-30, min(abs(y) for y in ys))) >= 1e3:
                 ax.set_yscale('log')
                 ax.set_ylabel('abs(FOM) (log)')
-                ys_abs = [abs(y) for y in ys]
         except Exception:
             pass
         if labels and len(labels) == len(xs):

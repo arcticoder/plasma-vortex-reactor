@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
+import sys
 import time
 from pathlib import Path
-import os, sys
 
 _here = os.path.dirname(os.path.abspath(__file__))
 _root = os.path.dirname(_here)
@@ -32,7 +33,8 @@ def main():
         return
 
     if args.simulate:
-        import types, sys as _sys
+        import sys as _sys
+        import types
         def _fake_sim(state):
             state = dict(state)
             state["hw"] = True
@@ -40,7 +42,7 @@ def main():
             return state
         # Create a proper module object for sys.modules
         mod = types.ModuleType('enhanced_simulation_hardware_abstraction_framework')
-        setattr(mod, 'simulate_hardware', _fake_sim)
+        mod.simulate_hardware = _fake_sim
         _sys.modules['enhanced_simulation_hardware_abstraction_framework'] = mod
 
     R = Reactor(grid=(16, 16), nu=1e-3)

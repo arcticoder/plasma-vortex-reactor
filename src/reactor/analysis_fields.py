@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, Sequence
 
 import numpy as np
+
 from .plotting import _mpl  # lazy-import helper for matplotlib
-from typing import Sequence
 
 
 def simulate_b_field_ripple(

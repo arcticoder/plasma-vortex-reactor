@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 from pathlib import Path
-import os, sys
 
 _here = os.path.dirname(os.path.abspath(__file__))
 _root = os.path.dirname(_here)
@@ -14,7 +15,6 @@ if _src not in sys.path:
 
 from reactor.analysis_fields import simulate_b_field_ripple
 from reactor.analysis_stat import stability_probability
-
 
 essential = {
     "desc": "Ablation: Compare stability with ripple control ON vs OFF",

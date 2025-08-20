@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Sequence
+
 
 class EnergyLedger:
     """Accumulate energy input and compute energy per antiproton."""
@@ -129,9 +131,6 @@ def optimize_lg_enhancement(E_base: float, gamma: float = 150.0, l_index: int = 
     """Toy optimization target: E_reduced = E_base / (1 + gamma^2 * l_index)."""
     factor = 1.0 + (float(gamma) ** 2) * float(l_index)
     return float(E_base) / float(factor)
-
-
-from typing import Sequence
 
 
 def plot_energy_reduction(time_ms: Sequence[float], energies_J: Sequence[float], out_png: str) -> None:

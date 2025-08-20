@@ -2,9 +2,9 @@
 from __future__ import annotations
 
 import argparse
+import datetime as _dt
 import json
 from pathlib import Path
-import datetime as _dt
 from typing import Any, Dict
 
 

@@ -14,9 +14,9 @@ from .logging_utils import append_event
 from .metrics import confinement_efficiency_estimator
 
 try:
-    from . import plotting as plotting_helpers  # type: ignore
+    from . import plotting as plotting_helpers  # noqa: F401
 except Exception:  # pragma: no cover
-    plotting_helpers = None  # type: ignore
+    plotting_helpers = None  # type: ignore[assignment]
 
 
 def cmd_demo(args: argparse.Namespace) -> None:
@@ -62,8 +62,8 @@ def cmd_param_sweep(args: argparse.Namespace) -> None:
     def _progress_iter(x):
         return x
     try:
-        from tqdm import tqdm  # type: ignore
-        def _progress_iter_tqdm(x):  # type: ignore
+        from tqdm import tqdm
+        def _progress_iter_tqdm(x):
             return tqdm(x)
     except Exception:  # pragma: no cover
         # keep default

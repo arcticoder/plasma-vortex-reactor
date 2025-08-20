@@ -13,13 +13,20 @@ _src = os.path.join(_root, "src")
 if _src not in sys.path:
     sys.path.insert(0, _src)
 
-from reactor.metrics import confinement_efficiency_estimator, antiproton_yield_estimator
-from reactor.analysis import bennett_confinement_check
+from typing import Any, Callable, Dict, Iterable, List, Optional
 
+from reactor.analysis import bennett_confinement_check
+from reactor.metrics import (
+    antiproton_yield_estimator,
+    confinement_efficiency_estimator,
+)
+
+quick_scatter: Optional[Callable[..., Any]]
 try:
-    from reactor.plotting import quick_scatter  # type: ignore
+    from reactor.plotting import quick_scatter as _quick_scatter
+    quick_scatter = _quick_scatter
 except Exception:
-    quick_scatter = None  # type: ignore
+    quick_scatter = None
 
 
 def main():
@@ -36,17 +43,40 @@ def main():
     ap.add_argument("--ripple-steps", type=int, default=10)
     ap.add_argument("--out", default="confinement_sweep.csv")
     ap.add_argument("--plot", default=None, help="Optional PNG output; requires matplotlib")
-    ap.add_argument("--plot-confinement-energy", default=None, help="Optional PNG plotting confinement vs synthetic energy reduction factor")
-    ap.add_argument("--full-sweep-with-ripple", action="store_true", help="Write full_sweep_with_ripple.csv for small demo ranges")
-    ap.add_argument("--full-sweep-with-time", action="store_true", help="Write full_sweep_with_time.csv including time and FOM columns")
-    ap.add_argument("--full-sweep-with-dynamic-ripple", action="store_true", help="Write full_sweep_with_dynamic_ripple.csv including time-varying ripple via Reactor.adjust_ripple")
+    ap.add_argument(
+        "--plot-confinement-energy",
+        default=None,
+        help="Optional PNG plotting confinement vs synthetic energy reduction factor",
+    )
+    ap.add_argument(
+        "--full-sweep-with-ripple",
+        action="store_true",
+        help="Write full_sweep_with_ripple.csv for small demo ranges",
+    )
+    ap.add_argument(
+        "--full-sweep-with-time",
+        action="store_true",
+        help="Write full_sweep_with_time.csv including time and FOM columns",
+    )
+    ap.add_argument(
+        "--full-sweep-with-dynamic-ripple",
+        action="store_true",
+        help=(
+            "Write full_sweep_with_dynamic_ripple.csv including time-varying ripple "
+            "via Reactor.adjust_ripple"
+        ),
+    )
     ap.add_argument(
         "--heatmap",
         default=None,
         help="Optional PNG heatmap path; requires matplotlib",
     )
     ap.add_argument("--json-out", default=None, help="Optional JSON output path for rows")
-    ap.add_argument("--jsonl-out", default=None, help="Optional JSONL (NDJSON) output path; one row per line")
+    ap.add_argument(
+        "--jsonl-out",
+        default=None,
+        help="Optional JSONL (NDJSON) output path; one row per line",
+    )
     ap.add_argument("--seed", type=int, default=None, help="Optional seed for deterministic behavior")
     args = ap.parse_args()
 
@@ -63,20 +93,22 @@ def main():
     ]
 
     # optional progress bar
-    def prog_iter_default(x):
+    def prog_iter_default(x: Iterable[float]) -> Iterable[float]:
         return x
     try:
-        from tqdm import tqdm  # type: ignore
-        def prog_iter_tqdm(x):  # type: ignore
+        from tqdm import tqdm
+
+        def prog_iter_tqdm(x: Iterable[float]) -> Iterable[float]:
             return tqdm(x)
+
+        prog_iter: Callable[[Iterable[float]], Iterable[float]] = prog_iter_tqdm
     except Exception:
-        prog_iter_tqdm = None  # type: ignore
-    prog_iter = prog_iter_tqdm or prog_iter_default
+        prog_iter = prog_iter_default
 
     with open(args.out, 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(["xi", "b_field_ripple_pct", "efficiency"])
-        rows = []
+        rows: List[Dict[str, Any]] = []
         for xi in prog_iter(xi_vals):
             for rp in ripple_vals:
                 eff = confinement_efficiency_estimator(xi, rp)
@@ -144,7 +176,8 @@ def main():
     if args.plot_confinement_energy:
         try:
             import numpy as np
-            from reactor.plotting import _mpl  # type: ignore
+
+            from reactor.plotting import _mpl
 
             plt = _mpl()
             # Build synthetic dataset: map efficiency in [0,1] to reduction factor ~ [100, 300]
@@ -165,8 +198,8 @@ def main():
 
     if args.full_sweep_with_ripple:
         # Small demo ranges to keep CI fast
-        from itertools import product
         import os as _os
+        from itertools import product
         n_e_range = [1e19, 1e20, 1e21]
         T_e_range = [5.0, 10.0, 20.0]
         B_range = [4.5, 5.0, 5.5]
@@ -187,10 +220,9 @@ def main():
 
     if args.full_sweep_with_time:
         # Include time dimension and compute FOM using a simple energy proxy E_total = t * 1e6
-        from itertools import product
         import csv as _csv
-        import math as _math
         import os as _os
+        from itertools import product
 
         n_e_range = [1e19, 1e20, 1e21]
         T_e_range = [5.0, 10.0, 20.0]
@@ -207,7 +239,19 @@ def main():
             from reactor.metrics import total_fom as _fom
             f = _fom(y, E_total)
             eta_ok = bennett_confinement_check(n_e, xi, B, ripple)
-            rows.append({"n_e": n_e, "T_e": T_e, "B": B, "xi": xi, "alpha": alpha, "t": t, "ripple": ripple, "yield": y, "E_total": E_total, "fom": f, "eta": bool(eta_ok)})
+            rows.append({
+                "n_e": n_e,
+                "T_e": T_e,
+                "B": B,
+                "xi": xi,
+                "alpha": alpha,
+                "t": t,
+                "ripple": ripple,
+                "yield": y,
+                "E_total": E_total,
+                "fom": f,
+                "eta": bool(eta_ok),
+            })
         _os.makedirs("data", exist_ok=True)
         with open("data/full_sweep_with_time.csv", "w", newline="", encoding="utf-8") as f:
             w = _csv.DictWriter(f, fieldnames=list(rows[0].keys()))
@@ -218,9 +262,11 @@ def main():
     if args.full_sweep_with_dynamic_ripple:
         # Use Reactor.adjust_ripple to evolve ripple vs time given a synthetic B_series around mean B
         from itertools import product
+
         import numpy as _np
-        from reactor.core import Reactor as _Reactor
+
         from reactor.analysis_fields import b_field_rms_fluctuation as _ripple
+        from reactor.core import Reactor as _Reactor
 
         n_e_range = [1e19, 1e20, 1e21]
         T_e_range = [5.0, 10.0, 20.0]
@@ -259,8 +305,8 @@ def main():
 
 
 def full_sweep(n_e_range, T_e_range, B_range, xi_range, out_csv: str = "full_sweep.csv") -> None:
-    from itertools import product
     import csv as _csv
+    from itertools import product
     rows = []
     for n_e, T_e, B, xi in product(n_e_range, T_e_range, B_range, xi_range):
         y = antiproton_yield_estimator(n_e, T_e, {"model": "physics"})
@@ -279,9 +325,9 @@ def optimize_confinement(I_p_range, r_p_range, B_range, out_csv: str = "optimize
     xi = I_p / (5π r_p B). Use ripple=5e-4 and n0=1e20 cm^-3 as defaults for Bennett check.
     Writes rows meeting eta>=0.94.
     """
-    from itertools import product
-    import math as _math
     import csv as _csv
+    import math as _math
+    from itertools import product
 
     rows = []
     for I_p, r_p, B in product(I_p_range, r_p_range, B_range):

@@ -4,8 +4,9 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
+import sys
 from pathlib import Path
-import os, sys
 
 _here = os.path.dirname(os.path.abspath(__file__))
 _root = os.path.dirname(_here)
@@ -13,7 +14,7 @@ _src = os.path.join(_root, "src")
 if _src not in sys.path:
     sys.path.insert(0, _src)
 
-from reactor.metrics import total_fom, antiproton_yield_estimator
+from reactor.metrics import antiproton_yield_estimator, total_fom
 
 
 def compute_fom(n_cm3: float, Te_eV: float) -> float:
@@ -23,7 +24,7 @@ def compute_fom(n_cm3: float, Te_eV: float) -> float:
     return float(total_fom(y, E_total))
 
 
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
 
 def _frontier_topk(grid: List[Dict[str, Any]], k: int) -> List[Dict[str, Any]]:
@@ -73,8 +74,9 @@ def main() -> None:
 
     # Plot
     try:
-        from reactor.plotting import _mpl
         import numpy as np
+
+        from reactor.plotting import _mpl
         plt = _mpl()
         fig, ax = plt.subplots(figsize=(6,4))
         # contour plot of FOM over n, T

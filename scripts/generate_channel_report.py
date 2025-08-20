@@ -13,7 +13,6 @@ if _src not in sys.path:
     sys.path.insert(0, _src)
 
 from reactor.energy import EnergyLedger
-from reactor.energy import fom as _fom
 
 
 def main():

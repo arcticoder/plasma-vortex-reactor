@@ -5,7 +5,6 @@ import argparse
 import json
 import struct
 
-
 MAGIC = b"TLNB"  # Timeline Binary magic
 VERSION = 1
 

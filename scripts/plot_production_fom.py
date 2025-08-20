@@ -12,7 +12,8 @@ if _src not in sys.path:
     sys.path.insert(0, _src)
 
 import numpy as np
-from reactor.metrics import antiproton_yield_estimator, total_fom, plot_fom_vs_yield
+
+from reactor.metrics import antiproton_yield_estimator, plot_fom_vs_yield, total_fom
 
 
 def main():
@@ -33,7 +34,7 @@ def main():
         E_vals = np.array([1e8, 1e9, 1e10], dtype=float)
         yields = []
         foms = []
-        for n, E in zip(n_vals, E_vals):
+        for n, E in zip(n_vals, E_vals, strict=False):
             y = antiproton_yield_estimator(n, args.Te_eV, {"model": "physics"})
             f = total_fom(y, E)
             yields.append(y)
@@ -43,8 +44,7 @@ def main():
     if args.overlay_thresholds:
         try:
             import json as _json
-            from reactor.plotting import _mpl
-            plt = _mpl()
+
             m = _json.loads(open(os.path.join(_root, "metrics.json")).read())
             thr = float(m.get("fom_min", 0.1))
             import matplotlib.pyplot as _plt  # type: ignore

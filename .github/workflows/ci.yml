@@ -7,6 +7,8 @@ on:
 jobs:
   test-and-artifacts:
     runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -19,7 +21,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install pytest ruff jsonschema
-          pip install -e .
+          # Install package with plotting extras to ensure matplotlib is available
+          pip install -e .[plot]
       - name: Run tests (fast)
         run: |
           . .venv/bin/activate
@@ -206,11 +209,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Set env
+        run: echo "PYTHONPATH=src" >> $GITHUB_ENV
       - name: Install
         run: |
           python -m venv .venv
           . .venv/bin/activate
           pip install -r requirements.txt
+          pip install -e .[plot]
       - name: Run demo and feasibility with gate
         run: |
           . .venv/bin/activate
@@ -231,6 +237,8 @@ jobs:
           python-version: '3.12'
       - name: Install ruff
         run: pip install ruff
+      - name: Ruff auto-fix
+        run: ruff check . --fix
       - name: Ruff check
         run: ruff check .
 
@@ -244,6 +252,8 @@ jobs:
       - name: Install mypy and deps
         run: |
           pip install mypy types-requests
+      - name: Set env
+        run: echo "PYTHONPATH=src" >> $GITHUB_ENV
       - name: Run mypy (strict)
         run: mypy --config-file pyproject.toml src/reactor scripts tests
 
@@ -257,6 +267,8 @@ jobs:
       - name: Install nox and mypy
         run: |
           pip install nox mypy
+      - name: Set env
+        run: echo "PYTHONPATH=src" >> $GITHUB_ENV
       - name: Run types (strict)
         run: nox -s types
 
@@ -290,6 +302,8 @@ jobs:
           python -m venv .venv
           . .venv/bin/activate
           pip install -r requirements.txt
+      - name: Set env
+        run: echo "PYTHONPATH=src" >> $GITHUB_ENV
       - name: Dry-run hardware CLI
         run: |
           . .venv/bin/activate

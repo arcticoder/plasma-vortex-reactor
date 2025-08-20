@@ -2,7 +2,14 @@ import json
 
 import numpy as np
 
-from reactor.energy import EnergyLedger, apply_lg_enhancement, fom, lg_mode_enhancement, merge_ledgers, optimize_lg_enhancement
+from reactor.energy import (
+    EnergyLedger,
+    apply_lg_enhancement,
+    fom,
+    lg_mode_enhancement,
+    merge_ledgers,
+    optimize_lg_enhancement,
+)
 from reactor.logging_utils import append_event
 from reactor.metrics import (
     antiproton_yield_estimator,

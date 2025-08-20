@@ -12,9 +12,9 @@ _src = os.path.join(_root, "src")
 if _src not in sys.path:
     sys.path.insert(0, _src)
 
+from reactor.analysis_confinement import bennett_confinement_check
 from reactor.metrics import antiproton_yield_estimator, total_fom
 from reactor.uq import run_uq_sampling
-from reactor.analysis_confinement import bennett_confinement_check
 
 
 def main():

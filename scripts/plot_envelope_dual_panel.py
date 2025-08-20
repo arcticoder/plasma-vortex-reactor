@@ -4,7 +4,6 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
-from typing import Dict, Any
 
 
 def main() -> None:
@@ -26,14 +25,16 @@ def main() -> None:
     # Build simple scatter coloring by FOM and overlay lines from time metrics
     try:
         # Ensure local package is importable when running from scripts/
-        import sys, os
+        import os
+        import sys
         _here = os.path.dirname(os.path.abspath(__file__))
         _root = os.path.dirname(_here)
         _src = os.path.join(_root, 'src')
         if _src not in sys.path:
             sys.path.insert(0, _src)
-        from reactor.plotting import _mpl
         import numpy as np
+
+        from reactor.plotting import _mpl
         plt = _mpl()
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 4))
         if grid:

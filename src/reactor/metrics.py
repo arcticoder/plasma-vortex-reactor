@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import Dict, Optional, Tuple, Any
+from typing import Any, Dict, Optional, Tuple
 
 import numpy as np
 
@@ -188,7 +188,16 @@ def log_fom_edge(yield_rate: float, E_total_J: float, path: str = "progress.ndjs
     from .logging_utils import append_event
 
     f = total_fom(yield_rate, E_total_J)
-    append_event(path, event="fom_edge_check", status=("ok" if f >= 0.1 else "fail"), details={"fom": float(f), "yield": float(yield_rate), "E_total": float(E_total_J)})
+    append_event(
+        path,
+        event="fom_edge_check",
+        status=("ok" if f >= 0.1 else "fail"),
+        details={
+            "fom": float(f),
+            "yield": float(yield_rate),
+            "E_total": float(E_total_J),
+        },
+    )
 
 
 def save_feasibility_gates_report(path: str, data: Dict) -> None:

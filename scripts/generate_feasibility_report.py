@@ -10,11 +10,11 @@ import numpy as np
 
 from reactor.analysis import (
     b_field_rms_fluctuation,
+    bennett_confinement_check,
     estimate_density_from_em,
     stability_variance,
 )
 from reactor.metrics import antiproton_yield_estimator, save_feasibility_gates_report, total_fom
-from reactor.analysis import bennett_confinement_check
 from reactor.thresholds import Thresholds
 
 

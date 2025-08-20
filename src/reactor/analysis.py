@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from .analysis_confinement import bennett_confinement_check  # noqa: F401
+
 # Re-export split submodules for backward compatibility
 from .analysis_econ import write_economic_report  # noqa: F401
 from .analysis_fields import (
@@ -8,4 +10,3 @@ from .analysis_fields import (
     simulate_b_field_ripple,  # noqa: F401
 )
 from .analysis_stat import stability_variance, windowed_gamma  # noqa: F401
-from .analysis_confinement import bennett_confinement_check  # noqa: F401

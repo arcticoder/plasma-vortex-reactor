@@ -20,7 +20,7 @@ def main() -> None:
         print(json.dumps({"valid": True, "json": args.json, "schema": args.schema}))
     except Exception as e:
         print(json.dumps({"valid": False, "error": str(e)}))
-        raise SystemExit(2)
+        raise SystemExit(2) from None
 
 
 if __name__ == "__main__":

@@ -4,8 +4,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-from typing import Any, Dict, List
 from pathlib import Path
+from typing import Any, Dict, List
 
 
 def _read_csv(path: str) -> List[Dict[str, Any]]:
@@ -57,7 +57,6 @@ def main():
     t_fom = _first_time_meeting(rows, "fom", 0.1, lambda v, thr: v >= thr)
 
     out = {"time_to_yield": t_yield, "time_to_fom": t_fom, "source": sweep_path}
-    from pathlib import Path
     import os
     os.makedirs(os.path.dirname(os.path.abspath(args.out_json)) or ".", exist_ok=True)
     with open(args.out_json, "w", encoding="utf-8") as f:
@@ -66,7 +65,8 @@ def main():
     try:
         # Simple bar plot
         # Use project plotting helper
-        import sys, os
+        import os
+        import sys
         _here = os.path.dirname(os.path.abspath(__file__))
         _root = os.path.dirname(_here)
         _src = os.path.join(_root, "src")

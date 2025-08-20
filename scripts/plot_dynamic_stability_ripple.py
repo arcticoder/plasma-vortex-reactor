@@ -49,7 +49,7 @@ def _read_sweep(path: str) -> Tuple[List[float], List[float]]:
     return xs, ys
 
 
-def main():
+def main() -> None:
     ap = argparse.ArgumentParser(description="Plot dynamic stability vs ripple")
     ap.add_argument("--from-sweep", default="data/full_sweep_with_dynamic_ripple.csv", help="Optional CSV produced by time/dynamic ripple sweeps")
     ap.add_argument("--out", default="artifacts/dynamic_stability_ripple.png")

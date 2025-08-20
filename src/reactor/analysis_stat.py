@@ -85,9 +85,9 @@ def plot_stability_ripple(
 
     Optional gate_y draws a horizontal gate line with an annotation.
     """
-    from .plotting import _mpl
-
     import numpy as _np
+
+    from .plotting import _mpl
     r = _np.asarray(list(ripples), dtype=float)
     p = _np.asarray(list(probabilities), dtype=float)
     plt = _mpl()

@@ -4,17 +4,18 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
+import sys
 from pathlib import Path
 from typing import List
 
-import os, sys
 _here = os.path.dirname(os.path.abspath(__file__))
 _root = os.path.dirname(_here)
 _src = os.path.join(_root, "src")
 if _src not in sys.path:
     sys.path.insert(0, _src)
 
-from reactor.metrics import total_fom, antiproton_yield_estimator
+from reactor.metrics import antiproton_yield_estimator, total_fom
 from reactor.plotting import _mpl
 
 

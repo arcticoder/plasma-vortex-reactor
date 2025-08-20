@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 import time
 from pathlib import Path
 
-import os, sys
 _here = os.path.dirname(os.path.abspath(__file__))
 _root = os.path.dirname(_here)
 _src = os.path.join(_root, "src")

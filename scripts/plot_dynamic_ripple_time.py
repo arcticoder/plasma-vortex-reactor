@@ -72,7 +72,7 @@ def main() -> None:
         ax.set_xlabel("t (s)"); ax.set_ylabel("ripple_dynamic")
         ax.set_title("Dynamic Ripple vs Time")
         from os import makedirs
-        from os.path import dirname, abspath
+        from os.path import abspath, dirname
         makedirs(dirname(abspath(args.out)) or ".", exist_ok=True)
         fig.tight_layout(); fig.savefig(args.out, dpi=150); plt.close(fig)
         print(json.dumps({"wrote": args.out}))

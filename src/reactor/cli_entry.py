@@ -45,10 +45,15 @@ def bench_step_loop() -> None:
 
 def build_artifacts() -> None:
     # One-shot builder: demo + report + KPI + key plots
-    import os, sys, json
+    import json
+    import os
+    import sys
     sys.path.insert(0, os.path.join(os.path.dirname(os.path.dirname(__file__)), ".."))
-    from scripts import demo_runner, generate_feasibility_report, run_report as rr, production_kpi as kpi
-    from scripts import plot_production_fom as pf, plot_stability as ps
+    from scripts import demo_runner, generate_feasibility_report
+    from scripts import plot_production_fom as pf
+    from scripts import plot_stability as ps
+    from scripts import production_kpi as kpi
+    from scripts import run_report as rr
 
     # Demo run (minimal)
     demo_runner.main()

@@ -5,12 +5,13 @@ Writes to `artifacts/kpi_trend.png` (overwrites) for quick inspection.
 """
 from __future__ import annotations
 
-import json
 import glob
+import json
 import os
 from pathlib import Path
 
 import matplotlib
+
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
@@ -44,7 +45,7 @@ def make_plot(rows, out_path: str):
 
     fig, ax = plt.subplots(figsize=(10,4))
     ax.plot(xs, ys, '-o', color='tab:blue', linewidth=1.5, markersize=6)
-    for xi, yi, c, lab in zip(xs, ys, colors, labels):
+    for xi, yi, c, lab in zip(xs, ys, colors, labels, strict=False):
         ax.scatter([xi], [yi], color=c, s=120, edgecolor='k', zorder=3)
         ax.text(xi, yi * 1.3, lab, rotation=30, fontsize=7, ha='center', va='bottom')
 

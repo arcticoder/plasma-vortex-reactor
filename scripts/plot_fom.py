@@ -13,7 +13,7 @@ if _src not in sys.path:
     sys.path.insert(0, _src)
 
 import numpy as np
-from reactor.metrics import plot_fom_vs_yield
+
 from reactor.plotting import _mpl
 
 
