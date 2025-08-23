@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from typing import Any, List
 import os
 import sys
 
@@ -22,9 +23,9 @@ def main():
     ap.add_argument("--series", default=None, help="JSON array of ripple fractions; if absent, use demo data")
     args = ap.parse_args()
     if args.series:
-        data = json.loads(args.series)
+        data: List[Any] = json.loads(args.series)
     else:
-        data = [
+        data: List[Any] = [
             {"y": 0.00005, "yMin": 0.00004, "yMax": 0.00006},
             {"y": 0.00007, "yMin": 0.00006, "yMax": 0.00008},
             {"y": 0.00006, "yMin": 0.00005, "yMax": 0.00007},
@@ -65,7 +66,7 @@ def main():
         # Expect a flat list of numbers
         if not (isinstance(data, list) and (not data or not isinstance(data[0], dict))):
             raise SystemExit("Invalid --series format for simple ripple array")
-    arr = [float(x) for x in data]
+        arr = [float(x) for x in data]
         t_ms = list(range(len(arr)))
         try:
             plot_b_field_ripple(t_ms, arr, args.out)

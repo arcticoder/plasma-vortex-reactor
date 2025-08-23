@@ -35,15 +35,17 @@ def main():
     if args.simulate:
         import sys as _sys
         import types
+        from typing import Any, cast
+
         def _fake_sim(state):
             state = dict(state)
             state["hw"] = True
             state["i"] = state.get("i", 0) + 1
             return state
+
         # Create a proper module object for sys.modules
-    from typing import Any, cast
-    mod = types.ModuleType('enhanced_simulation_hardware_abstraction_framework')
-    setattr(mod, 'simulate_hardware', cast(Any, _fake_sim))
+        mod = types.ModuleType('enhanced_simulation_hardware_abstraction_framework')
+        setattr(mod, 'simulate_hardware', cast(Any, _fake_sim))
         _sys.modules['enhanced_simulation_hardware_abstraction_framework'] = mod
 
     R = Reactor(grid=(16, 16), nu=1e-3)
