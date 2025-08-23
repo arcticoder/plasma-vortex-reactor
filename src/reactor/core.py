@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Callable, Optional
+
 import numpy as np
 
 from .analysis_fields import b_field_rms_fluctuation
@@ -333,11 +335,9 @@ class Reactor:
             return
 
 
-from typing import Callable, Optional
-
 # Optional ecosystem integration with unified_gut_polymerization
 try:
-    # pair_production_rate(n_e_cm3, T_e_eV) -> rate [1/(cm^3 s)]
+    # pair_production_rate(n_e_cm3, T_eV) -> rate [1/(cm^3 s)]
     from unified_gut_polymerization import pair_production_rate as _pair_production_rate
 except Exception:  # pragma: no cover - optional dep
     _pair_production_rate = None
