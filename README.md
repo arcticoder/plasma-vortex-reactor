@@ -30,6 +30,14 @@ Open the multi-repo workspace: plasma-vortex-reactor.code-workspace
   ```
   python scripts/param_sweep_confinement.py --out data/confinement_sweep.csv
   ```
+  - Full time sweep (writes `data/full_sweep_with_time.csv` with t, ripple, yield, E_total, fom, eta):
+  ```
+  python scripts/param_sweep_confinement.py --full-sweep-with-time
+  ```
+  - Dynamic ripple sweep (writes `data/full_sweep_with_dynamic_ripple.csv` using `Reactor.adjust_ripple`):
+  ```
+  python scripts/param_sweep_confinement.py --full-sweep-with-dynamic-ripple
+  ```
 - Metrics gate check against metrics.json:
   ```
   python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
@@ -115,6 +123,8 @@ Order of operations (to produce artifacts/integrated_report.json):
 - Generate `feasibility_gates_report.json` (e.g., with datasets or scenario outputs).
 - Optionally run `uq_optimize.py` (writes `uq_optimized.json`) and `param_sweep_confinement.py --full-sweep-with-time/--full-sweep-with-dynamic-ripple` (writes `data/full_sweep_with_*.csv`).
 - Run `run_report.py --integrated-out artifacts/integrated_report.json` (defaults will look in `data/` for sweeps).
+  - If `data/full_sweep_with_time.csv` is missing, run:
+    `python scripts/param_sweep_confinement.py --full-sweep-with-time`
 
 ### Additional CLI entry points
 

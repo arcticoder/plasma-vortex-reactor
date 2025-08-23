@@ -21,8 +21,10 @@ def main():
     )
     ap.add_argument(
         "--scenario",
+        nargs="?",
+        const=None,
         default=None,
-        help="Optional scenario path or name to enable scenario-specific gates (e.g., high-load)",
+        help="Optional scenario path or name to enable scenario-specific gates (e.g., high-load). If provided without a value, ignored.",
     )
     args = ap.parse_args()
     try:

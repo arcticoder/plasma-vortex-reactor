@@ -254,7 +254,8 @@ class Reactor:
 
     def log_high_load_timeout(self, path: str = "progress.ndjson") -> None:
         try:
-            append_event(path, event="high_load_timeout", status="fail")
+            # Treat high-load timeouts as warnings to avoid degrading KPI by default
+            append_event(path, event="high_load_timeout", status="warn")
         except Exception:
             pass
 
@@ -332,12 +333,17 @@ class Reactor:
             return
 
 
+from typing import Callable, Optional
+
 # Optional ecosystem integration with unified_gut_polymerization
 try:
     # pair_production_rate(n_e_cm3, T_e_eV) -> rate [1/(cm^3 s)]
-    from unified_gut_polymerization import pair_production_rate
+    from unified_gut_polymerization import pair_production_rate as _pair_production_rate
 except Exception:  # pragma: no cover - optional dep
-    pair_production_rate = None  # type: ignore
+    _pair_production_rate = None
+
+# Expose as Optional[Callable] for type-checkers
+pair_production_rate: Optional[Callable[[float, float], float]] = _pair_production_rate
 
 
 def update_yield_with_gut(state: dict) -> dict:

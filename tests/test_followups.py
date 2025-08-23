@@ -177,7 +177,7 @@ def test_b_field_ripple_gate_0_01pct():
 def test_gut_yield_mock(monkeypatch):
     # Patch pair_production_rate to return fixed rate
     import reactor.core as core_mod
-    core_mod.pair_production_rate = lambda n, T: 1e10  # type: ignore[attr-defined]
+    setattr(core_mod, "pair_production_rate", lambda n, T: 1e10)
     state = {"n_e": 1e20, "T_e": 10.0, "dt": 1e-3}
     new = core_mod.update_yield_with_gut(state)
     assert new.get("yield", 0.0) >= 1e7
@@ -191,7 +191,7 @@ def test_hardware_simulation_logging(tmp_path, monkeypatch):
     import types
     fake_mod = types.SimpleNamespace(simulate_hardware=_fake_simulate)
     modules = {}
-    modules['enhanced_simulation_hardware_abstraction_framework'] = fake_mod  # type: ignore[index]
+    modules['enhanced_simulation_hardware_abstraction_framework'] = fake_mod
     monkeypatch.setitem(sys.modules, 'enhanced_simulation_hardware_abstraction_framework', fake_mod)
 
     timeline = tmp_path / "progress.ndjson"
