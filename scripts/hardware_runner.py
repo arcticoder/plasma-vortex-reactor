@@ -45,7 +45,7 @@ def main():
 
         # Create a proper module object for sys.modules
         mod = types.ModuleType('enhanced_simulation_hardware_abstraction_framework')
-        setattr(mod, 'simulate_hardware', cast(Any, _fake_sim))
+        mod.simulate_hardware = cast(Any, _fake_sim)
         _sys.modules['enhanced_simulation_hardware_abstraction_framework'] = mod
 
     R = Reactor(grid=(16, 16), nu=1e-3)

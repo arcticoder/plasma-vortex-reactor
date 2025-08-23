@@ -56,8 +56,8 @@ def main() -> None:
     grid: List[Dict[str, Any]] = []
     for n in ns:
         for T in Ts:
-            f = compute_fom(float(n), float(T))
-            grid.append({"n_cm3": float(n), "Te_eV": float(T), "fom": float(f)})
+            fom_val = compute_fom(float(n), float(T))
+            grid.append({"n_cm3": float(n), "Te_eV": float(T), "fom": float(fom_val)})
 
     # Save JSON and CSV
     Path(Path(args.out_json).parent).mkdir(parents=True, exist_ok=True)
@@ -66,8 +66,8 @@ def main() -> None:
     Path(args.out_json).write_text(json.dumps({"grid": grid, "n_points": int(args.n_points)}))
     frontier = _frontier_topk(grid, int(args.top_k))
     Path(args.frontier_json).write_text(json.dumps({"frontier": frontier, "k": int(args.top_k)}))
-    with open(args.out_csv, "w", newline="", encoding="utf-8") as f:
-        w = csv.writer(f)
+    with open(args.out_csv, "w", newline="", encoding="utf-8") as out_f:
+        w = csv.writer(out_f)
         w.writerow(["n_cm3", "Te_eV", "fom"])
         for row in grid:
             w.writerow([row["n_cm3"], row["Te_eV"], row["fom"]])

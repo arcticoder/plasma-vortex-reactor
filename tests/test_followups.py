@@ -177,7 +177,7 @@ def test_b_field_ripple_gate_0_01pct():
 def test_gut_yield_mock(monkeypatch):
     # Patch pair_production_rate to return fixed rate
     import reactor.core as core_mod
-    setattr(core_mod, "pair_production_rate", lambda n, T: 1e10)
+    core_mod.pair_production_rate = lambda n, T: 10000000000.0
     state = {"n_e": 1e20, "T_e": 10.0, "dt": 1e-3}
     new = core_mod.update_yield_with_gut(state)
     assert new.get("yield", 0.0) >= 1e7
