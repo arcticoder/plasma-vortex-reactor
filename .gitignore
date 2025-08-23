@@ -31,7 +31,6 @@ MANIFEST
 artifacts/
 data/
 production_kpi.json
-integrated_report.json
 operating_envelope.json
 operating_envelope.csv
 operating_envelope.png
