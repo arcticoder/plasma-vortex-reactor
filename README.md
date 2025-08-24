@@ -38,6 +38,11 @@ Open the multi-repo workspace: plasma-vortex-reactor.code-workspace
   ```
   python scripts/param_sweep_confinement.py --full-sweep-with-dynamic-ripple
   ```
+  - Bennett-profile checks (confinement ≥94%, Γ>140 for ≥10 ms):
+  ```
+  python scripts/param_sweep_confinement.py --bennett-check --out artifacts/stability_bennett.json
+  python scripts/plot_stability.py --from-json artifacts/stability_bennett.json --out artifacts/stability.png
+  ```
 - Metrics gate check against metrics.json:
   ```
   python scripts/metrics_gate.py --metrics metrics.json --report feasibility_gates_report.json
@@ -65,8 +70,10 @@ Artifacts produced by this repo:
 - plot_dynamic_stability_ripple.py: Generate dynamic stability vs ripple plot from sweep CSV.
 - run_report.py: Merge feasibility, timeline, UQ, and sweep heads into integrated_report.json.
 - production_kpi.py: Produce production_kpi.json summary; respects optional configs/cost_model.json.
+  - Also summarizes energy-per-antiproton for antiproton program comparisons.
 - calibrate_ripple_alpha.py: Fit decay alpha from dynamic ripple sweep CSV.
 - time_to_stability_yield.py: Compute time to reach yield/FOM thresholds and emit JSON/PNG.
+  - Use to report trap particle-retention (%) and Γ over 10 ms for magnetization/transport-tailored reporting.
 - envelope_sweep.py: Density–Temperature operating envelope with FOM contours.
 - ablation_ripple.py: Ablation of ripple control ON vs OFF.
 - plot_kpi_trend.py: Plot KPI FOM trend across revisions (writes `artifacts/kpi_trend.png`).
