@@ -1,0 +1,10 @@
+{"event": "hardware_timeout", "status": "fail", "ts": "2025-08-25T02:01:01.011549+00:00"}
+{"event": "high_load_timeout", "status": "warn", "ts": "2025-08-25T02:01:01.012616+00:00"}
+{"event": "hardware_timeout", "status": "fail", "ts": "2025-08-25T02:01:01.036122+00:00"}
+{"event": "high_load_timeout", "status": "warn", "ts": "2025-08-25T02:01:01.036381+00:00"}
+{"event": "hardware_timeout", "status": "fail", "ts": "2025-08-25T02:01:01.058673+00:00"}
+{"event": "hardware_timeout", "status": "fail", "ts": "2025-08-25T02:01:44.303189+00:00"}
+{"event": "high_load_timeout", "status": "warn", "ts": "2025-08-25T02:01:44.303441+00:00"}
+{"event": "hardware_timeout", "status": "fail", "ts": "2025-08-25T02:01:44.328054+00:00"}
+{"event": "high_load_timeout", "status": "warn", "ts": "2025-08-25T02:01:44.328288+00:00"}
+{"event": "hardware_timeout", "status": "fail", "ts": "2025-08-25T02:01:44.350446+00:00"}

@@ -33,9 +33,14 @@ def _first_time_meeting(rows: List[Dict[str, Any]], key: str, threshold: float, 
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Compute time-to-stability and time-to-yield from sweep CSVs")
+    ap = argparse.ArgumentParser(description="Compute time-to-metrics from sweeps; optional Gamma duration and trap retention")
     # Prefer local file name; fallback to data/ prefix for CI/dev convenience
     ap.add_argument("--sweep-time", default="full_sweep_with_time.csv")
+    ap.add_argument("--gamma-series", default=None, help="JSON array of Gamma values; enables Gamma duration computation")
+    ap.add_argument("--gamma-dt", type=float, default=1e-3, help="Time step (s) for Gamma series when --gamma-series is used")
+    ap.add_argument("--gamma-threshold", type=float, default=140.0)
+    ap.add_argument("--gamma-min-duration", type=float, default=1e-2, help="Minimum duration (s) to consider Gamma sustained")
+    ap.add_argument("--retention-csv", default=None, help="CSV with a retention or retention_pct column; reports mean")
     # Tests expect outputs in CWD by default
     ap.add_argument("--out-json", default="time_to_metrics.json")
     ap.add_argument("--out-png", default="time_to_metrics.png")
@@ -56,7 +61,53 @@ def main():
     t_yield = _first_time_meeting(rows, "yield", 1e12, lambda v, thr: v >= thr)
     t_fom = _first_time_meeting(rows, "fom", 0.1, lambda v, thr: v >= thr)
 
-    out = {"time_to_yield": t_yield, "time_to_fom": t_fom, "source": sweep_path}
+    out: Dict[str, Any] = {"time_to_yield": t_yield, "time_to_fom": t_fom, "source": sweep_path}
+
+    # Optional Gamma duration computation
+    if ap.parse_args().gamma_series:
+        try:
+            args2 = ap.parse_args()
+            import json as _json
+            series = _json.loads(args2.gamma_series)
+            dt = float(args2.gamma_dt)
+            thr = float(args2.gamma_threshold)
+            min_dur = float(args2.gamma_min_duration)
+            # Compute longest contiguous duration above threshold
+            cur = 0
+            best = 0
+            for g in series:
+                try:
+                    if float(g) >= thr:
+                        cur += dt
+                        if cur > best:
+                            best = cur
+                    else:
+                        cur = 0
+                except Exception:
+                    continue
+            out["gamma_longest_duration_s"] = best
+            out["gamma_sustained_pass"] = best >= min_dur
+        except Exception:
+            pass
+
+    # Optional trap retention (%) aggregation
+    if ap.parse_args().retention_csv:
+        try:
+            args3 = ap.parse_args()
+            rrows = _read_csv(args3.retention_csv)
+            vals = []
+            for r in rrows:
+                for k in ("retention_pct", "retention"):
+                    if k in r and r[k] not in (None, ""):
+                        try:
+                            vals.append(float(r[k]))
+                            break
+                        except Exception:
+                            continue
+            if vals:
+                out["retention_mean_pct"] = sum(vals) / len(vals)
+        except Exception:
+            pass
     import os
     os.makedirs(os.path.dirname(os.path.abspath(args.out_json)) or ".", exist_ok=True)
     with open(args.out_json, "w", encoding="utf-8") as f:
@@ -94,7 +145,7 @@ def main():
         except Exception:
             pass
 
-    print(json.dumps({"wrote": args.out_json, "plot": args.out_png}))
+    print(json.dumps({"wrote": args.out_json, "plot": args.out_png, **({"gamma": out.get("gamma_longest_duration_s")} if out.get("gamma_longest_duration_s") is not None else {})}))
 
 
 if __name__ == "__main__":

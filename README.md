@@ -40,8 +40,11 @@ Open the multi-repo workspace: plasma-vortex-reactor.code-workspace
   ```
   - Bennett-profile checks (confinement ≥94%, Γ>140 for ≥10 ms):
   ```
-  python scripts/param_sweep_confinement.py --bennett-check --out artifacts/stability_bennett.json
-  python scripts/plot_stability.py --from-json artifacts/stability_bennett.json --out artifacts/stability.png
+  # Confinement (η) via Bennett check appears in sweep CSV rows as 'eta' booleans
+  python scripts/param_sweep_confinement.py --full-sweep-with-time
+  
+  # Plot Γ timeline using a provided JSON array series and overlay thresholds
+  python scripts/plot_stability.py --series "[150,150,150,120]" --overlay-thresholds --out artifacts/stability.png
   ```
 - Metrics gate check against metrics.json:
   ```
@@ -73,7 +76,9 @@ Artifacts produced by this repo:
   - Also summarizes energy-per-antiproton for antiproton program comparisons.
 - calibrate_ripple_alpha.py: Fit decay alpha from dynamic ripple sweep CSV.
 - time_to_stability_yield.py: Compute time to reach yield/FOM thresholds and emit JSON/PNG.
-  - Use to report trap particle-retention (%) and Γ over 10 ms for magnetization/transport-tailored reporting.
+  - Also supports reporting Γ duration and trap retention summary:
+    - `--gamma-series '[150,150,...]' --gamma-dt 0.001 --gamma-threshold 140 --gamma-min-duration 0.01`
+    - `--retention-csv data/retention_window.csv` (expects `retention_pct` or `retention` column)
 - envelope_sweep.py: Density–Temperature operating envelope with FOM contours.
 - ablation_ripple.py: Ablation of ripple control ON vs OFF.
 - plot_kpi_trend.py: Plot KPI FOM trend across revisions (writes `artifacts/kpi_trend.png`).
@@ -88,6 +93,12 @@ python scripts/run_report.py --feasibility feasibility_gates_report.json --timel
 python scripts/production_kpi.py --feasibility feasibility_gates_report.json --metrics metrics.json --uq uq_optimized.json --cost-model configs/cost_model.json --out production_kpi.json
 python scripts/calibrate_ripple_alpha.py --from-csv data/full_sweep_with_dynamic_ripple.csv --out calibration.json
 python scripts/time_to_stability_yield.py --sweep-time data/full_sweep_with_time.csv --out-json artifacts/time_to_metrics.json --out-png artifacts/time_to_metrics.png
+# Optional: include Γ duration and retention summary
+python scripts/time_to_stability_yield.py \
+  --sweep-time data/full_sweep_with_time.csv \
+  --gamma-series "[150,150,150,150,120]" --gamma-dt 0.002 --gamma-threshold 140 --gamma-min-duration 0.01 \
+  --retention-csv data/retention_window.csv \
+  --out-json artifacts/time_to_metrics_gamma.json --out-png artifacts/time_to_metrics_gamma.png
 python scripts/plot_kpi_trend.py --out artifacts/kpi_trend.png
 python scripts/timeline_analysis.py --timeline docs/timeline_anomalies.ndjson --out timeline_stats.json
 python scripts/envelope_sweep.py --n-points 12 --out-json artifacts/operating_envelope.json --out-csv data/operating_envelope.csv --out-png artifacts/operating_envelope.png
