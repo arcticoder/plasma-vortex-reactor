@@ -41,7 +41,7 @@ def main():
     ap.add_argument("--ripple-min", type=float, default=0.0)
     ap.add_argument("--ripple-max", type=float, default=0.02)
     ap.add_argument("--ripple-steps", type=int, default=10)
-    ap.add_argument("--out", default="confinement_sweep.csv")
+    ap.add_argument("--out", default="data/confinement_sweep.csv")
     ap.add_argument("--plot", default=None, help="Optional PNG output; requires matplotlib")
     ap.add_argument(
         "--plot-confinement-energy",
@@ -105,6 +105,9 @@ def main():
     except Exception:
         prog_iter = prog_iter_default
 
+    # Ensure directory for --out exists
+    out_dir = os.path.dirname(os.path.abspath(args.out)) or "."
+    os.makedirs(out_dir, exist_ok=True)
     with open(args.out, 'w', newline='') as f:
         w = csv.writer(f)
         w.writerow(["xi", "b_field_ripple_pct", "efficiency"])

@@ -43,8 +43,9 @@ Open the multi-repo workspace: plasma-vortex-reactor.code-workspace
   # Confinement (η) via Bennett check appears in sweep CSV rows as 'eta' booleans
   python scripts/param_sweep_confinement.py --full-sweep-with-time
   
-  # Plot Γ timeline using a provided JSON array series and overlay thresholds
-  python scripts/plot_stability.py --series "[150,150,150,120]" --overlay-thresholds --out artifacts/stability.png
+  # Plot Γ timeline using a provided JSON array series and overlay thresholds; also dump raw data for numeric checks
+  python scripts/plot_stability.py --series "[150,150,150,120]" --overlay-thresholds --out artifacts/stability.png \
+    --out-json artifacts/stability_data.json --out-csv data/stability_data.csv
   ```
 - Metrics gate check against metrics.json:
   ```
